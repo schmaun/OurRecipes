@@ -1,8 +1,6 @@
 package de.schmaun.ourrecipes;
 
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -16,8 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 public class EditRecipeActivity extends AppCompatActivity {
 
@@ -79,37 +75,60 @@ public class EditRecipeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {
+    public static class EditRecipeMainFragment extends Fragment {
+        public EditRecipeMainFragment() {
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
+        public static EditRecipeMainFragment newInstance() {
+            EditRecipeMainFragment fragment = new EditRecipeMainFragment();
+
             return fragment;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_edit_recipe, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            View rootView = inflater.inflate(R.layout.fragment_edit_recipe_main, container, false);
+
+            return rootView;
+        }
+    }
+
+    public static class EditRecipeImagesFragment extends Fragment {
+        public EditRecipeImagesFragment() {
+        }
+
+        public static EditRecipeImagesFragment newInstance() {
+            EditRecipeImagesFragment fragment = new EditRecipeImagesFragment();
+
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_edit_recipe_images, container, false);
+
+            return rootView;
+        }
+    }
+
+    public static class EditRecipeMetaFragment extends Fragment {
+        public EditRecipeMetaFragment() {
+        }
+
+        public static EditRecipeMetaFragment newInstance() {
+            EditRecipeMetaFragment fragment = new EditRecipeMetaFragment();
+
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_edit_recipe_meta, container, false);
+
             return rootView;
         }
     }
@@ -126,14 +145,19 @@ public class EditRecipeActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            switch (position) {
+                case 1:
+                    return EditRecipeImagesFragment.newInstance();
+                case 2:
+                    return EditRecipeMetaFragment.newInstance();
+                default:
+                case 0:
+                    return EditRecipeMainFragment.newInstance();
+            }
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 3;
         }
 
@@ -141,11 +165,11 @@ public class EditRecipeActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return getString(R.string.edit_recipe_page_title_main);
                 case 1:
-                    return "SECTION 2";
+                    return getString(R.string.edit_recipe_page_title_images);
                 case 2:
-                    return "SECTION 3";
+                    return getString(R.string.edit_recipe_page_title_meta);
             }
             return null;
         }
