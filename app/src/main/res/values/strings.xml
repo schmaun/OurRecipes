@@ -15,5 +15,11 @@
     <string name="edit_recipe_delete">Delete</string>
 
     <string name="recipe_saved">Recipe saved</string>
+    <string name="edit_recipe_name">Name</string>
+    <string name="edit_recipe_ingredients">Ingredients</string>
+    <string name="edit_recipe_preparation_steps">Preparation Steps</string>
+    <string name="edit_recipe_name_helper_text">Grandmas Sweet Unicorn</string>
+    <string name="edit_recipe_ingredients_helper_text">1 tsp Sugar, 5 cups unicorn meat</string>
+    <string name="edit_recipe_preparation_steps_helper_text">Boil water Add unicorn meat</string>
 
 </resources>
