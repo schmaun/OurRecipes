@@ -34,11 +34,12 @@
         android:hint="@string/edit_recipe_ingredients"
         android:layout_below="@+id/edit_recipe_name"
         android:layout_alignParentStart="true"
-        app:met_floatingLabel="highlight"
         android:layout_alignParentEnd="true"
+        android:minLines="2"
+        android:gravity="top"
+        app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_ingredients_helper_text"
         app:met_helperTextAlwaysShown="true"
-        android:minLines="2"
         />
 
     <com.rengwuxian.materialedittext.MaterialEditText
@@ -48,13 +49,14 @@
         android:ems="10"
         android:id="@+id/add_recipe_preparation"
         android:hint="@string/edit_recipe_preparation_steps"
-        app:met_floatingLabel="highlight"
         android:layout_below="@+id/edit_recipe_ingredients"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
+        android:minLines="2"
+        android:gravity="top"
+        app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_preparation_steps_helper_text"
         app:met_helperTextAlwaysShown="true"
-        android:minLines="2"
         />
 
 </RelativeLayout>
