@@ -17,6 +17,10 @@ public class RecipeImage {
     public RecipeImage() {
     }
 
+    public RecipeImage(String location) {
+        this.location = location;
+    }
+
     public long getId() {
         return Id;
     }
