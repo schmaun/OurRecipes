@@ -1,14 +1,10 @@
 package de.schmaun.ourrecipes;
 
-import android.Manifest;
 import android.content.Context;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
@@ -27,12 +23,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import de.schmaun.ourrecipes.Adapter.RecipeAdapter;
 import de.schmaun.ourrecipes.Adapter.RecipeImageAdapter;
 import de.schmaun.ourrecipes.Database.DbHelper;
-import de.schmaun.ourrecipes.Database.RecipeRepository;
 import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
@@ -139,7 +132,6 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
     }
 
 
-
     public static class EditRecipeMainFragment extends Fragment {
         private RecipeChangedListener recipeChangedListener;
 
@@ -166,14 +158,16 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
             TextView name = (TextView) rootView.findViewById(R.id.edit_recipe_name);
 
+
             return rootView;
         }
     }
 
     public static class EditRecipeImagesFragment extends Fragment {
-        private RecyclerView imageList;
-        ArrayList<RecipeImage> recipeImages = new ArrayList<>();
+        private RecyclerView imageListView;
+        ArrayList<RecipeImage> recipeImages;
         private RecipeChangedListener recipeChangedListener;
+        private static final String STATE_ITEMS = "items";
 
         public EditRecipeImagesFragment() {
         }
@@ -197,42 +191,54 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
             View rootView = inflater.inflate(R.layout.fragment_edit_recipe_images, container, false);
 
-
-
-            RecipeImage image2 = new RecipeImage("http://api.learn2crack.com/android/images/froyo.png");
-            image2.setDescription("awefojefwajo  ef wa ef efwafea wa efwafwe ");
-            recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/eclair.png"));
-            recipeImages.add(image2);
-            recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/ginger.png"));
-            recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/honey.png"));
-            RecipeImage imageIC = new RecipeImage("http://api.learn2crack.com/android/images/icecream.png");
-            imageIC.setDescription("lecker eis");
-            recipeImages.add(imageIC);
-            RecipeImage imageJB = new RecipeImage("http://api.learn2crack.com/android/images/jellybean.png");
-            imageJB.setDescription("bohnen und speck oder so");
-            recipeImages.add(imageJB);
-            recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/kitkat.png"));
-            recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/lollipop.png"));
-            recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/marshmallow.png"));
-
-
-
             DbHelper db = new DbHelper(getContext());
 
-            imageList = (RecyclerView) rootView.findViewById(R.id.edit_recipe_image_list);
+            imageListView = (RecyclerView) rootView.findViewById(R.id.edit_recipe_image_list);
             GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
-            RecipeImageAdapter imageAdapter = new RecipeImageAdapter(getContext(), recipeImages);
 
-
-            imageList.setLayoutManager(layoutManager);
-            imageList.setAdapter(imageAdapter);
-            imageList.setItemAnimator(new DefaultItemAnimator());
-            imageList.setHasFixedSize(true);
-
-            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(imageAdapter));
-            itemTouchHelper.attachToRecyclerView(imageList);
+            imageListView.setLayoutManager(layoutManager);
+            imageListView.setItemAnimator(new DefaultItemAnimator());
+            imageListView.setHasFixedSize(true);
 
             return rootView;
+        }
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            if (savedInstanceState != null) {
+                recipeImages = (ArrayList<RecipeImage>) savedInstanceState.getSerializable(STATE_ITEMS);
+            } else {
+                recipeImages = new ArrayList<>();
+
+                RecipeImage image2 = new RecipeImage("http://api.learn2crack.com/android/images/froyo.png");
+                image2.setDescription("awefojefwajo  ef wa ef efwafea wa efwafwe ");
+                recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/eclair.png"));
+                recipeImages.add(image2);
+                recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/ginger.png"));
+                recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/honey.png"));
+                RecipeImage imageIC = new RecipeImage("http://api.learn2crack.com/android/images/icecream.png");
+                imageIC.setDescription("lecker eis");
+                recipeImages.add(imageIC);
+                RecipeImage imageJB = new RecipeImage("http://api.learn2crack.com/android/images/jellybean.png");
+                imageJB.setDescription("bohnen und speck oder so");
+                recipeImages.add(imageJB);
+                recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/kitkat.png"));
+                recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/lollipop.png"));
+                recipeImages.add(new RecipeImage("http://api.learn2crack.com/android/images/marshmallow.png"));
+            }
+
+            RecipeImageAdapter imageAdapter = new RecipeImageAdapter(getContext(), recipeImages);
+            imageListView.setAdapter(imageAdapter);
+
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(imageAdapter));
+            itemTouchHelper.attachToRecyclerView(imageListView);
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+            outState.putSerializable(STATE_ITEMS, recipeImages);
         }
 
         public static class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
@@ -369,6 +375,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         private Context context;
+        private final String TAG = "SectionsPagerAdapter";
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -376,6 +383,8 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         @Override
         public Fragment getItem(int position) {
+            Log.d(TAG, String.format("getItem called: %d", position));
+
             switch (position) {
                 case 1:
                     return EditRecipeImagesFragment.newInstance();
