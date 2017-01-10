@@ -23,5 +23,6 @@
     <string name="edit_recipe_preparation_steps_helper_text">Boil water\nAdd unicorn meat</string>
     <string name="edit_recipe_image_description">Edit image description</string>
     <string name="edit_recipe_add_image">Add image</string>
+    <string name="edit_recipe_name_error_empty">Please name the recipe</string>
 
 </resources>

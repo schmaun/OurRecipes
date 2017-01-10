@@ -21,11 +21,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.schmaun.ourrecipes.Adapter.RecipeImageAdapter;
 import de.schmaun.ourrecipes.Database.DbHelper;
+import de.schmaun.ourrecipes.Database.RecipeRepository;
 import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
@@ -48,6 +51,10 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
     public Recipe recipe;
 
+    private EditRecipeMainFragment mainFragment;
+    private EditRecipeImagesFragment imagesFragment;
+    private EditRecipeMetaFragment metaFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,8 +73,9 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-    }
 
+        recipe = new Recipe();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -84,8 +92,13 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_save) {
+            if(validate()) {
+                collectDataFromFragments();
+                saveRecipe();
+                onSavedRecipe();
+                finish();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -131,9 +144,64 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
     }
 
+    private boolean validate()
+    {
+        if (mainFragment != null) {
+            return mainFragment.isValid();
+        }
 
-    public static class EditRecipeMainFragment extends Fragment {
-        private RecipeChangedListener recipeChangedListener;
+        return false;
+    }
+
+    private void collectDataFromFragments()
+    {
+        if (mainFragment != null) {
+            Recipe recipe = mainFragment.getRecipe();
+
+            this.recipe.setName(recipe.getName());
+            this.recipe.setIngredients(recipe.getIngredients());
+            this.recipe.setPreparation(recipe.getPreparation());
+        }
+
+        if (imagesFragment != null) {
+            this.recipe.setImages(imagesFragment.getRecipe().getImages());
+        }
+
+        if (metaFragment != null) {
+            this.recipe.setLabels(metaFragment.getRecipe().getLabels());
+        }
+    }
+
+    private void saveRecipe()
+    {
+        DbHelper dbHelper = new DbHelper(this);
+
+        RecipeRepository repository = RecipeRepository.getInstance(dbHelper);
+        repository.save(recipe);
+
+        Toast.makeText(this, getString(R.string.recipe_saved), Toast.LENGTH_LONG).show();
+    }
+
+    private void onSavedRecipe()
+    {
+        if (mainFragment != null) {
+            mainFragment.onSaved();
+        }
+
+        if (imagesFragment != null) {
+            imagesFragment.onSaved();
+        }
+
+        if (metaFragment != null) {
+            metaFragment.onSaved();
+        }
+    }
+
+
+    public static class EditRecipeMainFragment extends Fragment implements RecipeFormInterface {
+        private TextView nameView;
+        private TextView ingredientsView;
+        private TextView preparationView;
 
         public EditRecipeMainFragment() {
         }
@@ -145,29 +213,48 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
 
         @Override
-        public void onAttach(Context context) {
-            super.onAttach(context);
-
-            recipeChangedListener = (RecipeChangedListener) context;
-        }
-
-        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_edit_recipe_main, container, false);
 
-            TextView name = (TextView) rootView.findViewById(R.id.edit_recipe_name);
-
+            nameView = (TextView) rootView.findViewById(R.id.edit_recipe_name);
+            ingredientsView = (TextView) rootView.findViewById(R.id.edit_recipe_ingredients);
+            preparationView = (TextView) rootView.findViewById(R.id.edit_recipe_preparation);
 
             return rootView;
         }
+
+        @Override
+        public boolean isValid() {
+            if (nameView.length() == 0) {
+                nameView.setError(getString(R.string.edit_recipe_name_error_empty));
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public Recipe getRecipe() {
+            Recipe recipe = new Recipe();
+            recipe.setName(nameView.getText().toString());
+            recipe.setIngredients(ingredientsView.getText().toString());
+            recipe.setPreparation(preparationView.getText().toString());
+
+            return recipe;
+        }
+
+        @Override
+        public void onSaved() {
+
+        }
     }
 
-    public static class EditRecipeImagesFragment extends Fragment {
+    public static class EditRecipeImagesFragment extends Fragment implements RecipeFormInterface {
         private RecyclerView imageListView;
         ArrayList<RecipeImage> recipeImages;
-        private RecipeChangedListener recipeChangedListener;
         private static final String STATE_ITEMS = "items";
+        public RecipeImage[] deletedImage;
 
         public EditRecipeImagesFragment() {
         }
@@ -176,13 +263,6 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
             EditRecipeImagesFragment fragment = new EditRecipeImagesFragment();
 
             return fragment;
-        }
-
-        @Override
-        public void onAttach(Context context) {
-            super.onAttach(context);
-
-            recipeChangedListener = (RecipeChangedListener) context;
         }
 
         @Override
@@ -239,6 +319,34 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
             outState.putSerializable(STATE_ITEMS, recipeImages);
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Recipe getRecipe() {
+            Recipe recipe = new Recipe();
+
+            recipe.setImages(recipeImages);
+
+            return recipe;
+        }
+
+        @Override
+        public void onSaved() {
+            removeDeletedImages();
+        }
+
+        protected void removeDeletedImages() {
+            for (RecipeImage recipeImage: deletedImage) {
+                File file = new File(recipeImage.getLocation());
+                boolean deleted = file.delete();
+
+                Log.d("deleteImageFile", Boolean.toString(deleted));
+            }
         }
 
         public static class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
@@ -340,8 +448,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
     }
 
-    public static class EditRecipeMetaFragment extends Fragment {
-        private RecipeChangedListener recipeChangedListener;
+    public static class EditRecipeMetaFragment extends Fragment implements RecipeFormInterface {
 
         public EditRecipeMetaFragment() {
         }
@@ -355,8 +462,6 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         @Override
         public void onAttach(Context context) {
             super.onAttach(context);
-
-            recipeChangedListener = (RecipeChangedListener) context;
         }
 
         @Override
@@ -365,6 +470,21 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
             View rootView = inflater.inflate(R.layout.fragment_edit_recipe_meta, container, false);
 
             return rootView;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public Recipe getRecipe() {
+            return new Recipe();
+        }
+
+        @Override
+        public void onSaved() {
+
         }
     }
 
@@ -376,9 +496,11 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         private Context context;
         private final String TAG = "SectionsPagerAdapter";
+        private FragmentManager fm;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            this.fm = fm;
         }
 
         @Override
@@ -412,6 +534,24 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
                     return getString(R.string.edit_recipe_page_title_meta);
             }
             return null;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            switch (position) {
+                case 0:
+                    mainFragment = (EditRecipeMainFragment) fragment;
+                    break;
+                case 1:
+                    imagesFragment = (EditRecipeImagesFragment) fragment;
+                    break;
+                case 2:
+                    metaFragment = (EditRecipeMetaFragment) fragment;
+                    break;
+            }
+
+            return fragment;
         }
     }
 }
