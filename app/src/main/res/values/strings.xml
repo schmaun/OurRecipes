@@ -24,5 +24,7 @@
     <string name="edit_recipe_image_description">Edit image description</string>
     <string name="edit_recipe_add_image">Add image</string>
     <string name="edit_recipe_name_error_empty">Please name the recipe</string>
+    <string name="edit_recipe_image_deleted">Image deleted</string>
+    <string name="edit_recipe_image_deleted_undo">UNDO</string>
 
 </resources>

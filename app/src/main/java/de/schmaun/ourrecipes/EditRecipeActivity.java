@@ -327,8 +327,6 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
             View rootView = inflater.inflate(R.layout.fragment_edit_recipe_images, container, false);
 
-            DbHelper db = new DbHelper(getContext());
-
             imageListView = (RecyclerView) rootView.findViewById(R.id.edit_recipe_image_list);
             GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
 
@@ -368,7 +366,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
                 }
             }
 
-            RecipeImageAdapter imageAdapter = new RecipeImageAdapter(getContext(), recipeImages);
+            RecipeImageAdapter imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, imageListView);
             imageListView.setAdapter(imageAdapter);
 
             ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(imageAdapter));

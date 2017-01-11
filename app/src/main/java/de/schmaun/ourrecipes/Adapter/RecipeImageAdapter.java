@@ -3,7 +3,11 @@ package de.schmaun.ourrecipes.Adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.Snackbar;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +29,11 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
 
     private Context context;
     private List<RecipeImage> images;
+    private View rootView;
+
+    private ArrayList<RecipeImage> deletedImages = new ArrayList<>();
+    protected RecipeImage deletedRecipeImage;
+    protected int deletedRecipeImagePosition;
 
     public static class ImageHolder extends RecyclerView.ViewHolder implements EditRecipeActivity.EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperViewHolder {
         public ImageView deleteButton;
@@ -50,9 +60,10 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         }
     }
 
-    public RecipeImageAdapter(Context context, List<RecipeImage> images) {
+    public RecipeImageAdapter(Context context, List<RecipeImage> images, View rootView) {
         this.context = context;
         this.images = images;
+        this.rootView = rootView;
     }
 
     @Override
@@ -71,8 +82,23 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
 
     @Override
     public void onItemDismiss(int position) {
+        deletedRecipeImage = images.get(position);
+        deletedRecipeImagePosition = position;
+
+        deletedImages.add(deletedRecipeImage);
         images.remove(position);
         notifyItemRemoved(position);
+
+        Snackbar snackbar = Snackbar.make(this.rootView, R.string.edit_recipe_image_deleted, Snackbar.LENGTH_LONG);
+        snackbar.setAction(R.string.edit_recipe_image_deleted_undo, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                images.add(deletedRecipeImagePosition, deletedRecipeImage);
+                deletedImages.remove(deletedRecipeImage);
+                notifyItemInserted(deletedRecipeImagePosition);
+            }
+        });
+        snackbar.show();
     }
 
     @Override
