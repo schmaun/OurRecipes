@@ -133,5 +133,10 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
     public int getItemCount() {
         return images == null ? 0 : images.size();
     }
+
+    public ArrayList<RecipeImage> getDeletedImages() {
+        return deletedImages;
+    }
+
 }
 

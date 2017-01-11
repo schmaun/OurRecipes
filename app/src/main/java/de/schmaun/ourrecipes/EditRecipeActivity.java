@@ -192,6 +192,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         if (imagesFragment != null) {
             this.recipe.setImages(imagesFragment.getRecipe().getImages());
+            this.recipe.setImagesToDelete(imagesFragment.getRecipe().getImagesToDelete());
         }
 
         if (metaFragment != null) {
@@ -208,6 +209,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         RecipeImageRepository recipeImageRepository = RecipeImageRepository.getInstance(dbHelper);
         recipeImageRepository.save(recipe.getId(), recipe.getImages());
+        recipeImageRepository.delete(recipe.getImagesToDelete());
 
         Toast.makeText(this, getString(R.string.recipe_saved), Toast.LENGTH_LONG).show();
     }
@@ -308,9 +310,10 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
     public static class EditRecipeImagesFragment extends EditRecipeFragment implements RecipeFormInterface {
         private RecyclerView imageListView;
+        private RecipeImageAdapter imageAdapter;
         ArrayList<RecipeImage> recipeImages;
+
         private static final String STATE_ITEMS = "items";
-        public ArrayList<RecipeImage> deletedImage = new ArrayList<RecipeImage>();
 
         public EditRecipeImagesFragment() {
         }
@@ -366,7 +369,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
                 }
             }
 
-            RecipeImageAdapter imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, imageListView);
+            imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, imageListView);
             imageListView.setAdapter(imageAdapter);
 
             ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(imageAdapter));
@@ -388,17 +391,18 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         public Recipe getRecipe() {
             Recipe recipe = new Recipe();
             recipe.setImages(recipeImages);
+            recipe.setImagesToDelete(imageAdapter.getDeletedImages());
 
             return recipe;
         }
 
         @Override
         public void onSaved() {
-            removeDeletedImages();
+            removeDeletedImageFiles();
         }
 
-        protected void removeDeletedImages() {
-            for (RecipeImage recipeImage: deletedImage) {
+        protected void removeDeletedImageFiles() {
+            for (RecipeImage recipeImage: imageAdapter.getDeletedImages()) {
                 File file = new File(recipeImage.getLocation());
                 boolean deleted = file.delete();
 

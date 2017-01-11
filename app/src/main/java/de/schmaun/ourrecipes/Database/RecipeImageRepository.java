@@ -99,11 +99,11 @@ public class RecipeImageRepository {
     public void delete(ArrayList<RecipeImage> imagesToDelete) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        for (RecipeImage image :
-                imagesToDelete) {
-            db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(image.getId())});
+        for (RecipeImage image : imagesToDelete) {
+            if(image.getId() > 0) {
+                db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(image.getId())});
+            }
         }
-
         db.close();
     }
 
