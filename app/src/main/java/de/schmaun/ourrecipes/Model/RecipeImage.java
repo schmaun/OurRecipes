@@ -1,5 +1,8 @@
 package de.schmaun.ourrecipes.Model;
 
+import org.parceler.Parcel;
+
+@Parcel(Parcel.Serialization.BEAN)
 public class RecipeImage {
 
     private long Id;

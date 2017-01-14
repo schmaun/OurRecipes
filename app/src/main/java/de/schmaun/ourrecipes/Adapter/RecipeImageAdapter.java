@@ -66,6 +66,11 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         this.rootView = rootView;
     }
 
+    public void addImage(RecipeImage image) {
+        this.images.add(image);
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {

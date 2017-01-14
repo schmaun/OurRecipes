@@ -1,7 +1,12 @@
 package de.schmaun.ourrecipes;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,16 +20,24 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.parceler.Parcels;
+
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import de.schmaun.ourrecipes.Adapter.RecipeImageAdapter;
 import de.schmaun.ourrecipes.Database.DbHelper;
@@ -308,12 +321,16 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
     }
 
-    public static class EditRecipeImagesFragment extends EditRecipeFragment implements RecipeFormInterface {
+    public static class EditRecipeImagesFragment extends EditRecipeFragment implements RecipeFormInterface, PhotoDialogFragment.PictureIntentHandler {
         private RecyclerView imageListView;
         private RecipeImageAdapter imageAdapter;
-        ArrayList<RecipeImage> recipeImages;
+        private ArrayList<RecipeImage> recipeImages;
 
         private static final String STATE_ITEMS = "items";
+        private String TAG = "EditRecipeImagesF";
+        static final int REQUEST_TAKE_PHOTO = 1;
+        static final int REQUEST_SELECT_PHOTO = 2;
+        private Uri newPhotoURI;
 
         public EditRecipeImagesFragment() {
         }
@@ -337,6 +354,17 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
             imageListView.setItemAnimator(new DefaultItemAnimator());
             imageListView.setHasFixedSize(true);
 
+            final EditRecipeImagesFragment fragment = this;
+            Button addImageButton = (Button) rootView.findViewById(R.id.edit_recipe_add_image);
+            addImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PhotoDialogFragment newFragment = new PhotoDialogFragment();
+                    newFragment.setPictureIntentHandler(fragment);
+                    newFragment.show(getActivity().getSupportFragmentManager(), "add_photo");
+                }
+            });
+
             return rootView;
         }
 
@@ -344,7 +372,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
             if (savedInstanceState != null) {
-                recipeImages = (ArrayList<RecipeImage>) savedInstanceState.getSerializable(STATE_ITEMS);
+                recipeImages = Parcels.unwrap(savedInstanceState.getParcelable(STATE_ITEMS));
             } else {
                 recipeImages = new ArrayList<>();
 
@@ -379,7 +407,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         @Override
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
-            outState.putSerializable(STATE_ITEMS, recipeImages);
+            outState.putParcelable(STATE_ITEMS, Parcels.wrap(recipeImages));
         }
 
         @Override
@@ -402,11 +430,55 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
 
         protected void removeDeletedImageFiles() {
-            for (RecipeImage recipeImage: imageAdapter.getDeletedImages()) {
+            for (RecipeImage recipeImage : imageAdapter.getDeletedImages()) {
                 File file = new File(recipeImage.getLocation());
                 boolean deleted = file.delete();
 
                 Log.d("deleteImageFile", Boolean.toString(deleted));
+            }
+        }
+
+        @Override
+        public void dispatchTakePicture() {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                    Toast.makeText(getContext(), R.string.error_taking_picture, Toast.LENGTH_LONG).show();
+                }
+
+                if (photoFile != null) {
+                    newPhotoURI = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, newPhotoURI);
+                    this.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                }
+            } else {
+                Toast.makeText(getContext(), R.string.no_camera_app_available, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private File createImageFile() throws IOException {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            File storageDir = getActivity().getExternalFilesDir("images");
+
+            return File.createTempFile(timeStamp, ".jpg", storageDir);
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            Log.d(TAG, String.format("onActivityResult requestCode: %d; resultCode:%d", requestCode, resultCode));
+
+            if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+                RecipeImage image = new RecipeImage();
+                image.setLocation(newPhotoURI.toString());
+                imageAdapter.addImage(image);
+            }
+
+            if (requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK) {
+
             }
         }
 

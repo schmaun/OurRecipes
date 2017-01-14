@@ -27,4 +27,12 @@
     <string name="edit_recipe_image_deleted">Image deleted</string>
     <string name="edit_recipe_image_deleted_undo">UNDO</string>
 
+    <string name="error_taking_picture">Error taking picture</string>
+    <string name="no_camera_app_available">No camera available :(</string>
+
+    <string-array name="edit_recipe_add_image_items">
+        <item>Take Picture</item>
+        <item>Select from Gallery</item>
+        <item>Select from Whatever</item>
+    </string-array>
 </resources>
