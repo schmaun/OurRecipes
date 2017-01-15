@@ -3,6 +3,7 @@ package de.schmaun.ourrecipes;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
@@ -30,10 +31,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
 import org.parceler.Parcels;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -321,7 +329,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
     }
 
-    public static class EditRecipeImagesFragment extends EditRecipeFragment implements RecipeFormInterface, PhotoDialogFragment.PictureIntentHandler {
+    public static class EditRecipeImagesFragment extends EditRecipeFragment implements RecipeFormInterface, PhotoDialogFragment.PictureIntentHandler, DownloadImageTask.DownloadImageHandler {
         private RecyclerView imageListView;
         private RecipeImageAdapter imageAdapter;
         private ArrayList<RecipeImage> recipeImages;
@@ -411,6 +419,80 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
 
         @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            Log.d(TAG, String.format("onActivityResult requestCode: %d; resultCode:%d", requestCode, resultCode));
+
+            if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+                RecipeImage image = new RecipeImage();
+                image.setLocation(newPhotoURI.toString());
+                imageAdapter.addImage(image);
+            }
+
+            if (requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK) {
+                Uri uri = data.getData();
+                Log.i(TAG, "Uri: " + uri.toString());
+
+                try {
+                    File file = createImageFile();
+                    new DownloadImageTask(getContext(), this, file).execute(uri);
+                } catch (IOException e) {
+
+                }
+            }
+        }
+
+        @Override
+        public void dispatchTakePicture() {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                    Toast.makeText(getContext(), R.string.error_taking_picture, Toast.LENGTH_LONG).show();
+                }
+
+                if (photoFile != null) {
+                    newPhotoURI = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, newPhotoURI);
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                }
+            } else {
+                Toast.makeText(getContext(), R.string.no_camera_app_available, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        public void dispatchSelectPictureFromGallery()
+        {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startSelectPictureIntent(photoPickerIntent);
+        }
+
+        public void dispatchSelectPictureFromStorageAccessFramework()
+        {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            startSelectPictureIntent(photoPickerIntent);
+        }
+
+        private void startSelectPictureIntent(Intent intent) {
+            intent.setType("image/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivityForResult(intent, REQUEST_SELECT_PHOTO);
+            } else {
+                Toast.makeText(getContext(), R.string.no_gallery_app_available, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private File createImageFile() throws IOException {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            File storageDir = getActivity().getExternalFilesDir("images");
+
+            return File.createTempFile(timeStamp, ".jpg", storageDir);
+        }
+
+        @Override
         public boolean isValid() {
             return true;
         }
@@ -439,47 +521,15 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
 
         @Override
-        public void dispatchTakePicture() {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                File photoFile = null;
-                try {
-                    photoFile = createImageFile();
-                } catch (IOException ex) {
-                    Toast.makeText(getContext(), R.string.error_taking_picture, Toast.LENGTH_LONG).show();
-                }
-
-                if (photoFile != null) {
-                    newPhotoURI = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, newPhotoURI);
-                    this.startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-                }
-            } else {
-                Toast.makeText(getContext(), R.string.no_camera_app_available, Toast.LENGTH_LONG).show();
-            }
-        }
-
-        private File createImageFile() throws IOException {
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-            File storageDir = getActivity().getExternalFilesDir("images");
-
-            return File.createTempFile(timeStamp, ".jpg", storageDir);
+        public void onError(Exception error) {
+            Toast.makeText(getContext(), R.string.error_saving_image, Toast.LENGTH_LONG).show();
         }
 
         @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            Log.d(TAG, String.format("onActivityResult requestCode: %d; resultCode:%d", requestCode, resultCode));
-
-            if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-                RecipeImage image = new RecipeImage();
-                image.setLocation(newPhotoURI.toString());
-                imageAdapter.addImage(image);
-            }
-
-            if (requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK) {
-
-            }
+        public void onSuccess(File file) {
+            RecipeImage image = new RecipeImage();
+            image.setLocation(file.getAbsolutePath());
+            imageAdapter.addImage(image);
         }
 
         public static class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
@@ -618,6 +668,57 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         @Override
         public void onSaved() {
 
+        }
+    }
+
+    public static class DownloadImageTask extends AsyncTask<Uri, Void, File> {
+        private Exception error;
+        private Context context;
+        private DownloadImageHandler imageHandler;
+        private File target;
+
+        interface DownloadImageHandler {
+            void onError(Exception error);
+            void onSuccess(File file);
+        }
+
+        public DownloadImageTask(Context context, DownloadImageHandler imageHandler, File target)
+        {
+            this.context = context;
+            this.imageHandler = imageHandler;
+            this.target = target;
+        }
+
+        protected File doInBackground(Uri... uris) {
+            try {
+                downloadImage(uris[0]);
+            } catch (IOException e) {
+                error = e;
+                Log.e("DownloadImageTask", e.getMessage(), e);
+            }
+            return target;
+        }
+
+        protected void onPostExecute(File file) {
+            if (error != null) {
+                imageHandler.onError(error);
+            } else {
+                imageHandler.onSuccess(file);
+            }
+        }
+
+        private void downloadImage(Uri uri) throws IOException {
+            InputStream in = context.getContentResolver().openInputStream(uri);
+            OutputStream out = new FileOutputStream(this.target);
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+
+            in.close();
+            out.close();
         }
     }
 

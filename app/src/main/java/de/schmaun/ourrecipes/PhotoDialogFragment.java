@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.ViewDebug;
 import android.widget.ListAdapter;
 
 import de.schmaun.ourrecipes.Adapter.ArrayWithIconAdapter;
@@ -18,6 +19,8 @@ public class PhotoDialogFragment extends DialogFragment {
 
     interface PictureIntentHandler {
         void dispatchTakePicture();
+        void dispatchSelectPictureFromGallery();
+        void dispatchSelectPictureFromStorageAccessFramework();
     }
 
     public void setPictureIntentHandler(PictureIntentHandler pictureIntentHandler) {
@@ -36,16 +39,16 @@ public class PhotoDialogFragment extends DialogFragment {
         builder.setTitle(R.string.edit_recipe_add_image)
                 .setAdapter(adapter, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, Integer.toString(which) + " clicked");
                         switch (which) {
                             case 0:
-                                Log.d(TAG, "0 clicked");
                                 pictureIntentHandler.dispatchTakePicture();
                                 break;
                             case 1:
-                                Log.d(TAG, "0 clicked");
+                                pictureIntentHandler.dispatchSelectPictureFromGallery();
                                 break;
                             case 2:
-                                Log.d(TAG, "0 clicked");
+                                pictureIntentHandler.dispatchSelectPictureFromStorageAccessFramework();
                                 break;
                         }
                     }
