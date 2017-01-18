@@ -27,11 +27,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.rengwuxian.materialedittext.MaterialMultiAutoCompleteTextView;
 
 import org.parceler.Parcels;
 
@@ -45,6 +48,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import de.schmaun.ourrecipes.Adapter.RecipeImageAdapter;
@@ -52,6 +56,7 @@ import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.LabelsRepository;
 import de.schmaun.ourrecipes.Database.RecipeImageRepository;
 import de.schmaun.ourrecipes.Database.RecipeRepository;
+import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
@@ -631,7 +636,9 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         }
     }
 
-    public static class EditRecipeMetaFragment extends Fragment implements RecipeFormInterface {
+    public static class EditRecipeMetaFragment extends EditRecipeFragment implements RecipeFormInterface {
+        private TextView notesView;
+        private MaterialMultiAutoCompleteTextView labelsView;
 
         public EditRecipeMetaFragment() {
         }
@@ -652,6 +659,31 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_edit_recipe_meta, container, false);
 
+            notesView = (TextView) rootView.findViewById(R.id.edit_recipe_notes);
+            labelsView = (MaterialMultiAutoCompleteTextView) rootView.findViewById(R.id.edit_recipe_labels);
+
+            Recipe recipe = recipeProvider.getRecipe();
+            if (savedInstanceState == null) {
+                notesView.setText(recipe.getNotes());
+            }
+
+            DbHelper dbHelper = new DbHelper(getContext());
+            LabelsRepository labelsRepository = LabelsRepository.getInstance(dbHelper);
+            List<Label> labels = labelsRepository.loadLabels();
+
+            labels.add(new Label("eins"));
+            labels.add(new Label("zwei"));
+            labels.add(new Label("3"));
+            labels.add(new Label("eins zwei"));
+            labels.add(new Label("x-mas"));
+            labels.add(new Label("mutter"));
+            labels.add(new Label("brot"));
+
+            ArrayAdapter<Label> adapter = new ArrayAdapter<Label>(getContext(), android.R.layout.simple_dropdown_item_1line, labels);
+
+            labelsView.setAdapter(adapter);
+            labelsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+
             return rootView;
         }
 
@@ -662,12 +694,25 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         @Override
         public Recipe getRecipe() {
-            return new Recipe();
+            Recipe recipe = new Recipe();
+            recipe.setNotes(notesView.getText().toString());
+            recipe.setLabels(parseLabels());
+
+            return recipe;
+        }
+
+        private ArrayList<Label> parseLabels() {
+            ArrayList<Label> recipeLabels = new ArrayList<>();
+            String labels[] = labelsView.getText().toString().split(",");
+            for (String label: labels) {
+                recipeLabels.add(new Label(label.trim()));
+            }
+
+            return recipeLabels;
         }
 
         @Override
         public void onSaved() {
-
         }
     }
 

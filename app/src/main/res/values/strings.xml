@@ -31,6 +31,10 @@
     <string name="no_camera_app_available">No camera available ¯\\_(ツ)_/¯</string>
     <string name="no_gallery_app_available">No gallery available ¯\\_(ツ)_/¯</string>
     <string name="error_saving_image">Error saving image</string>
+    <string name="edit_recipe_notes">Notes</string>
+    <string name="edit_recipe_notes_helper_text">Use it for some notes for yourself</string>
+    <string name="edit_recipe_labels_helper_text">Comma separated list like "meat, Winter, x-mas"</string>
+    <string name="edit_recipe_labels">Labels</string>
 
     <string-array name="edit_recipe_add_image_items">
         <item>Take Picture</item>

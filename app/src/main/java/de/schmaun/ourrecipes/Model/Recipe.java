@@ -16,6 +16,8 @@ public class Recipe {
 
     private String preparation;
 
+    private String notes;
+
     private int rating;
 
     private ArrayList<RecipeImage> images;
@@ -105,22 +107,18 @@ public class Recipe {
     }
 
     public ArrayList<Label> getLabels() {
-        ArrayList<Label> labels = new ArrayList<>();
-
-        Label label = new Label();
-        label.setName("label 1");
-        labels.add(label);
-         label = new Label();
-        label.setName("label 2");
-        labels.add(label);
-         label = new Label();
-        label.setName("label 2");
-        labels.add(label);
-
         return labels;
     }
 
     public void setLabels(ArrayList<Label> labels) {
         this.labels = labels;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

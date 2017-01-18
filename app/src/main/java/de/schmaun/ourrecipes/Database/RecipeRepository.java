@@ -3,6 +3,7 @@ package de.schmaun.ourrecipes.Database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class RecipeRepository {
     public static final String COLUMN_NAME_DESCRIPTION = "description";
     public static final String COLUMN_NAME_INGREDIENTS = "ingredients";
     public static final String COLUMN_NAME_PREPARATION = "preparation";
+    public static final String COLUMN_NAME_NOTES = "notes";
 
     public static final String COLUMN_NAME_RATING = "rating";
 
@@ -117,9 +119,10 @@ public class RecipeRepository {
         values.put(COLUMN_NAME_CATEGORY_ID, recipe.getCategoryId());
 
         values.put(COLUMN_NAME_NAME, recipe.getName());
-        values.put(COLUMN_NAME_INGREDIENTS, recipe.getDescription());
+        values.put(COLUMN_NAME_DESCRIPTION, recipe.getDescription());
         values.put(COLUMN_NAME_INGREDIENTS, recipe.getIngredients());
         values.put(COLUMN_NAME_PREPARATION, recipe.getPreparation());
+        values.put(COLUMN_NAME_NOTES, recipe.getNotes());
 
         return values;
     }
@@ -152,8 +155,16 @@ public class RecipeRepository {
                 + ")");
     }
 
-    public static void onUpgrade(SQLiteDatabase db) {
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        //onCreate(db);
+    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        for (int i = oldVersion + 1; i <= newVersion; i++) {
+            doUpgrade(db, i);
+        }
+    }
+
+    private static void doUpgrade(SQLiteDatabase db, int newVersion) {
+        switch (newVersion) {            case 2:
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_NOTES + " TEXT");
+                break;
+        }
     }
 }

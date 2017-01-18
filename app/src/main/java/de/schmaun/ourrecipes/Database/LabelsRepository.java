@@ -56,15 +56,33 @@ public class LabelsRepository {
     public ArrayList<Label> loadLabels(long recipeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT " +
-                "l." + COLUMN_NAME_ID + ", " +
-                "l." + COLUMN_NAME_NAME + " " +
-                "FROM " + TABLE_NAME + " AS l " +
-                "JOIN " + REL_TABLE_NAME + " ON " + REL_COLUMN_LABEL_ID + "=l." + COLUMN_NAME_ID + " " +
-                "WHERE " + REL_COLUMN_RECIPE_ID + "=? " +
-                "ORDER BY l." + COLUMN_NAME_NAME + " ASC"
+                        "l." + COLUMN_NAME_ID + ", " +
+                        "l." + COLUMN_NAME_NAME + " " +
+                        "FROM " + TABLE_NAME + " AS l " +
+                        "JOIN " + REL_TABLE_NAME + " ON " + REL_COLUMN_LABEL_ID + "=l." + COLUMN_NAME_ID + " " +
+                        "WHERE " + REL_COLUMN_RECIPE_ID + "=? " +
+                        "ORDER BY l." + COLUMN_NAME_NAME + " ASC"
                 , new String[]{Long.toString(recipeId)}
         );
 
+
+        ArrayList<Label> labels = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                Label label = getFromCursor(cursor);
+                labels.add(label);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return labels;
+    }
+
+    public ArrayList<Label> loadLabels() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, COLUMN_NAME_NAME +  " ASC");
 
         ArrayList<Label> labels = new ArrayList<>();
         if (cursor.moveToFirst()) {
@@ -89,8 +107,7 @@ public class LabelsRepository {
         return label;
     }
 
-    private ContentValues createContentValues(Label label)
-    {
+    private ContentValues createContentValues(Label label) {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NAME_NAME, label.getName());
@@ -109,8 +126,8 @@ public class LabelsRepository {
                 + REL_COLUMN_LABEL_ID + " INTEGER,"
                 + REL_COLUMN_RECIPE_ID + " INTEGER"
                 + ")");
-        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_position ON " + TABLE_NAME + "(" + REL_COLUMN_LABEL_ID + ", " +  REL_COLUMN_RECIPE_ID + ");");
-        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_position ON " + TABLE_NAME + "(" +  REL_COLUMN_RECIPE_ID + ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_position ON " + TABLE_NAME + "(" + REL_COLUMN_LABEL_ID + ", " + REL_COLUMN_RECIPE_ID + ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_position ON " + TABLE_NAME + "(" + REL_COLUMN_RECIPE_ID + ");");
     }
 
     public static void onUpgrade(SQLiteDatabase db) {

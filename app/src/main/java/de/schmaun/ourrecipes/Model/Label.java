@@ -1,9 +1,16 @@
 package de.schmaun.ourrecipes.Model;
 
-public class Label {
+import java.io.Serializable;
+
+public class Label implements Serializable {
 
     private long id;
     private String name;
+
+    public Label(){}
+    public Label(String name) {
+        this.name = name;
+    }
 
     public long getId() {
         return id;
@@ -20,4 +27,7 @@ public class Label {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() { return name; }
 }
