@@ -237,6 +237,9 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         recipeImageRepository.save(recipe.getId(), recipe.getImages());
         recipeImageRepository.delete(recipe.getImagesToDelete());
 
+        LabelsRepository labelsRepository = LabelsRepository.getInstance(dbHelper);
+        labelsRepository.saveLabels(recipe);
+
         Toast.makeText(this, getString(R.string.recipe_saved), Toast.LENGTH_LONG).show();
     }
 
@@ -665,19 +668,12 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
             Recipe recipe = recipeProvider.getRecipe();
             if (savedInstanceState == null) {
                 notesView.setText(recipe.getNotes());
+                labelsView.setText(parseLabelsToText(recipe.getLabels()));
             }
 
             DbHelper dbHelper = new DbHelper(getContext());
             LabelsRepository labelsRepository = LabelsRepository.getInstance(dbHelper);
             List<Label> labels = labelsRepository.loadLabels();
-
-            labels.add(new Label("eins"));
-            labels.add(new Label("zwei"));
-            labels.add(new Label("3"));
-            labels.add(new Label("eins zwei"));
-            labels.add(new Label("x-mas"));
-            labels.add(new Label("mutter"));
-            labels.add(new Label("brot"));
 
             ArrayAdapter<Label> adapter = new ArrayAdapter<Label>(getContext(), android.R.layout.simple_dropdown_item_1line, labels);
 
@@ -705,10 +701,24 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
             ArrayList<Label> recipeLabels = new ArrayList<>();
             String labels[] = labelsView.getText().toString().split(",");
             for (String label: labels) {
-                recipeLabels.add(new Label(label.trim()));
+                label = label.trim();
+                if (label.length() > 0) {
+                    recipeLabels.add(new Label(label));
+                }
             }
 
             return recipeLabels;
+        }
+
+        private String parseLabelsToText(ArrayList<Label> recipeLabels)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Label label: recipeLabels) {
+                stringBuilder.append(label.getName());
+                stringBuilder.append(", ");
+            }
+
+            return stringBuilder.toString();
         }
 
         @Override
