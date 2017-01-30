@@ -176,7 +176,7 @@ public class LabelsRepository {
         db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS " + COLUMN_NAME_NAME + " ON " + TABLE_NAME + "(" + COLUMN_NAME_NAME + ");");
     }
 
-    public static void onUpgrade(SQLiteDatabase db) {
+    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + REL_TABLE_NAME);
         onCreate(db);

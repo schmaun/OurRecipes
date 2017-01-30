@@ -3,15 +3,12 @@ package de.schmaun.ourrecipes.Adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
-import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SnapHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,7 +33,8 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
     protected int deletedRecipeImagePosition;
 
     public static class ImageHolder extends RecyclerView.ViewHolder implements EditRecipeActivity.EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperViewHolder {
-        public ImageView deleteButton;
+        public Button deleteButton;
+        public Button coverButton;
         public TextView imageTextView;
         public ImageView imageView;
 
@@ -44,7 +42,8 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
             super(v);
             imageView = (ImageView) v.findViewById(R.id.recipeImage);
             imageTextView = (TextView) v.findViewById(R.id.recipeImageText);
-            deleteButton = (ImageView) v.findViewById(R.id.recipeImageDelete);
+            deleteButton = (Button) v.findViewById(R.id.recipeImageDelete);
+            coverButton = (Button) v.findViewById(R.id.recipeImageSetAsCover);
         }
 
         @Override
@@ -106,6 +105,17 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         snackbar.show();
     }
 
+    public void onSetAsCoverImage(int position) {
+        for(RecipeImage image: images) {
+            image.setCoverImage(false);
+        }
+
+        RecipeImage image = images.get(position);
+        image.setCoverImage(true);
+
+        notifyDataSetChanged();
+    }
+
     @Override
     public ImageHolder onCreateViewHolder(final ViewGroup viewGroup, int viewType) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.recipe_image_row_card, viewGroup, false);
@@ -132,6 +142,18 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
                 onItemDismiss(imageHolder.getAdapterPosition());
             }
         });
+
+        imageHolder.coverButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onSetAsCoverImage(imageHolder.getAdapterPosition());
+            }
+        });
+
+        imageHolder.coverButton.setEnabled(true);
+        if(image.isCoverImage()) {
+            imageHolder.coverButton.setEnabled(false);
+        }
     }
 
     @Override

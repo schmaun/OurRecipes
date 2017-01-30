@@ -3,14 +3,22 @@ package de.schmaun.ourrecipes.Database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import de.schmaun.ourrecipes.Model.Recipe;
 
 public class RecipeRepository {
+    private final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss.sss";
+    private final String TAG = "RecipeRepository";
 
     private static RecipeRepository mInstance;
 
@@ -28,6 +36,10 @@ public class RecipeRepository {
     public static final String COLUMN_NAME_NOTES = "notes";
 
     public static final String COLUMN_NAME_RATING = "rating";
+    public static final String COLUMN_NAME_FAVOURITE = "favourite";
+
+    public static final String COLUMN_NAME_CREATED_AT = "createdAt";
+    public static final String COLUMN_NAME_LAST_EDIT_AT = "lastEditAt";
 
     public RecipeRepository(DbHelper dbHelper) {
         this.dbHelper = dbHelper;
@@ -87,6 +99,7 @@ public class RecipeRepository {
     }
 
     public long insert(Recipe recipe) {
+        recipe.setCreatedAt(new Date());
         ContentValues contentValues = createContentValues(recipe);
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -99,6 +112,7 @@ public class RecipeRepository {
 
     public void update(Recipe recipe)
     {
+        recipe.setLastEditAt(new Date());
         ContentValues contentValues = createContentValues(recipe);
         contentValues.put(COLUMN_NAME_ID, recipe.getId());
 
@@ -117,12 +131,18 @@ public class RecipeRepository {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NAME_CATEGORY_ID, recipe.getCategoryId());
-
         values.put(COLUMN_NAME_NAME, recipe.getName());
+
         values.put(COLUMN_NAME_DESCRIPTION, recipe.getDescription());
         values.put(COLUMN_NAME_INGREDIENTS, recipe.getIngredients());
         values.put(COLUMN_NAME_PREPARATION, recipe.getPreparation());
         values.put(COLUMN_NAME_NOTES, recipe.getNotes());
+
+        values.put(COLUMN_NAME_RATING, recipe.getRating());
+        values.put(COLUMN_NAME_FAVOURITE, recipe.getFavourite());
+
+        values.put(COLUMN_NAME_CREATED_AT, formatDate(recipe.getCreatedAt()));
+        values.put(COLUMN_NAME_LAST_EDIT_AT, formatDate(recipe.getLastEditAt()));
 
         return values;
     }
@@ -132,13 +152,47 @@ public class RecipeRepository {
 
         recipe.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_ID)));
         recipe.setCategoryId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_CATEGORY_ID)));
-
         recipe.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)));
+
         recipe.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
         recipe.setIngredients(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_INGREDIENTS)));
         recipe.setPreparation(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PREPARATION)));
+        recipe.setNotes(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NOTES)));
+
+        recipe.setRating(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_RATING)));
+        recipe.setFavourite(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_FAVOURITE)));
+
+        recipe.setCreatedAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CREATED_AT))));
+        recipe.setLastEditAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_LAST_EDIT_AT))));
 
         return recipe;
+    }
+
+    private Date createDate(String date) {
+        if (date == null) {
+            return null;
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+
+        try {
+            return format.parse(date);
+        } catch (ParseException e) {
+            Log.d(TAG, "invalid date: " + date);
+            return null;
+        }
+    }
+
+    private String formatDate(Date date)
+    {
+        if (date == null) {
+            return null
+                    ;
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+
+        return format.format(date);
     }
 
     public static void onCreate(SQLiteDatabase db) {
@@ -150,9 +204,16 @@ public class RecipeRepository {
                 + COLUMN_NAME_DESCRIPTION + " TEXT,"
                 + COLUMN_NAME_INGREDIENTS + " TEXT,"
                 + COLUMN_NAME_PREPARATION + " TEXT,"
+                + COLUMN_NAME_NOTES + " TEXT,"
 
-                + COLUMN_NAME_RATING + " INTEGER"
+                + COLUMN_NAME_RATING + " INTEGER,"
+                + COLUMN_NAME_FAVOURITE + " INTEGER,"
+
+                + COLUMN_NAME_CREATED_AT + " TEXT,"
+                + COLUMN_NAME_LAST_EDIT_AT + " TEXT"
                 + ")");
+
+        db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_FAVOURITE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_FAVOURITE + ");");
     }
 
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -162,8 +223,15 @@ public class RecipeRepository {
     }
 
     private static void doUpgrade(SQLiteDatabase db, int newVersion) {
-        switch (newVersion) {            case 2:
+        switch (newVersion) {
+            case 2:
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_NOTES + " TEXT");
+                break;
+            case 6:
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_FAVOURITE + " INTEGER");
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_CREATED_AT + " TEXT");
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_LAST_EDIT_AT + " TEXT");
+                db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_FAVOURITE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_FAVOURITE + ");");
                 break;
         }
     }

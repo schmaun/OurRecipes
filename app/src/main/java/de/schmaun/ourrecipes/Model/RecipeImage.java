@@ -1,6 +1,7 @@
 package de.schmaun.ourrecipes.Model;
 
 import org.parceler.Parcel;
+import org.parceler.Transient;
 
 @Parcel(Parcel.Serialization.BEAN)
 public class RecipeImage {
@@ -16,6 +17,8 @@ public class RecipeImage {
     private String location;
 
     private int position;
+
+    private int isCoverImage;
 
     public RecipeImage() {
     }
@@ -72,6 +75,25 @@ public class RecipeImage {
         return position;
     }
 
+    public int getCoverImage() {
+        return isCoverImage;
+    }
+
+    public void setCoverImage(int coverImage) {
+        isCoverImage = coverImage;
+    }
+
+    @Transient
+    public void setCoverImage(boolean coverImage) {
+        isCoverImage = coverImage ? 1 : 0;
+    }
+
+    @Transient
+    public boolean isCoverImage()
+    {
+        return (isCoverImage == 1);
+    }
+
     public RecipeImage clone()
     {
         RecipeImage clone = new RecipeImage();
@@ -80,7 +102,8 @@ public class RecipeImage {
         clone.setLocation(this.getLocation());
         clone.setName(this.getName());
         clone.setPosition(this.getPosition());
-        clone.setRecipeId(this.getId());
+        clone.setRecipeId(this.getRecipeId());
+        clone.setCoverImage(this.getCoverImage());
 
         return clone;
     }

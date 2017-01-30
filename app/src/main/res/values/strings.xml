@@ -21,7 +21,7 @@
     <string name="edit_recipe_name_helper_text">Grandmas Sweet Unicorn</string>
     <string name="edit_recipe_ingredients_helper_text">1 tsp Sugar, 5 cups unicorn meat</string>
     <string name="edit_recipe_preparation_steps_helper_text">Boil water\nAdd unicorn meat</string>
-    <string name="edit_recipe_image_description">Edit image description</string>
+    <string name="edit_recipe_image_description">Click to set an image description</string>
     <string name="edit_recipe_add_image">Add image</string>
     <string name="edit_recipe_name_error_empty">Please name the recipe</string>
     <string name="edit_recipe_image_deleted">Image deleted</string>
@@ -35,6 +35,9 @@
     <string name="edit_recipe_notes_helper_text">Use it for some notes for yourself</string>
     <string name="edit_recipe_labels_helper_text">Comma separated list like "meat, Winter, x-mas"</string>
     <string name="edit_recipe_labels">Labels</string>
+    <string name="edit_recipe_cover_image_radio_label">Set as cover image</string>
+    <string name="edit_recipe_set_as_cover_image_button">Set as cover image</string>
+    <string name="edit_recipe_delete_image_button">delete</string>
 
     <string-array name="edit_recipe_add_image_items">
         <item>Take Picture</item>

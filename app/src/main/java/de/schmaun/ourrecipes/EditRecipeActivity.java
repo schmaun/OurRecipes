@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.MultiAutoCompleteTextView;
@@ -99,27 +100,42 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mViewPager.getWindowToken(), 0);
+            }
+        });
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        recipe = new Recipe();
         Bundle bundle = getIntent().getExtras();
-        long recipeId = 0;
         if (bundle != null) {
-            recipeId = bundle.getLong(BUNDLE_KEY_RECIPE_ID);
-            Log.d(TAG_LIFECYCLE, String.format("started with %s=%s", BUNDLE_KEY_RECIPE_ID, Long.toString(recipeId)));
+            recipe.setId(bundle.getLong(BUNDLE_KEY_RECIPE_ID));
+            Log.d(TAG_LIFECYCLE, String.format("started with %s=%s", BUNDLE_KEY_RECIPE_ID, Long.toString(recipe.getId())));
         }
 
-        recipe = new Recipe();
-        if (savedInstanceState == null && recipeId > 0) {
+        if (savedInstanceState == null && recipe.getId() > 0) {
             DbHelper dbHelper = new DbHelper(this);
             RecipeRepository repository = RecipeRepository.getInstance(dbHelper);
-            recipe = repository.load(recipeId);
+            recipe = repository.load(recipe.getId());
 
             RecipeImageRepository imageRepository = RecipeImageRepository.getInstance(dbHelper);
-            recipe.setImages(imageRepository.load(recipeId));
+            recipe.setImages(imageRepository.load(recipe.getId()));
 
             LabelsRepository labelsRepository = LabelsRepository.getInstance(dbHelper);
-            recipe.setLabels(labelsRepository.loadLabels(recipeId));
+            recipe.setLabels(labelsRepository.loadLabels(recipe.getId()));
 
             Log.d(TAG_LIFECYCLE, "recipe loaded");
         }
@@ -223,6 +239,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         if (metaFragment != null) {
             this.recipe.setLabels(metaFragment.getRecipe().getLabels());
+            this.recipe.setNotes(metaFragment.getRecipe().getNotes());
         }
     }
 
@@ -662,13 +679,13 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_edit_recipe_meta, container, false);
 
-            notesView = (TextView) rootView.findViewById(R.id.edit_recipe_notes);
             labelsView = (MaterialMultiAutoCompleteTextView) rootView.findViewById(R.id.edit_recipe_labels);
+            notesView = (TextView) rootView.findViewById(R.id.edit_recipe_notes);
 
             Recipe recipe = recipeProvider.getRecipe();
             if (savedInstanceState == null) {
-                notesView.setText(recipe.getNotes());
                 labelsView.setText(parseLabelsToText(recipe.getLabels()));
+                notesView.setText(recipe.getNotes());
             }
 
             DbHelper dbHelper = new DbHelper(getContext());
@@ -712,6 +729,10 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeChang
 
         private String parseLabelsToText(ArrayList<Label> recipeLabels)
         {
+            if (recipeLabels == null) {
+                return "";
+            }
+
             StringBuilder stringBuilder = new StringBuilder();
             for (Label label: recipeLabels) {
                 stringBuilder.append(label.getName());

@@ -23,6 +23,7 @@ public class RecipeImageRepository {
     public static final String COLUMN_NAME_DESCRIPTION = "description";
     public static final String COLUMN_NAME_LOCATION = "location";
     public static final String COLUMN_NAME_POSITION = "position";
+    public static final String COLUMN_NAME_IS_COVER_IMAGE = "isCoverImage";
 
     public RecipeImageRepository(DbHelper dbHelper) {
         this.dbHelper = dbHelper;
@@ -117,6 +118,7 @@ public class RecipeImageRepository {
         image.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
         image.setLocation(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_LOCATION)));
         image.setPosition(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_POSITION)));
+        image.setCoverImage(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_IS_COVER_IMAGE)));
 
         return image;
     }
@@ -131,6 +133,7 @@ public class RecipeImageRepository {
         values.put(COLUMN_NAME_DESCRIPTION, recipeImage.getDescription());
         values.put(COLUMN_NAME_LOCATION, recipeImage.getLocation());
         values.put(COLUMN_NAME_POSITION, recipeImage.getPosition());
+        values.put(COLUMN_NAME_IS_COVER_IMAGE, recipeImage.getCoverImage());
 
         return values;
     }
@@ -143,14 +146,30 @@ public class RecipeImageRepository {
                 + COLUMN_NAME_NAME + " TEXT,"
                 + COLUMN_NAME_DESCRIPTION + " TEXT,"
                 + COLUMN_NAME_LOCATION + " TEXT,"
-                + COLUMN_NAME_POSITION + " INTEGER"
+                + COLUMN_NAME_POSITION + " INTEGER,"
+                + COLUMN_NAME_IS_COVER_IMAGE + " INTEGER"
 
                 + ")");
         db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_position ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " +  COLUMN_NAME_POSITION + ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_cover ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " +  COLUMN_NAME_IS_COVER_IMAGE + ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_IS_COVER_IMAGE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_IS_COVER_IMAGE + ");");
     }
 
-    public static void onUpgrade(SQLiteDatabase db) {
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        onCreate(db);
+    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        for (int i = oldVersion + 1; i <= newVersion; i++) {
+            doUpgrade(db, i);
+        }
     }
+
+    private static void doUpgrade(SQLiteDatabase db, int newVersion) {
+        switch (newVersion) {
+            case 6:
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_IS_COVER_IMAGE + " INTEGER");
+                db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_cover ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " +  COLUMN_NAME_IS_COVER_IMAGE + ");");
+                db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_IS_COVER_IMAGE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_IS_COVER_IMAGE + ");");
+                break;
+        }
+    }
+
+
 }
