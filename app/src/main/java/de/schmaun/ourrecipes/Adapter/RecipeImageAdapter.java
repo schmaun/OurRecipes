@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.schmaun.ourrecipes.EditRecipe.EditRecipeImagesFragment;
+import de.schmaun.ourrecipes.EditRecipe.ImageCardTouchHelperCallback;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
 
-public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.ImageHolder> implements EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperAdapter {
+public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.ImageHolder> implements ImageCardTouchHelperCallback.ItemTouchHelperAdapter {
 
     private Context context;
     private List<RecipeImage> images;
@@ -32,7 +32,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
     private RecipeImage deletedRecipeImage;
     private int deletedRecipeImagePosition;
 
-    static class ImageHolder extends RecyclerView.ViewHolder implements EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperViewHolder {
+    static class ImageHolder extends RecyclerView.ViewHolder implements ImageCardTouchHelperCallback.ItemTouchHelperViewHolder {
         Button deleteButton;
         Button coverButton;
         TextView imageTextView;
@@ -59,9 +59,10 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         }
     }
 
-    public RecipeImageAdapter(Context context, List<RecipeImage> images, View rootView) {
+    public RecipeImageAdapter(Context context, List<RecipeImage> images, ArrayList<RecipeImage> deletedImages, View rootView) {
         this.context = context;
         this.images = images;
+        this.deletedImages = deletedImages;
         this.rootView = rootView;
     }
 
@@ -165,5 +166,8 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         return deletedImages;
     }
 
+    public void setDeletedImages(ArrayList<RecipeImage> deletedImages) {
+        this.deletedImages = deletedImages;
+    }
 }
 

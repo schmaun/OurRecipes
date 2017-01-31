@@ -41,7 +41,8 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Reci
     private RecipeImageAdapter imageAdapter;
     private ArrayList<RecipeImage> recipeImages;
 
-    private static final String STATE_ITEMS = "items";
+    private static final String STATE_IMAGES = "images";
+    private static final String STATE_DELETED_ITEMS = "deletedImages";
     private static final String TAG = "EditRecipeImagesF";
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_SELECT_PHOTO = 2;
@@ -84,8 +85,11 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Reci
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        ArrayList<RecipeImage> deletedImages = new ArrayList<>();
         if (savedInstanceState != null) {
-            recipeImages = Parcels.unwrap(savedInstanceState.getParcelable(STATE_ITEMS));
+            recipeImages = Parcels.unwrap(savedInstanceState.getParcelable(STATE_IMAGES));
+            deletedImages = Parcels.unwrap(savedInstanceState.getParcelable(STATE_DELETED_ITEMS));
         } else {
             recipeImages = new ArrayList<>();
             if (recipeProvider.getRecipe().getId() != 0) {
@@ -93,17 +97,18 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Reci
             }
         }
 
-        imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, imageListView);
+        imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, deletedImages, imageListView);
         imageListView.setAdapter(imageAdapter);
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(imageAdapter));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ImageCardTouchHelperCallback(imageAdapter));
         itemTouchHelper.attachToRecyclerView(imageListView);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(STATE_ITEMS, Parcels.wrap(recipeImages));
+        outState.putParcelable(STATE_IMAGES, Parcels.wrap(recipeImages));
+        outState.putParcelable(STATE_DELETED_ITEMS, Parcels.wrap(imageAdapter.getDeletedImages()));
     }
 
     @Override
@@ -196,15 +201,6 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Reci
         removeDeletedImageFiles();
     }
 
-    protected void removeDeletedImageFiles() {
-        for (RecipeImage recipeImage : imageAdapter.getDeletedImages()) {
-            File file = new File(recipeImage.getLocation());
-            boolean deleted = file.delete();
-
-            Log.d("deleteImageFile", Boolean.toString(deleted));
-        }
-    }
-
     @Override
     public void onError(Exception error) {
         Toast.makeText(getContext(), R.string.error_saving_image, Toast.LENGTH_LONG).show();
@@ -217,89 +213,12 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Reci
         imageAdapter.addImage(image);
     }
 
-    public static class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
-        public interface ItemTouchHelperAdapter {
-            void onItemMove(int fromPosition, int toPosition);
+    protected void removeDeletedImageFiles() {
+        for (RecipeImage recipeImage : imageAdapter.getDeletedImages()) {
+            File file = new File(recipeImage.getLocation());
+            boolean deleted = file.delete();
 
-            void onItemDismiss(int position);
-        }
-
-        /**
-         * Notifies a View Holder of relevant callbacks from
-         * {@link ItemTouchHelper.Callback}.
-         */
-        public interface ItemTouchHelperViewHolder {
-
-            /**
-             * Called when the {@link ItemTouchHelper} first registers an
-             * item as being moved or swiped.
-             * Implementations should update the item view to indicate
-             * it's active state.
-             */
-            void onItemSelected();
-
-            /**
-             * Called when the {@link ItemTouchHelper} has completed the
-             * move or swipe, and the active item state should be cleared.
-             */
-            void onItemClear();
-        }
-
-        private final ItemTouchHelperAdapter mAdapter;
-
-        SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
-            mAdapter = adapter;
-        }
-
-        @Override
-        public boolean isLongPressDragEnabled() {
-            return true;
-        }
-
-        @Override
-        public boolean isItemViewSwipeEnabled() {
-            return true;
-        }
-
-        @Override
-        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
-            int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-
-            return makeMovementFlags(dragFlags, swipeFlags);
-        }
-
-        @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-            mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-            return true;
-        }
-
-        @Override
-        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
-        }
-
-        @Override
-        public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-            if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-                if (viewHolder instanceof ItemTouchHelperViewHolder) {
-                    ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-                    itemViewHolder.onItemSelected();
-                }
-            }
-
-            super.onSelectedChanged(viewHolder, actionState);
-        }
-
-        @Override
-        public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            super.clearView(recyclerView, viewHolder);
-
-            if (viewHolder instanceof ItemTouchHelperViewHolder) {
-                ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-                itemViewHolder.onItemClear();
-            }
+            Log.d("deleteImageFile", Boolean.toString(deleted));
         }
     }
 }
