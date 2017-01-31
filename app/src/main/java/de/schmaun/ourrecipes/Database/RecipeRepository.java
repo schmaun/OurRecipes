@@ -74,6 +74,18 @@ public class RecipeRepository {
         return recipes;
     }
 
+    public Recipe loadWithChildren(long recipeId) {
+        Recipe recipe = load(recipeId);
+
+        RecipeImageRepository imageRepository = RecipeImageRepository.getInstance(dbHelper);
+        recipe.setImages(imageRepository.load(recipe.getId()));
+
+        LabelsRepository labelsRepository = LabelsRepository.getInstance(dbHelper);
+        recipe.setLabels(labelsRepository.loadLabels(recipe.getId()));
+
+        return recipe;
+    }
+
     public Recipe load(long recipeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipeId)}, null, null, null, "1");

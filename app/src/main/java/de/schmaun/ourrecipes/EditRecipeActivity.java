@@ -26,8 +26,7 @@ import de.schmaun.ourrecipes.EditRecipe.EditRecipeMainFragment;
 import de.schmaun.ourrecipes.EditRecipe.EditRecipeMetaFragment;
 import de.schmaun.ourrecipes.Model.Recipe;
 
-public class EditRecipeActivity extends AppCompatActivity implements RecipeProviderInterface {
-    public static final String BUNDLE_KEY_RECIPE_ID = "recipeId";
+public class EditRecipeActivity extends RecipeActivity implements RecipeProviderInterface {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -44,13 +43,9 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeProvi
      */
     private ViewPager mViewPager;
 
-    private Recipe recipe;
-
     private EditRecipeMainFragment mainFragment;
     private EditRecipeImagesFragment imagesFragment;
     private EditRecipeMetaFragment metaFragment;
-
-    private static final String TAG_LIFECYCLE = "ERA:lifecycle";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,26 +79,7 @@ public class EditRecipeActivity extends AppCompatActivity implements RecipeProvi
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        recipe = new Recipe();
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            recipe.setId(bundle.getLong(BUNDLE_KEY_RECIPE_ID));
-            Log.d(TAG_LIFECYCLE, String.format("started with %s=%s", BUNDLE_KEY_RECIPE_ID, Long.toString(recipe.getId())));
-        }
-
-        if (savedInstanceState == null && recipe.getId() > 0) {
-            DbHelper dbHelper = new DbHelper(this);
-            RecipeRepository repository = RecipeRepository.getInstance(dbHelper);
-            recipe = repository.load(recipe.getId());
-
-            RecipeImageRepository imageRepository = RecipeImageRepository.getInstance(dbHelper);
-            recipe.setImages(imageRepository.load(recipe.getId()));
-
-            LabelsRepository labelsRepository = LabelsRepository.getInstance(dbHelper);
-            recipe.setLabels(labelsRepository.loadLabels(recipe.getId()));
-
-            Log.d(TAG_LIFECYCLE, "recipe loaded");
-        }
+        loadRecipe(savedInstanceState);
     }
 
     @Override

@@ -167,4 +167,13 @@ public class Recipe {
         this.lastEditAt = lastEditAt;
     }
 
+    public RecipeImage getCoverImage() {
+        for (RecipeImage image : images) {
+            if (image.isCoverImage()) {
+                return image;
+            }
+        }
+
+        return null;
+    }
 }

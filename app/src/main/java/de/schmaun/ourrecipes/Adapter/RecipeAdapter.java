@@ -12,6 +12,7 @@ import java.util.List;
 import de.schmaun.ourrecipes.EditRecipeActivity;
 import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.RecipeViewHolder;
+import de.schmaun.ourrecipes.ViewRecipeActivity;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
 
@@ -31,8 +32,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
 
         return new RecipeViewHolder(v, new RecipeViewHolder.ViewHolderClicks() {
             public void showRecipe(View caller, long recipeId) {
-                Intent intent = new Intent(viewGroup.getContext(), EditRecipeActivity.class);
-                intent.putExtra(EditRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipeId);
+                Intent intent = new Intent(viewGroup.getContext(), ViewRecipeActivity.class);
+                intent.putExtra(ViewRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipeId);
                 viewGroup.getContext().startActivity(intent);
             }
         });

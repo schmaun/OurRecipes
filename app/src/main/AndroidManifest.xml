@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.schmaun.ourrecipes">
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -39,6 +40,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <activity
+            android:name=".ViewRecipeActivity"
+            android:label="@string/title_activity_view_recipe"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
