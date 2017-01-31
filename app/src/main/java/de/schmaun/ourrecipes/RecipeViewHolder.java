@@ -8,9 +8,9 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.On
     public TextView recipeName;
     public TextView recipeDescription;
     public long id;
-    private IViewHolderClicks onClickListener;
+    private ViewHolderClicks onClickListener;
 
-    public RecipeViewHolder(View itemView, IViewHolderClicks onClickListener) {
+    public RecipeViewHolder(View itemView, ViewHolderClicks onClickListener) {
         super(itemView);
         itemView.setOnClickListener(this);
         this.onClickListener = onClickListener;
@@ -24,7 +24,7 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.On
         onClickListener.showRecipe(v, this.id);
     }
 
-    public static interface IViewHolderClicks {
-        public void showRecipe(View caller, long recipeId);
+    public interface ViewHolderClicks {
+        void showRecipe(View caller, long recipeId);
     }
 }

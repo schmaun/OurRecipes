@@ -4,10 +4,10 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.ViewDebug;
 import android.widget.ListAdapter;
 
 import de.schmaun.ourrecipes.Adapter.ArrayWithIconAdapter;
@@ -17,7 +17,7 @@ public class PhotoDialogFragment extends DialogFragment {
     private String TAG = "PhotoDialogFragment";
     private PictureIntentHandler pictureIntentHandler;
 
-    interface PictureIntentHandler {
+    public interface PictureIntentHandler {
         void dispatchTakePicture();
         void dispatchSelectPictureFromGallery();
         void dispatchSelectPictureFromStorageAccessFramework();
@@ -27,6 +27,7 @@ public class PhotoDialogFragment extends DialogFragment {
         this.pictureIntentHandler = pictureIntentHandler;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

@@ -29,7 +29,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
     public RecipeViewHolder onCreateViewHolder(final ViewGroup viewGroup, int viewType) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(rowLayout, viewGroup, false);
 
-        return new RecipeViewHolder(v, new RecipeViewHolder.IViewHolderClicks() {
+        return new RecipeViewHolder(v, new RecipeViewHolder.ViewHolderClicks() {
             public void showRecipe(View caller, long recipeId) {
                 Intent intent = new Intent(viewGroup.getContext(), EditRecipeActivity.class);
                 intent.putExtra(EditRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipeId);

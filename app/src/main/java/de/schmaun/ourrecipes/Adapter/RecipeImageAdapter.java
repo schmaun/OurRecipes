@@ -18,27 +18,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.schmaun.ourrecipes.EditRecipeActivity;
+import de.schmaun.ourrecipes.EditRecipe.EditRecipeImagesFragment;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
 
-public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.ImageHolder> implements EditRecipeActivity.EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperAdapter {
+public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.ImageHolder> implements EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperAdapter {
 
     private Context context;
     private List<RecipeImage> images;
     private View rootView;
 
     private ArrayList<RecipeImage> deletedImages = new ArrayList<>();
-    protected RecipeImage deletedRecipeImage;
-    protected int deletedRecipeImagePosition;
+    private RecipeImage deletedRecipeImage;
+    private int deletedRecipeImagePosition;
 
-    public static class ImageHolder extends RecyclerView.ViewHolder implements EditRecipeActivity.EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperViewHolder {
-        public Button deleteButton;
-        public Button coverButton;
-        public TextView imageTextView;
-        public ImageView imageView;
+    static class ImageHolder extends RecyclerView.ViewHolder implements EditRecipeImagesFragment.SimpleItemTouchHelperCallback.ItemTouchHelperViewHolder {
+        Button deleteButton;
+        Button coverButton;
+        TextView imageTextView;
+        ImageView imageView;
 
-        public ImageHolder(View v) {
+        ImageHolder(View v) {
             super(v);
             imageView = (ImageView) v.findViewById(R.id.recipeImage);
             imageTextView = (TextView) v.findViewById(R.id.recipeImageText);
@@ -105,7 +105,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         snackbar.show();
     }
 
-    public void onSetAsCoverImage(int position) {
+    private void onSetAsCoverImage(int position) {
         for(RecipeImage image: images) {
             image.setCoverImage(false);
         }
