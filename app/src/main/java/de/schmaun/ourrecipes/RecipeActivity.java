@@ -14,7 +14,7 @@ class RecipeActivity extends AppCompatActivity {
 
     public Recipe recipe;
 
-    void loadRecipe(Bundle savedInstanceState)
+    void loadRecipe(Bundle savedInstanceState, boolean forceLoading)
     {
         recipe = new Recipe();
         long recipeId = 0;
@@ -24,7 +24,7 @@ class RecipeActivity extends AppCompatActivity {
             Log.d(TAG_LIFECYCLE, String.format("started with %s=%s", BUNDLE_KEY_RECIPE_ID, Long.toString(recipe.getId())));
         }
 
-        if (savedInstanceState == null && recipeId > 0) {
+        if ((savedInstanceState == null || forceLoading == true) && recipeId > 0) {
             DbHelper dbHelper = new DbHelper(this);
             RecipeRepository repository = RecipeRepository.getInstance(dbHelper);
             recipe = repository.loadWithChildren(recipeId);
