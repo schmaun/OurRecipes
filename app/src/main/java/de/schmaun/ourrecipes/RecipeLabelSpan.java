@@ -35,12 +35,19 @@ public class RecipeLabelSpan extends ReplacementSpan implements LineHeightSpan {
         final float badgeHeight = textSize * 2.25f;
         final float textOffsetVertical = textSize * 1.45f;
 
-        RectF badge = new RectF(x, y, textLength, y + badgeHeight);
+        /*RectF badge = new RectF(x, y, textLength, y + badgeHeight);
         paint.setColor(backgroundColor);
         canvas.drawRoundRect(badge, CORNER_RADIUS, CORNER_RADIUS, paint);
 
         paint.setColor(textColor);
         canvas.drawText(text, start, end, x, y + textOffsetVertical, paint);
+*/
+
+        RectF rect = new RectF(x, top, x + measureText(paint, text, start, end), bottom);
+        paint.setColor(backgroundColor);
+        canvas.drawRoundRect(rect, CORNER_RADIUS, CORNER_RADIUS, paint);
+        paint.setColor(textColor);
+        canvas.drawText(text, start, end, x, y, paint);
     }
 
     @Override
@@ -54,7 +61,7 @@ public class RecipeLabelSpan extends ReplacementSpan implements LineHeightSpan {
 
     @Override
     public void chooseHeight(CharSequence text, int start, int end, int spanstartv, int v, Paint.FontMetricsInt fm) {
-        fm.bottom += lineHeight;
-        fm.descent += 5;
+        //fm.bottom += lineHeight;
+        //fm.descent += 5;
     }
 }

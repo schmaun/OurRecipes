@@ -24,4 +24,12 @@
     </style>
     <style name="RecipeView.Text" parent="@android:style/TextAppearance.Material.Medium" />
 
+
+
+    <style name="imageViewDialog" parent="android:Theme" >
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
 </resources>
