@@ -139,4 +139,9 @@
     <string name="view_recipe_ingredients">Ingredients</string>
     <string name="view_recipe_preparation_steps">Preparation Steps</string>
     <string name="view_recipe_notes">Notes</string>
+    <string name="edit_leave_confirm_headline">Really go back?</string>
+    <string name="edit_leave_confirm_text">You have unsaved changes. Do you want to save them?</string>
+    <string name="edit_leave_confirm_button_yes">Yes</string>
+    <string name="edit_leave_confirm_button_no">No</string>
+    <string name="edit_leave_confirm_button_stay">Stay</string>
 </resources>

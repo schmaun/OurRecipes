@@ -12,6 +12,7 @@ class RecipeActivity extends AppCompatActivity implements RecipeProviderInterfac
     public static final String BUNDLE_KEY_RECIPE_ID = "recipeId";
     private static final String TAG_LIFECYCLE = "RA:lifecycle";
 
+    protected boolean hasUnsavedChanges = false;
     public Recipe recipe;
 
     void loadRecipe(Bundle savedInstanceState, boolean forceLoading)
@@ -36,5 +37,10 @@ class RecipeActivity extends AppCompatActivity implements RecipeProviderInterfac
     @Override
     public Recipe getRecipe() {
         return recipe;
+    }
+
+    @Override
+    public void setHasUnsavedChanges(boolean unsavedChanges) {
+        hasUnsavedChanges = unsavedChanges;
     }
 }

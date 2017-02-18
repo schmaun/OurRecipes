@@ -1,7 +1,9 @@
 package de.schmaun.ourrecipes;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.design.widget.TabLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -90,22 +92,59 @@ public class EditRecipeActivity extends RecipeActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_save) {
-            if(validate()) {
-                collectDataFromFragments();
-                saveRecipe();
-                onSavedRecipe();
-                finish();
-            }
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                showExitDialog();
+                return true;
+            case R.id.action_save:
+                saveAndFinish();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void saveAndFinish() {
+        if(validate()) {
+            collectDataFromFragments();
+            saveRecipe();
+            onSavedRecipe();
+            finish();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        showExitDialog();
+    }
+
+    private void showExitDialog() {
+        if (!hasUnsavedChanges()) {
+            finish();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.edit_leave_confirm_headline)
+            .setMessage(R.string.edit_leave_confirm_text)
+            .setPositiveButton(R.string.edit_leave_confirm_button_yes, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    saveAndFinish();
+                }
+
+            })
+            .setNeutralButton(R.string.edit_leave_confirm_button_no, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+
+            })
+            .setNegativeButton(R.string.edit_leave_confirm_button_stay, null)
+            .show();
     }
 
     private boolean validate()
@@ -117,6 +156,21 @@ public class EditRecipeActivity extends RecipeActivity {
             }
 
             return valid;
+        }
+
+        return false;
+    }
+
+    private boolean hasUnsavedChanges()
+    {
+        if (mainFragment != null && mainFragment.hasUnsavedChanges()) {
+            return true;
+        }
+        if (imagesFragment != null && imagesFragment.hasUnsavedChanges()) {
+            return true;
+        }
+        if (metaFragment != null && metaFragment.hasUnsavedChanges()) {
+            return true;
         }
 
         return false;

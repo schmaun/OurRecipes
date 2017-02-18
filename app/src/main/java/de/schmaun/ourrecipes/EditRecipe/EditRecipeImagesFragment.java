@@ -36,7 +36,7 @@ import de.schmaun.ourrecipes.RecipeFormInterface;
 
 import static android.app.Activity.RESULT_OK;
 
-public class EditRecipeImagesFragment extends EditRecipeFragment implements RecipeFormInterface, PhotoDialogFragment.PictureIntentHandler, DownloadImageTask.DownloadImageHandler {
+public class EditRecipeImagesFragment extends EditRecipeFragment implements PhotoDialogFragment.PictureIntentHandler, DownloadImageTask.DownloadImageHandler {
     private RecyclerView imageListView;
     private RecipeImageAdapter imageAdapter;
     private ArrayList<RecipeImage> recipeImages;
@@ -98,6 +98,7 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Reci
         }
 
         imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, deletedImages, imageListView);
+        imageAdapter.registerAdapterDataObserver(new EditRecipeImagesObserver(this));
         imageListView.setAdapter(imageAdapter);
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ImageCardTouchHelperCallback(imageAdapter));

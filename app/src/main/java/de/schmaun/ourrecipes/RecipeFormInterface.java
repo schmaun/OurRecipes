@@ -6,4 +6,5 @@ public interface RecipeFormInterface {
     boolean isValid();
     Recipe getRecipe();
     void onSaved();
+    boolean hasUnsavedChanges();
 }

@@ -26,9 +26,6 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
     private TextView notesView;
     private MaterialMultiAutoCompleteTextView labelsView;
 
-    public EditRecipeMetaFragment() {
-    }
-
     public static EditRecipeMetaFragment newInstance() {
         return new EditRecipeMetaFragment();
     }
@@ -60,6 +57,9 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
 
         labelsView.setAdapter(adapter);
         labelsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+
+        labelsView.addTextChangedListener(new EditRecipeTextWatcher(this));
+        notesView.addTextChangedListener(new EditRecipeTextWatcher(this));
 
         return rootView;
     }

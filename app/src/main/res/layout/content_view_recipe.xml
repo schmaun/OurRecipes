@@ -61,7 +61,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:ellipsize="end"
-                android:maxLines="4"
                 android:textAppearance="@style/RecipeView.Text" />
 
 
@@ -79,7 +78,6 @@
 
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:ellipsize="end"
-                android:maxLines="4"
                 android:textAppearance="@style/RecipeView.Text" />
 
             <TextView
@@ -96,7 +94,6 @@
 
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:ellipsize="end"
-                android:maxLines="4"
                 android:textAppearance="@style/RecipeView.Text" />
         </LinearLayout>
     </RelativeLayout>

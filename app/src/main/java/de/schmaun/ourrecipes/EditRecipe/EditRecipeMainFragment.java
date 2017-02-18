@@ -2,6 +2,8 @@ package de.schmaun.ourrecipes.EditRecipe;
 
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +17,6 @@ public class EditRecipeMainFragment extends EditRecipeFragment implements Recipe
     private TextView nameView;
     private TextView ingredientsView;
     private TextView preparationView;
-
-    public EditRecipeMainFragment() {
-    }
 
     public static EditRecipeMainFragment newInstance() {
         return new EditRecipeMainFragment();
@@ -38,6 +37,10 @@ public class EditRecipeMainFragment extends EditRecipeFragment implements Recipe
             ingredientsView.setText(recipe.getIngredients());
             preparationView.setText(recipe.getPreparation());
         }
+
+        nameView.addTextChangedListener(new EditRecipeTextWatcher(this));
+        ingredientsView.addTextChangedListener(new EditRecipeTextWatcher(this));
+        preparationView.addTextChangedListener(new EditRecipeTextWatcher(this));
 
         return rootView;
     }
