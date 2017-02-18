@@ -68,6 +68,10 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
 
     public void addImage(RecipeImage image) {
         this.images.add(image);
+        if (this.images.size() == 1) {
+            onSetAsCoverImage(image);
+        }
+
         notifyDataSetChanged();
     }
 
@@ -94,12 +98,21 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         images.remove(position);
         notifyItemRemoved(position);
 
+        if (images.size() == 1) {
+            onSetAsCoverImage(0);
+        }
+
         Snackbar snackbar = Snackbar.make(this.rootView, R.string.edit_recipe_image_deleted, Snackbar.LENGTH_LONG);
         snackbar.setAction(R.string.edit_recipe_image_deleted_undo, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 images.add(deletedRecipeImagePosition, deletedRecipeImage);
                 deletedImages.remove(deletedRecipeImage);
+
+                if (deletedRecipeImage.isCoverImage()) {
+                    onSetAsCoverImage(deletedRecipeImage);
+                }
+
                 notifyItemInserted(deletedRecipeImagePosition);
             }
         });
@@ -107,11 +120,14 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
     }
 
     private void onSetAsCoverImage(int position) {
-        for(RecipeImage image: images) {
-            image.setCoverImage(false);
+        onSetAsCoverImage(images.get(position));
+    }
+
+    private void onSetAsCoverImage(RecipeImage image) {
+        for(RecipeImage notCoverImage: images) {
+            notCoverImage.setCoverImage(false);
         }
 
-        RecipeImage image = images.get(position);
         image.setCoverImage(true);
 
         notifyDataSetChanged();
