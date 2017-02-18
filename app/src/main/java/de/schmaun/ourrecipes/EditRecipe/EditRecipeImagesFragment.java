@@ -208,8 +208,10 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Reci
 
     @Override
     public void onSuccess(File file) {
+        Uri uri = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", file);
+
         RecipeImage image = new RecipeImage();
-        image.setLocation(file.getAbsolutePath());
+        image.setLocation(uri.toString());
         imageAdapter.addImage(image);
     }
 

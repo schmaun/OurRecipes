@@ -80,7 +80,7 @@ public class ViewRecipeActivity extends RecipeActivity {
         notesView.setText(recipe.getNotes());
         labelsView.setText(getFormattedLabels());
 
-        SimpleRecipeImageAdapter imageAdapter = new SimpleRecipeImageAdapter(this, recipe.getImages());
+        SimpleRecipeImageAdapter imageAdapter = new SimpleRecipeImageAdapter(this, recipe);
 
         imagesView.setHasFixedSize(true);
         imagesView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));

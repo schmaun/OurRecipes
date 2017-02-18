@@ -6,9 +6,13 @@
     android:layout_centerVertical="true"
     android:layout_centerHorizontal="true"
     >
-    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/view_image_dialog_pager"
+
+    <ImageView
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </android.support.v4.view.ViewPager>
+        android:layout_height="match_parent"
+        android:id="@+id/view_image_dialog_image"
+        />
+
 </RelativeLayout>

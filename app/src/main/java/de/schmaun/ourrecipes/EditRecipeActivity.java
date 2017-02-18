@@ -25,7 +25,7 @@ import de.schmaun.ourrecipes.EditRecipe.EditRecipeMainFragment;
 import de.schmaun.ourrecipes.EditRecipe.EditRecipeMetaFragment;
 import de.schmaun.ourrecipes.Model.Recipe;
 
-public class EditRecipeActivity extends RecipeActivity implements RecipeProviderInterface {
+public class EditRecipeActivity extends RecipeActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -173,11 +173,6 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeProvider
         if (metaFragment != null) {
             metaFragment.onSaved();
         }
-    }
-
-    @Override
-    public Recipe getRecipe() {
-        return recipe;
     }
 
     private class PagerAdapter extends FragmentPagerAdapter {

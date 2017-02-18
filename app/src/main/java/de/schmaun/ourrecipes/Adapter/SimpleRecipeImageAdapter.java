@@ -18,12 +18,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.schmaun.ourrecipes.ImageViewDialogFragment;
+import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
+import de.schmaun.ourrecipes.RecipeProviderInterface;
 
 public class SimpleRecipeImageAdapter extends RecyclerView.Adapter<SimpleRecipeImageAdapter.ImageHolder> {
 
     private Context context;
+    private Recipe recipe;
     private List<RecipeImage> images;
 
     static class ImageHolder extends RecyclerView.ViewHolder {
@@ -35,9 +38,10 @@ public class SimpleRecipeImageAdapter extends RecyclerView.Adapter<SimpleRecipeI
         }
     }
 
-    public SimpleRecipeImageAdapter(Context context, List<RecipeImage> images) {
+    public SimpleRecipeImageAdapter(Context context, Recipe recipe) {
         this.context = context;
-        this.images = images;
+        this.recipe = recipe;
+        this.images = recipe.getImages();
     }
 
     @Override
@@ -50,20 +54,14 @@ public class SimpleRecipeImageAdapter extends RecyclerView.Adapter<SimpleRecipeI
     @Override
     public void onBindViewHolder(final ImageHolder imageHolder, int i) {
         final RecipeImage image = images.get(i);
+        final int currentImagePosition = i;
 
         imageHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction ft = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
-                ImageViewDialogFragment frag = ImageViewDialogFragment.newInstance(image);
-
-                frag.show(ft, "txn_tag");
-
-                /*
-                ImageViewDialogFragment newFragment = new ImageViewDialogFragment();
-                newFragment.setImage(image);
-                newFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "add_photo");
-                */
+                FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
+                ImageViewDialogFragment imageViewDialog = ImageViewDialogFragment.newInstance((RecipeProviderInterface)context, currentImagePosition);
+                imageViewDialog.show(transaction, "imageViewDialog");
             }
         });
 

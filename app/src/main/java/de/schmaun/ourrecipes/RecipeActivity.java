@@ -8,7 +8,7 @@ import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.RecipeRepository;
 import de.schmaun.ourrecipes.Model.Recipe;
 
-class RecipeActivity extends AppCompatActivity {
+class RecipeActivity extends AppCompatActivity implements RecipeProviderInterface {
     public static final String BUNDLE_KEY_RECIPE_ID = "recipeId";
     private static final String TAG_LIFECYCLE = "RA:lifecycle";
 
@@ -31,5 +31,10 @@ class RecipeActivity extends AppCompatActivity {
 
             Log.d(TAG_LIFECYCLE, "recipe loaded");
         }
+    }
+
+    @Override
+    public Recipe getRecipe() {
+        return recipe;
     }
 }

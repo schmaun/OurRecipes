@@ -3,6 +3,7 @@ package de.schmaun.ourrecipes;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import java.io.File;
@@ -10,8 +11,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 
 public class DownloadImageTask extends AsyncTask<Uri, Void, File> {
+    public static final String TAG = "DownloadImageTask";
     private Exception error;
     private Context context;
     private DownloadImageHandler imageHandler;
@@ -34,7 +37,7 @@ public class DownloadImageTask extends AsyncTask<Uri, Void, File> {
             downloadImage(uris[0]);
         } catch (IOException e) {
             error = e;
-            Log.e("DownloadImageTask", e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
         return target;
     }
