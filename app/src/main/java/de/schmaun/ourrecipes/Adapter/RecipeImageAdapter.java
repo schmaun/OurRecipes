@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +21,10 @@ import java.util.Collections;
 import java.util.List;
 
 import de.schmaun.ourrecipes.EditRecipe.ImageCardTouchHelperCallback;
+import de.schmaun.ourrecipes.ImageViewDialogFragment;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
+import de.schmaun.ourrecipes.RecipeProviderInterface;
 
 public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.ImageHolder> implements ImageCardTouchHelperCallback.ItemTouchHelperAdapter {
 
@@ -142,6 +146,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
 
     @Override
     public void onBindViewHolder(final ImageHolder imageHolder, int i) {
+        final int position = i;
         RecipeImage image = images.get(i);
         Glide.with(context).load(image.getLocation()).centerCrop().into(imageHolder.imageView);
 
@@ -171,6 +176,15 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         if(image.isCoverImage()) {
             imageHolder.coverButton.setEnabled(false);
         }
+
+        imageHolder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
+                ImageViewDialogFragment imageViewDialog = ImageViewDialogFragment.newInstance((RecipeProviderInterface)context, position);
+                imageViewDialog.show(transaction, "imageViewDialog");
+            }
+        });
     }
 
     @Override

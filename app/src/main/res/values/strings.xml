@@ -39,13 +39,14 @@
     <string name="edit_recipe_set_as_cover_image_button">Set as cover image</string>
     <string name="edit_recipe_delete_image_button">delete</string>
     <string name="action_edit_recipe">Edit recipe</string>
+    <string name="action_edit_image">Edit image</string>
 
     <string-array name="edit_recipe_add_image_items">
         <item>Take Picture</item>
         <item>Select from Gallery</item>
         <item>Select from Whatever</item>
     </string-array>
-    <string name="title_activity_view_recipe">ViewRecipeActivity</string>
+    <string name="title_activity_view_recipe">View recipe</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -144,4 +145,6 @@
     <string name="edit_leave_confirm_button_yes">Yes</string>
     <string name="edit_leave_confirm_button_no">No</string>
     <string name="edit_leave_confirm_button_stay">Stay</string>
+    <string name="dialog_view_image_title">Image %1$d of %2$d</string>
+
 </resources>
