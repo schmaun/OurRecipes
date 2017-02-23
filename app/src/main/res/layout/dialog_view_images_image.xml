@@ -14,4 +14,15 @@
         android:id="@+id/view_image_dialog_image"
         />
 
+    <TextView
+        android:id="@+id/view_image_dialog_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textColor="@color/imageViewText"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:maxLines="10"
+        android:ellipsize="end"
+        />
 </RelativeLayout>

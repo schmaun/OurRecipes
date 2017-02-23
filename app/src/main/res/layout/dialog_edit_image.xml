@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:id="@+id/edit_image_dialog_image"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:id="@+id/edit_image_dialog_description"
+        android:hint="@string/edit_image_description"
+        android:gravity="top"
+        app:met_floatingLabel="highlight"
+        />
+</LinearLayout>

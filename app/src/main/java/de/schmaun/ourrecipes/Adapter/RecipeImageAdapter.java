@@ -3,10 +3,12 @@ package de.schmaun.ourrecipes.Adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,22 +16,24 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.schmaun.ourrecipes.EditRecipe.EditImageDialogFragment;
 import de.schmaun.ourrecipes.EditRecipe.ImageCardTouchHelperCallback;
 import de.schmaun.ourrecipes.ImageViewDialogFragment;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
 import de.schmaun.ourrecipes.RecipeProviderInterface;
 
-public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.ImageHolder> implements ImageCardTouchHelperCallback.ItemTouchHelperAdapter {
+public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.ImageHolder> implements ImageCardTouchHelperCallback.ItemTouchHelperAdapter, EditImageDialogFragment.RecipeImageProvider {
 
     private Context context;
-    private List<RecipeImage> images;
+    private ArrayList<RecipeImage> images;
     private View rootView;
 
     private ArrayList<RecipeImage> deletedImages = new ArrayList<>();
@@ -63,7 +67,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         }
     }
 
-    public RecipeImageAdapter(Context context, List<RecipeImage> images, ArrayList<RecipeImage> deletedImages, View rootView) {
+    public RecipeImageAdapter(Context context, ArrayList<RecipeImage> images, ArrayList<RecipeImage> deletedImages, View rootView) {
         this.context = context;
         this.images = images;
         this.deletedImages = deletedImages;
@@ -77,6 +81,16 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         }
 
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void onImageDescriptionChange(RecipeImage image) {
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public ArrayList<RecipeImage> getImages() {
+        return images;
     }
 
     @Override
@@ -133,7 +147,6 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         }
 
         image.setCoverImage(true);
-
         notifyDataSetChanged();
     }
 
@@ -147,6 +160,8 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
     @Override
     public void onBindViewHolder(final ImageHolder imageHolder, int i) {
         final int position = i;
+        final RecipeImageAdapter that = this;
+
         RecipeImage image = images.get(i);
         Glide.with(context).load(image.getLocation()).centerCrop().into(imageHolder.imageView);
 
@@ -177,12 +192,12 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
             imageHolder.coverButton.setEnabled(false);
         }
 
-        imageHolder.imageView.setOnClickListener(new View.OnClickListener() {
+        imageHolder.imageTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
-                ImageViewDialogFragment imageViewDialog = ImageViewDialogFragment.newInstance((RecipeProviderInterface)context, position);
-                imageViewDialog.show(transaction, "imageViewDialog");
+                EditImageDialogFragment editImageDialog = EditImageDialogFragment.newInstance(that, position);
+                editImageDialog.show(transaction, "editImageDialog");
             }
         });
     }

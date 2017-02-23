@@ -6,4 +6,5 @@
     <color name="imageText">#4c4c4c</color>
     <color name="recipeLabelText">#ffffff</color>
     <color name="recipeLabelBackground">#aaaaaa</color>
+    <color name="imageViewText">#ffffff</color>
 </resources>
