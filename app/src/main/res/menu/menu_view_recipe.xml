@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="de.schmaun.ourrecipes.ViewRecipeActivity">
+
     <item
         android:id="@+id/action_edit"
         android:orderInCategory="10"

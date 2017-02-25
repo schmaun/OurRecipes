@@ -80,7 +80,7 @@ public class EditRecipeActivity extends RecipeActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        loadRecipe(savedInstanceState, false);
+        loadRecipeOnCreate(savedInstanceState, false);
     }
 
     @Override

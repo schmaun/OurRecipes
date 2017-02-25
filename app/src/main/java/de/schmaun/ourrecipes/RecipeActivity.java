@@ -1,8 +1,12 @@
 package de.schmaun.ourrecipes;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 
 import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.RecipeRepository;
@@ -14,11 +18,12 @@ class RecipeActivity extends AppCompatActivity implements RecipeProviderInterfac
 
     protected boolean hasUnsavedChanges = false;
     public Recipe recipe;
+    public long recipeId;
 
-    void loadRecipe(Bundle savedInstanceState, boolean forceLoading)
+    void loadRecipeOnCreate(Bundle savedInstanceState, boolean forceLoading)
     {
         recipe = new Recipe();
-        long recipeId = 0;
+        recipeId = 0;
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             recipeId = bundle.getLong(BUNDLE_KEY_RECIPE_ID);
@@ -26,12 +31,15 @@ class RecipeActivity extends AppCompatActivity implements RecipeProviderInterfac
         }
 
         if ((savedInstanceState == null || forceLoading == true) && recipeId > 0) {
-            DbHelper dbHelper = new DbHelper(this);
-            RecipeRepository repository = RecipeRepository.getInstance(dbHelper);
-            recipe = repository.loadWithChildren(recipeId);
-
+            loadRecipe(recipeId);
             Log.d(TAG_LIFECYCLE, "recipe loaded");
         }
+    }
+
+    void loadRecipe(long recipeId) {
+        DbHelper dbHelper = new DbHelper(this);
+        RecipeRepository repository = RecipeRepository.getInstance(dbHelper);
+        recipe = repository.loadWithChildren(recipeId);
     }
 
     @Override
@@ -42,5 +50,27 @@ class RecipeActivity extends AppCompatActivity implements RecipeProviderInterfac
     @Override
     public void setHasUnsavedChanges(boolean unsavedChanges) {
         hasUnsavedChanges = unsavedChanges;
+    }
+
+    protected class LikeButtonOnClickListener implements OnLikeListener {
+        private Context context;
+
+        public LikeButtonOnClickListener(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void liked(LikeButton likeButton) {
+            recipe.setFavourite(true);
+            DbHelper dbHelper = new DbHelper(context);
+            RecipeRepository.getInstance(dbHelper).updateFavouriteStatus(recipe, 1);
+        }
+
+        @Override
+        public void unLiked(LikeButton likeButton) {
+            recipe.setFavourite(false);
+            DbHelper dbHelper = new DbHelper(context);
+            RecipeRepository.getInstance(dbHelper).updateFavouriteStatus(recipe, 0);
+        }
     }
 }

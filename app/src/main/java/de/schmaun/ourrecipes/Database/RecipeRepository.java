@@ -133,6 +133,15 @@ public class RecipeRepository {
         db.close();
     }
 
+    public void updateFavouriteStatus(Recipe recipe, int favStatus) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_FAVOURITE, favStatus);
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipe.getId())});
+        db.close();
+    }
+
     public void delete(long recipeId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipeId)});

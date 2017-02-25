@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,16 +25,19 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.github.iojjj.rcbs.RoundedCornersBackgroundSpan;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 
 import de.schmaun.ourrecipes.Adapter.SimpleRecipeImageAdapter;
+import de.schmaun.ourrecipes.Database.DbHelper;
+import de.schmaun.ourrecipes.Database.RecipeRepository;
 import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.RecipeImage;
-
-import static android.support.design.R.attr.layoutManager;
 
 public class ViewRecipeActivity extends RecipeActivity {
 
     private TextView labelsView;
+    static final int REQUEST_EDIT_RECIPE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,28 @@ public class ViewRecipeActivity extends RecipeActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        loadRecipeOnCreate(savedInstanceState, true);
+
+        fillView();
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // start cooking mode
+            }
+        });
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        loadRecipe(recipeId);
+        fillView();
+    }
+
+    private void fillView() {
         ImageView coverImageView = (ImageView) findViewById(R.id.view_recipe_cover_image);
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.view_recipe_toolbar_layout);
 
@@ -51,9 +77,6 @@ public class ViewRecipeActivity extends RecipeActivity {
         TextView preparationView = (TextView) findViewById(R.id.view_recipe_preparation);
         TextView notesView = (TextView) findViewById(R.id.view_recipe_notes);
         RecyclerView imagesView = (RecyclerView) findViewById(R.id.view_recipe_images);
-
-
-        loadRecipe(savedInstanceState, true);
 
         TextView ingredientsHeadlineView = (TextView) findViewById(R.id.view_recipe_ingredients_headline);
         TextView preparationHeadlineView = (TextView) findViewById(R.id.view_recipe_preparation_headline);
@@ -79,7 +102,6 @@ public class ViewRecipeActivity extends RecipeActivity {
         preparationView.setText(recipe.getPreparation());
         notesView.setText(recipe.getNotes());
         labelsView.setText(getFormattedLabels());
-
         SimpleRecipeImageAdapter imageAdapter = new SimpleRecipeImageAdapter(this, recipe);
 
         imagesView.setHasFixedSize(true);
@@ -89,16 +111,9 @@ public class ViewRecipeActivity extends RecipeActivity {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(imagesView.getContext(), LinearLayoutManager.HORIZONTAL);
         imagesView.addItemDecoration(dividerItemDecoration);
 
-
-
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
-        */
+        LikeButton likeButton = (LikeButton) findViewById(R.id.view_recipe_like_button);
+        likeButton.setOnLikeListener(new LikeButtonOnClickListener(this));
+        likeButton.setLiked(recipe.isFavourite());
     }
 
     private static float convertDpToPx(Context context, float dp) {
