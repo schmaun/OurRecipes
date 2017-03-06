@@ -3,7 +3,9 @@ package de.schmaun.ourrecipes;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,9 +22,12 @@ import android.view.MenuItem;
 import de.schmaun.ourrecipes.Adapter.RecipeAdapter;
 import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.RecipeRepository;
+import de.schmaun.ourrecipes.Main.RecipeLabelFragment;
+import de.schmaun.ourrecipes.Main.dummy.DummyContent;
+import de.schmaun.ourrecipes.Model.Label;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, RecipeLabelFragment.OnListFragmentInteractionListener {
 
     Context context;
 
@@ -51,13 +56,14 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
+        showMainContent(R.id.nav_start);
+/*
         DbHelper db = new DbHelper(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
@@ -71,6 +77,8 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        */
+
     }
 
     @Override
@@ -105,28 +113,39 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        showMainContent(itemId);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showMainContent(int itemId) {
+        switch (itemId) {
+            case R.id.nav_start:
+                RecipeLabelFragment fragment = RecipeLabelFragment.newInstance(2);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_main, fragment)
+                        .commit();
+
+                break;
+            case R.id.nav_favourites:
+                break;
+            case R.id.nav_feeling_lucky:
+                break;
+            case R.id.nav_settings:
+                break;
+            case R.id.nav_about:
+                break;
+        }
+    }
+
+    @Override
+    public void onRecipeLabelClick(Label label) {
+
     }
 }

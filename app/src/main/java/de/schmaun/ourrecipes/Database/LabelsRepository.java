@@ -4,14 +4,17 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.Recipe;
 
 public class LabelsRepository {
 
+    public static final String TAG = "LabelsRepository";
     private static LabelsRepository mInstance;
 
     private DbHelper dbHelper;
@@ -36,6 +39,54 @@ public class LabelsRepository {
         }
 
         return mInstance;
+    }
+
+    public List<Label> getLabelsForMain() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Label> labels = new ArrayList<>();
+
+        String sql = "SELECT " +
+                "label." + COLUMN_NAME_ID + " AS id, " +
+                "label." + COLUMN_NAME_NAME + " AS name, " +
+                "recipeImage." + RecipeImageRepository.COLUMN_NAME_LOCATION + " AS imageLocation, " +
+                "COUNT(DISTINCT recipe." + RecipeRepository.COLUMN_NAME_ID + ") AS countRecipes " +
+                "FROM " + TABLE_NAME + " AS label " +
+                "JOIN " + REL_TABLE_NAME + " AS rel ON rel." + REL_COLUMN_LABEL_ID + "=label." + COLUMN_NAME_ID + " " +
+                "JOIN " + RecipeRepository.TABLE_NAME + " AS recipe ON recipe." + RecipeRepository.COLUMN_NAME_ID + "=rel." + REL_COLUMN_RECIPE_ID + " " +
+                "JOIN " + RecipeImageRepository.TABLE_NAME + " AS recipeImage ON recipeImage." + RecipeImageRepository.COLUMN_NAME_RECIPE_ID + "=recipe." + RecipeRepository.COLUMN_NAME_ID + " " +
+                "GROUP BY label." + COLUMN_NAME_ID + " " +
+                "ORDER BY label." + COLUMN_NAME_NAME + " ASC";
+
+        Log.d(TAG, sql);
+        Cursor cursor = db.rawQuery(sql, null);
+
+        int i = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                Label label = new Label();
+                label.setId(cursor.getLong(cursor.getColumnIndex("id")));
+                label.setName(cursor.getString(cursor.getColumnIndex("name")));
+                label.setImageLocation(cursor.getString(cursor.getColumnIndex("imageLocation")));
+                label.setCountRecipes(cursor.getInt(cursor.getColumnIndex("countRecipes")));
+
+                Label labelBefore = null;
+                if (i >= 2) {
+                    labelBefore = labels.get(i - 2);
+                }
+
+                if (Math.random() < 0.4f && labelBefore != null && !labelBefore.isFullSpan()) {
+                    label.setFullSpan(true);
+                }
+
+                i++;
+                labels.add(label);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return labels;
     }
 
     public void delete(Label label) {

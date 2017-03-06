@@ -8,4 +8,6 @@
     <color name="recipeLabelText">#ffffff</color>
     <color name="recipeLabelBackground">#aaaaaa</color>
     <color name="imageViewText">#ffffff</color>
+    <color name="labelListText">#ffffff</color>
+    <color name="labelListTextBackground">#11ffffff</color>
 </resources>

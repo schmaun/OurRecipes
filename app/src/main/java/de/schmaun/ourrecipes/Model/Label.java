@@ -6,6 +6,9 @@ public class Label implements Serializable {
 
     private long id;
     private String name;
+    private int countRecipes;
+    private String imageLocation;
+    private boolean fullSpan;
 
     public Label(){}
     public Label(String name) {
@@ -30,4 +33,28 @@ public class Label implements Serializable {
 
     @Override
     public String toString() { return name; }
+
+    public int getCountRecipes() {
+        return countRecipes;
+    }
+
+    public String getImageLocation() {
+        return imageLocation;
+    }
+
+    public void setImageLocation(String imageLocation) {
+        this.imageLocation = imageLocation;
+    }
+
+    public void setCountRecipes(int countRecipes) {
+        this.countRecipes = countRecipes;
+    }
+
+    public void setFullSpan(boolean fullSpan) {
+        this.fullSpan = fullSpan;
+    }
+
+    public boolean isFullSpan() {
+        return fullSpan;
+    }
 }

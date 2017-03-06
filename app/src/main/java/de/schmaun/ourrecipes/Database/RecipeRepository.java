@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.Recipe;
 
 public class RecipeRepository {
