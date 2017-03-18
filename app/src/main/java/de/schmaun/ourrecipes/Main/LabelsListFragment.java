@@ -44,6 +44,12 @@ public class LabelsListFragment extends Fragment {
 
         StopWatch stopWatch = StopWatch.createAndStart();
         labels = LabelsRepository.getInstance(db).getLabelsForMain();
+
+        Label label = new Label();
+        label.setId(-1);
+        label.setName(getString(R.string.not_labeled));
+        labels.add(label);
+
         Log.d(TAG, "getLabelsForMain duration: " + Long.toString(stopWatch.stop()));
     }
 

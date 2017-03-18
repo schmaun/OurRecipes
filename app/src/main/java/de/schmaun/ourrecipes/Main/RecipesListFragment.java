@@ -62,7 +62,12 @@ public class RecipesListFragment extends Fragment {
         DbHelper db = new DbHelper(getContext());
 
         StopWatch stopWatch = StopWatch.createAndStart();
-        recipes = RecipeRepository.getInstance(db).getRecipesForLabel(labelId);
+
+        if (labelId > 0) {
+            recipes = RecipeRepository.getInstance(db).getRecipesForLabel(labelId);
+        } else {
+            recipes = RecipeRepository.getInstance(db).getRecipesWithoutLabel(labelId);
+        }
         Log.d(TAG, "getRecipesForLabel duration: " + Long.toString(stopWatch.stop()));
     }
 

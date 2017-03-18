@@ -9,11 +9,12 @@
             android:title="Start" />
         <item
             android:id="@+id/nav_favorites"
-            android:title="Favourites" />
+            android:title="Favorites" />
         <item
             android:id="@+id/nav_feeling_lucky"
             android:title="Feeling Lucky" />
     </group>
+
 
     <group
         android:id="@+id/menu_bottom"

@@ -97,6 +97,31 @@ public class RecipeRepository {
         return recipes;
     }
 
+    public List<Recipe> getRecipesWithoutLabel(long labelId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        List<Recipe> recipes = new ArrayList<Recipe>();
+
+        String sql = "SELECT recipe.* FROM " + TABLE_NAME + " AS recipe " +
+                "LEFT JOIN " + LabelsRepository.REL_TABLE_NAME + " AS rel ON rel." + LabelsRepository.REL_COLUMN_RECIPE_ID + "=recipe." + COLUMN_NAME_ID + " " +
+                "WHERE rel." + LabelsRepository.REL_COLUMN_LABEL_ID + " IS NULL " +
+                "ORDER BY recipe." + COLUMN_NAME_NAME;
+        Cursor cursor = db.rawQuery(sql, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Recipe recipe = getRecipeFromCursor(cursor);
+                loadChildren(recipe);
+                recipes.add(recipe);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return recipes;
+    }
+
     public Recipe loadWithChildren(long recipeId) {
         Recipe recipe = load(recipeId);
         loadChildren(recipe);
