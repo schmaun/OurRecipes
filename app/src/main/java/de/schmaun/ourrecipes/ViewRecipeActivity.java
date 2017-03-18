@@ -26,11 +26,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.github.iojjj.rcbs.RoundedCornersBackgroundSpan;
 import com.like.LikeButton;
-import com.like.OnLikeListener;
 
 import de.schmaun.ourrecipes.Adapter.SimpleRecipeImageAdapter;
-import de.schmaun.ourrecipes.Database.DbHelper;
-import de.schmaun.ourrecipes.Database.RecipeRepository;
 import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
@@ -113,7 +110,7 @@ public class ViewRecipeActivity extends RecipeActivity {
 
         LikeButton likeButton = (LikeButton) findViewById(R.id.view_recipe_like_button);
         likeButton.setOnLikeListener(new LikeButtonOnClickListener(this));
-        likeButton.setLiked(recipe.isFavourite());
+        likeButton.setLiked(recipe.isFavorite());
     }
 
     private static float convertDpToPx(Context context, float dp) {

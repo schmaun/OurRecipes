@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
-import de.schmaun.ourrecipes.EditRecipeActivity;
 import de.schmaun.ourrecipes.Model.Recipe;
+import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.RecipeViewHolder;
 import de.schmaun.ourrecipes.ViewRecipeActivity;
 
@@ -18,12 +20,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
 
     private List<Recipe> recipes;
     private int rowLayout;
-    private Context mContext;
+    private Context context;
 
     public RecipeAdapter(List<Recipe> recipes, int rowLayout, Context context) {
         this.recipes = recipes;
         this.rowLayout = rowLayout;
-        this.mContext = context;
+        this.context = context;
     }
 
     @Override
@@ -44,6 +46,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
         Recipe recipe = recipes.get(i);
         recipeViewHolder.recipeName.setText(recipe.getName());
         recipeViewHolder.id = recipe.getId();
+
+        RecipeImage coverImage = recipe.getCoverImage();
+        if (coverImage == null && recipe.getImages().size() > 0) {
+            coverImage = recipe.getImages().get(0);
+        }
+
+        if (coverImage != null) {
+            Glide.with(context).load(coverImage.getLocation()).centerCrop().into(recipeViewHolder.image);
+        }
+
+        if (recipe.isFavorite()) {
+            recipeViewHolder.favImage.setVisibility(View.VISIBLE);
+        } else {
+            recipeViewHolder.favImage.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

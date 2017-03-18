@@ -11,18 +11,17 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import de.schmaun.ourrecipes.Main.RecipeLabelFragment.OnListFragmentInteractionListener;
+import de.schmaun.ourrecipes.Main.LabelsListFragment.LabelListInteractionListener;
 import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.R;
 
 import java.util.List;
-import java.util.Locale;
 
 public class RecipeLabelRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLabelRecyclerViewAdapter.ViewHolder> {
 
     private Context context;
     private final List<Label> labels;
-    private final OnListFragmentInteractionListener interactionListener;
+    private final LabelsListFragment.LabelListInteractionListener interactionListener;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
@@ -40,7 +39,7 @@ public class RecipeLabelRecyclerViewAdapter extends RecyclerView.Adapter<RecipeL
         }
     }
 
-    public RecipeLabelRecyclerViewAdapter(Context context, List<Label> recipeLabels, OnListFragmentInteractionListener listener) {
+    public RecipeLabelRecyclerViewAdapter(Context context, List<Label> recipeLabels, LabelListInteractionListener listener) {
         this.context = context;
         labels = recipeLabels;
         interactionListener = listener;
@@ -57,28 +56,14 @@ public class RecipeLabelRecyclerViewAdapter extends RecyclerView.Adapter<RecipeL
         holder.item = labels.get(position);
 
         Glide.with(context).load(labels.get(position).getImageLocation()).centerCrop().into(holder.imageView);
-
         holder.nameView.setText(labels.get(position).getName());
         //holder.countRecipesView.setText(String.format(Locale.getDefault(), "%,d", labels.get(position).getCountRecipes()));
-
-        //float heightFactor = (labels.get(position).getCountRecipes() / 1);
-        double heightFactor = Math.log((double)labels.get(position).getCountRecipes());
-        if (heightFactor > 1) {
-            ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();
-            //layoutParams.height = Math.round(layoutParams.height * (float) heightFactor);
-        }
-
-        StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.view.getLayoutParams();
-
-            layoutParams.setFullSpan(holder.item.isFullSpan());
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != interactionListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    //interactionListener.onRecipeLabelClick(holder.item);
+                    interactionListener.onLabelsListLabelClick(holder.item);
                 }
             }
         });

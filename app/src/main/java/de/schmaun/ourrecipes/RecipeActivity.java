@@ -61,16 +61,16 @@ class RecipeActivity extends AppCompatActivity implements RecipeProviderInterfac
 
         @Override
         public void liked(LikeButton likeButton) {
-            recipe.setFavourite(true);
+            recipe.setFavorite(true);
             DbHelper dbHelper = new DbHelper(context);
-            RecipeRepository.getInstance(dbHelper).updateFavouriteStatus(recipe, 1);
+            RecipeRepository.getInstance(dbHelper).updateFavoriteStatus(recipe, 1);
         }
 
         @Override
         public void unLiked(LikeButton likeButton) {
-            recipe.setFavourite(false);
+            recipe.setFavorite(false);
             DbHelper dbHelper = new DbHelper(context);
-            RecipeRepository.getInstance(dbHelper).updateFavouriteStatus(recipe, 0);
+            RecipeRepository.getInstance(dbHelper).updateFavoriteStatus(recipe, 0);
         }
     }
 }

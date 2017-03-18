@@ -60,7 +60,6 @@ public class LabelsRepository {
         Log.d(TAG, sql);
         Cursor cursor = db.rawQuery(sql, null);
 
-        int i = 0;
         if (cursor.moveToFirst()) {
             do {
                 Label label = new Label();
@@ -68,17 +67,6 @@ public class LabelsRepository {
                 label.setName(cursor.getString(cursor.getColumnIndex("name")));
                 label.setImageLocation(cursor.getString(cursor.getColumnIndex("imageLocation")));
                 label.setCountRecipes(cursor.getInt(cursor.getColumnIndex("countRecipes")));
-
-                Label labelBefore = null;
-                if (i >= 2) {
-                    labelBefore = labels.get(i - 2);
-                }
-
-                if (Math.random() < 0.4f && labelBefore != null && !labelBefore.isFullSpan()) {
-                    label.setFullSpan(true);
-                }
-
-                i++;
                 labels.add(label);
             } while (cursor.moveToNext());
         }
@@ -228,8 +216,5 @@ public class LabelsRepository {
     }
 
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + REL_TABLE_NAME);
-        onCreate(db);
     }
 }

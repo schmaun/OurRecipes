@@ -10,7 +10,10 @@ public class Label implements Serializable {
     private String imageLocation;
     private boolean fullSpan;
 
+    private int importance;
+
     public Label(){}
+
     public Label(String name) {
         this.name = name;
     }
@@ -56,5 +59,13 @@ public class Label implements Serializable {
 
     public boolean isFullSpan() {
         return fullSpan;
+    }
+
+    public int getImportance() {
+        return importance;
+    }
+
+    public void setImportance(int importance) {
+        this.importance = importance;
     }
 }

@@ -9,5 +9,5 @@
     <color name="recipeLabelBackground">#aaaaaa</color>
     <color name="imageViewText">#ffffff</color>
     <color name="labelListText">#ffffff</color>
-    <color name="labelListTextBackground">#11ffffff</color>
+    <color name="labelListTextBackground">#44000000</color>
 </resources>

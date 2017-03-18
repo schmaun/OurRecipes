@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view_label"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-
-    android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp"
-    >
+    app:cardCornerRadius="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -38,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
                 android:textColor="@color/labelListText" />
         </LinearLayout>
     </RelativeLayout>

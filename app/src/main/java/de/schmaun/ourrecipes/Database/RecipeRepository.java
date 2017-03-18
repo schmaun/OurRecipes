@@ -3,9 +3,7 @@ package de.schmaun.ourrecipes.Database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.text.format.DateUtils;
 import android.util.Log;
-import android.util.SparseArray;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,7 +12,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.Recipe;
 
 public class RecipeRepository {
@@ -37,7 +34,7 @@ public class RecipeRepository {
     public static final String COLUMN_NAME_NOTES = "notes";
 
     public static final String COLUMN_NAME_RATING = "rating";
-    public static final String COLUMN_NAME_FAVOURITE = "favourite";
+    public static final String COLUMN_NAME_FAVORITE = "favourite";
 
     public static final String COLUMN_NAME_CREATED_AT = "createdAt";
     public static final String COLUMN_NAME_LAST_EDIT_AT = "lastEditAt";
@@ -75,9 +72,39 @@ public class RecipeRepository {
         return recipes;
     }
 
+    public List<Recipe> getRecipesForLabel(long labelId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        List<Recipe> recipes = new ArrayList<Recipe>();
+
+        String sql = "SELECT recipe.* FROM " + TABLE_NAME + " AS recipe " +
+                "JOIN " + LabelsRepository.REL_TABLE_NAME + " AS rel ON rel." + LabelsRepository.REL_COLUMN_RECIPE_ID + "=recipe." + COLUMN_NAME_ID + " " +
+                "WHERE rel." + LabelsRepository.REL_COLUMN_LABEL_ID + "=" + Long.toString(labelId) + " " +
+                "ORDER BY recipe." + COLUMN_NAME_NAME;
+        Cursor cursor = db.rawQuery(sql, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Recipe recipe = getRecipeFromCursor(cursor);
+                loadChildren(recipe);
+                recipes.add(recipe);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return recipes;
+    }
+
     public Recipe loadWithChildren(long recipeId) {
         Recipe recipe = load(recipeId);
+        loadChildren(recipe);
 
+        return recipe;
+    }
+
+    private Recipe loadChildren(Recipe recipe) {
         RecipeImageRepository imageRepository = RecipeImageRepository.getInstance(dbHelper);
         recipe.setImages(imageRepository.load(recipe.getId()));
 
@@ -134,9 +161,9 @@ public class RecipeRepository {
         db.close();
     }
 
-    public void updateFavouriteStatus(Recipe recipe, int favStatus) {
+    public void updateFavoriteStatus(Recipe recipe, int favStatus) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME_FAVOURITE, favStatus);
+        values.put(COLUMN_NAME_FAVORITE, favStatus);
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipe.getId())});
@@ -161,7 +188,7 @@ public class RecipeRepository {
         values.put(COLUMN_NAME_NOTES, recipe.getNotes());
 
         values.put(COLUMN_NAME_RATING, recipe.getRating());
-        values.put(COLUMN_NAME_FAVOURITE, recipe.getFavourite());
+        values.put(COLUMN_NAME_FAVORITE, recipe.getFavorite());
 
         values.put(COLUMN_NAME_CREATED_AT, formatDate(recipe.getCreatedAt()));
         values.put(COLUMN_NAME_LAST_EDIT_AT, formatDate(recipe.getLastEditAt()));
@@ -182,7 +209,7 @@ public class RecipeRepository {
         recipe.setNotes(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NOTES)));
 
         recipe.setRating(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_RATING)));
-        recipe.setFavourite(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_FAVOURITE)));
+        recipe.setFavorite(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_FAVORITE)));
 
         recipe.setCreatedAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CREATED_AT))));
         recipe.setLastEditAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_LAST_EDIT_AT))));
@@ -229,13 +256,13 @@ public class RecipeRepository {
                 + COLUMN_NAME_NOTES + " TEXT,"
 
                 + COLUMN_NAME_RATING + " INTEGER,"
-                + COLUMN_NAME_FAVOURITE + " INTEGER,"
+                + COLUMN_NAME_FAVORITE + " INTEGER,"
 
                 + COLUMN_NAME_CREATED_AT + " TEXT,"
                 + COLUMN_NAME_LAST_EDIT_AT + " TEXT"
                 + ")");
 
-        db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_FAVOURITE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_FAVOURITE + ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_FAVORITE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_FAVORITE + ");");
     }
 
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -250,11 +277,12 @@ public class RecipeRepository {
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_NOTES + " TEXT");
                 break;
             case 6:
-                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_FAVOURITE + " INTEGER");
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_FAVORITE + " INTEGER");
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_CREATED_AT + " TEXT");
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_LAST_EDIT_AT + " TEXT");
-                db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_FAVOURITE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_FAVOURITE + ");");
+                db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_FAVORITE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_FAVORITE + ");");
                 break;
         }
     }
+
 }

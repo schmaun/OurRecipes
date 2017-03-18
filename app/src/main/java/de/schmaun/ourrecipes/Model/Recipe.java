@@ -1,12 +1,7 @@
 package de.schmaun.ourrecipes.Model;
 
-import android.util.Log;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 public class Recipe {
 
@@ -32,7 +27,7 @@ public class Recipe {
 
     private ArrayList<Label> labels;
 
-    private boolean isFavourite;
+    private boolean isFavorite;
 
     private Date createdAt;
 
@@ -135,20 +130,20 @@ public class Recipe {
         this.notes = notes;
     }
 
-    public boolean isFavourite() {
-        return isFavourite;
+    public boolean isFavorite() {
+        return isFavorite;
     }
 
-    public int getFavourite() {
-        return isFavourite ? 1 : 0;
+    public int getFavorite() {
+        return isFavorite ? 1 : 0;
     }
 
-    public void setFavourite(boolean favourite) {
-        isFavourite = favourite;
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 
-    public void setFavourite(int favourite) {
-        isFavourite = (favourite == 1);
+    public void setFavorite(int favorite) {
+        isFavorite = (favorite == 1);
     }
 
     public Date getCreatedAt() {

@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,21 +17,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import de.schmaun.ourrecipes.Adapter.RecipeAdapter;
-import de.schmaun.ourrecipes.Database.DbHelper;
-import de.schmaun.ourrecipes.Database.RecipeRepository;
-import de.schmaun.ourrecipes.Main.RecipeLabelFragment;
-import de.schmaun.ourrecipes.Main.dummy.DummyContent;
+import de.schmaun.ourrecipes.Main.LabelsListFragment;
+import de.schmaun.ourrecipes.Main.RecipesListFragment;
 import de.schmaun.ourrecipes.Model.Label;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, RecipeLabelFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LabelsListFragment.LabelListInteractionListener, RecipesListFragment.RecipeListInteractionListener {
 
     Context context;
-
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,23 +53,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        showMainContent(R.id.nav_start);
-/*
-        DbHelper db = new DbHelper(this);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mAdapter = new RecipeAdapter(RecipeRepository.getInstance(db).getRecipes(), R.layout.recipe_row, this);
-        mRecyclerView.setAdapter(mAdapter);
-
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        */
-
+        showLabelsListFragmentOnCreate();
     }
 
     @Override
@@ -93,8 +68,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
         return true;
     }
 
@@ -116,24 +91,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
-        showMainContent(itemId);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void showMainContent(int itemId) {
         switch (itemId) {
             case R.id.nav_start:
-                RecipeLabelFragment fragment = RecipeLabelFragment.newInstance(2);
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_main, fragment)
-                        .commit();
-
+                showLabelsListFragment(true);
                 break;
-            case R.id.nav_favourites:
+            case R.id.nav_favorites:
                 break;
             case R.id.nav_feeling_lucky:
                 break;
@@ -142,10 +104,44 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_about:
                 break;
         }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
-    public void onRecipeLabelClick(Label label) {
+    public void onLabelsListLabelClick(Label label) {
+        showRecipesListFragment(label);
+    }
 
+    private void showLabelsListFragment(boolean addToBackStack) {
+        LabelsListFragment fragment = LabelsListFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction()
+                .replace(R.id.content_main, fragment);
+
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
+
+        transaction.commit();
+    }
+
+    private void showLabelsListFragmentOnCreate() {
+        this.showLabelsListFragment(false);
+    }
+
+    private void showRecipesListFragment(Label label) {
+        RecipesListFragment fragment = RecipesListFragment.newInstance(2, label);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_main, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void onRecipesListLabelClick(Label label) {
     }
 }

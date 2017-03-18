@@ -8,7 +8,7 @@
             android:id="@+id/nav_start"
             android:title="Start" />
         <item
-            android:id="@+id/nav_favourites"
+            android:id="@+id/nav_favorites"
             android:title="Favourites" />
         <item
             android:id="@+id/nav_feeling_lucky"
