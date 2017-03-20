@@ -208,6 +208,9 @@ public class ViewRecipeActivity extends RecipeActivity {
                 intent.putExtra(EditRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipe.getId());
                 startActivity(intent);
                 break;
+            case android.R.id.home:
+                finish();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

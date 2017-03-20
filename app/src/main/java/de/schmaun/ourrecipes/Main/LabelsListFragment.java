@@ -83,6 +83,12 @@ public class LabelsListFragment extends Fragment {
         interactionListener = null;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(R.string.app_name);
+    }
+
     public interface LabelListInteractionListener {
         void onLabelsListLabelClick(Label label);
     }

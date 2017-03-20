@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,13 +27,13 @@ import de.schmaun.ourrecipes.Model.Label;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LabelsListFragment.LabelListInteractionListener, RecipesListFragment.RecipeListInteractionListener {
 
-    Context context;
+    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = this;
+        final Context context = this;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -133,10 +136,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showRecipesListFragment(Label label) {
-        RecipesListFragment fragment = RecipesListFragment.newInstance(2, label);
+        setTitle(label.getName());
         FragmentManager fragmentManager = getSupportFragmentManager();
+        RecipesListFragment fragment = RecipesListFragment.newInstance(2, label);
+
         fragmentManager.beginTransaction()
-                .replace(R.id.content_main, fragment)
+                .replace(R.id.content_main, fragment, "recipes")
                 .addToBackStack(null)
                 .commit();
     }

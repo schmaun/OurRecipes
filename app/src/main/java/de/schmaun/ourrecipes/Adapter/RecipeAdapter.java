@@ -34,9 +34,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
 
         return new RecipeViewHolder(v, new RecipeViewHolder.ViewHolderClicks() {
             public void showRecipe(View caller, long recipeId) {
-                Intent intent = new Intent(viewGroup.getContext(), ViewRecipeActivity.class);
+                Intent intent = new Intent(context, ViewRecipeActivity.class);
                 intent.putExtra(ViewRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipeId);
-                viewGroup.getContext().startActivity(intent);
+                context.startActivity(intent);
             }
         });
     }
