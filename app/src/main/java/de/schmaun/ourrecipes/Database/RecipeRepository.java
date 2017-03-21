@@ -3,6 +3,7 @@ package de.schmaun.ourrecipes.Database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -51,61 +52,37 @@ public class RecipeRepository {
         return mInstance;
     }
 
-    public List<Recipe> getRecipes()
+    public List<Recipe> getFavoriteRecipes()
     {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT recipe.* FROM " + TABLE_NAME + " AS recipe " +
+                "WHERE recipe." + RecipeRepository.COLUMN_NAME_FAVORITE + "=1 " +
+                "ORDER BY recipe." + COLUMN_NAME_NAME;
 
-        List<Recipe> recipes = new ArrayList<Recipe>();
-
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_NAME_ID, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                Recipe recipe = getRecipeFromCursor(cursor);
-                recipes.add(recipe);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-
-        return recipes;
+        return loadRecipes(sql);
     }
 
     public List<Recipe> getRecipesForLabel(long labelId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        List<Recipe> recipes = new ArrayList<Recipe>();
-
         String sql = "SELECT recipe.* FROM " + TABLE_NAME + " AS recipe " +
                 "JOIN " + LabelsRepository.REL_TABLE_NAME + " AS rel ON rel." + LabelsRepository.REL_COLUMN_RECIPE_ID + "=recipe." + COLUMN_NAME_ID + " " +
                 "WHERE rel." + LabelsRepository.REL_COLUMN_LABEL_ID + "=" + Long.toString(labelId) + " " +
                 "ORDER BY recipe." + COLUMN_NAME_NAME;
-        Cursor cursor = db.rawQuery(sql, null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                Recipe recipe = getRecipeFromCursor(cursor);
-                loadChildren(recipe);
-                recipes.add(recipe);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-
-        return recipes;
+        return loadRecipes(sql);
     }
 
     public List<Recipe> getRecipesWithoutLabel(long labelId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        List<Recipe> recipes = new ArrayList<Recipe>();
-
         String sql = "SELECT recipe.* FROM " + TABLE_NAME + " AS recipe " +
                 "LEFT JOIN " + LabelsRepository.REL_TABLE_NAME + " AS rel ON rel." + LabelsRepository.REL_COLUMN_RECIPE_ID + "=recipe." + COLUMN_NAME_ID + " " +
                 "WHERE rel." + LabelsRepository.REL_COLUMN_LABEL_ID + " IS NULL " +
                 "ORDER BY recipe." + COLUMN_NAME_NAME;
+
+        return loadRecipes(sql);
+    }
+
+    private List<Recipe> loadRecipes(String sql) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Recipe> recipes = new ArrayList<Recipe>();
+
         Cursor cursor = db.rawQuery(sql, null);
 
         if (cursor.moveToFirst()) {
@@ -139,7 +116,7 @@ public class RecipeRepository {
         return recipe;
     }
 
-    public Recipe load(long recipeId) {
+    private Recipe load(long recipeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipeId)}, null, null, null, "1");
 
@@ -163,7 +140,7 @@ public class RecipeRepository {
         }
     }
 
-    public long insert(Recipe recipe) {
+    private long insert(Recipe recipe) {
         recipe.setCreatedAt(new Date());
         ContentValues contentValues = createContentValues(recipe);
 
@@ -175,7 +152,7 @@ public class RecipeRepository {
         return id;
     }
 
-    public void update(Recipe recipe)
+    private void update(Recipe recipe)
     {
         recipe.setLastEditAt(new Date());
         ContentValues contentValues = createContentValues(recipe);

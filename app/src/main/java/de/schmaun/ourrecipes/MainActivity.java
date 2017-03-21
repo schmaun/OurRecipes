@@ -4,12 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,11 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import de.schmaun.ourrecipes.Main.LabelsListFragment;
-import de.schmaun.ourrecipes.Main.RecipesListFragment;
+import de.schmaun.ourrecipes.Main.RecipesListByLabelFragment;
+import de.schmaun.ourrecipes.Main.RecipesListFavoritesFragment;
 import de.schmaun.ourrecipes.Model.Label;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LabelsListFragment.LabelListInteractionListener, RecipesListFragment.RecipeListInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LabelsListFragment.LabelListInteractionListener {
 
     public static final String TAG = "MainActivity";
 
@@ -78,9 +75,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -99,6 +93,7 @@ public class MainActivity extends AppCompatActivity
                 showLabelsListFragment(true);
                 break;
             case R.id.nav_favorites:
+                showRecipesListFavoritesFragment();
                 break;
             case R.id.nav_feeling_lucky:
                 break;
@@ -115,14 +110,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLabelsListLabelClick(Label label) {
-        showRecipesListFragment(label);
+        showRecipesListByLabelFragment(label);
+    }
+
+    private void showLabelsListFragmentOnCreate() {
+        this.showLabelsListFragment(false);
     }
 
     private void showLabelsListFragment(boolean addToBackStack) {
-        LabelsListFragment fragment = LabelsListFragment.newInstance();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction()
-                .replace(R.id.content_main, fragment);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content_main, LabelsListFragment.newInstance());
 
         if (addToBackStack) {
             transaction.addToBackStack(null);
@@ -131,22 +129,23 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
     }
 
-    private void showLabelsListFragmentOnCreate() {
-        this.showLabelsListFragment(false);
-    }
-
-    private void showRecipesListFragment(Label label) {
+    private void showRecipesListByLabelFragment(Label label) {
         setTitle(label.getName());
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        RecipesListFragment fragment = RecipesListFragment.newInstance(2, label);
-
-        fragmentManager.beginTransaction()
+        RecipesListByLabelFragment fragment = RecipesListByLabelFragment.newInstance(label);
+        getSupportFragmentManager()
+                .beginTransaction()
                 .replace(R.id.content_main, fragment, "recipes")
                 .addToBackStack(null)
                 .commit();
     }
 
-    @Override
-    public void onRecipesListLabelClick(Label label) {
+    private void showRecipesListFavoritesFragment() {
+        setTitle(getString(R.string.favorites));
+        RecipesListFavoritesFragment fragment = RecipesListFavoritesFragment.newInstance();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content_main, fragment, "recipes")
+                .addToBackStack(null)
+                .commit();
     }
 }
