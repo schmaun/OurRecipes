@@ -150,5 +150,7 @@
     <string name="edit_image_description">Image Description</string>
     <string name="not_labeled">Not labeled</string>
     <string name="favorites">Favorites</string>
+    <string name="recipes">Recipes</string>
+    <string name="settings">Settings</string>
 
 </resources>

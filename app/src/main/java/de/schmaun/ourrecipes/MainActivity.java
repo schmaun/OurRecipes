@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LabelsListFragment.LabelListInteractionListener {
 
     public static final String TAG = "MainActivity";
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
@@ -97,11 +98,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_favorites:
                 showRecipesListFavoritesFragment();
                 break;
-            case R.id.nav_feeling_lucky:
-                break;
             case R.id.nav_settings:
-                break;
-            case R.id.nav_about:
                 break;
         }
 
@@ -116,6 +113,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showLabelsListFragmentOnCreate() {
+        navigationView.getMenu().getItem(0).setChecked(true);
         this.showLabelsListFragment(false);
     }
 
