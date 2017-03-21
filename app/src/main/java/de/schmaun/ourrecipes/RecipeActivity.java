@@ -32,7 +32,7 @@ class RecipeActivity extends AppCompatActivity implements RecipeProviderInterfac
             Log.d(TAG_LIFECYCLE, String.format("started with %s=%s", BUNDLE_KEY_RECIPE_ID, Long.toString(recipe.getId())));
         }
 
-        if ((savedInstanceState == null || forceLoading == true) && recipeId > 0) {
+        if ((savedInstanceState == null || forceLoading) && recipeId > 0) {
             loadRecipe(recipeId);
             Log.d(TAG_LIFECYCLE, "recipe loaded");
         }

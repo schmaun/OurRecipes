@@ -33,9 +33,6 @@ import de.schmaun.ourrecipes.Model.RecipeImage;
 
 public class ViewRecipeActivity extends RecipeActivity {
 
-    private TextView labelsView;
-    static final int REQUEST_EDIT_RECIPE = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,11 +62,35 @@ public class ViewRecipeActivity extends RecipeActivity {
         fillView();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_view_recipe, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_edit:
+                Intent intent = new Intent(this, EditRecipeActivity.class);
+                intent.putExtra(EditRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipe.getId());
+                startActivity(intent);
+                break;
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void fillView() {
         ImageView coverImageView = (ImageView) findViewById(R.id.view_recipe_cover_image);
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.view_recipe_toolbar_layout);
 
-        labelsView = (TextView) findViewById(R.id.view_recipe_labels);
+        TextView labelsView = (TextView) findViewById(R.id.view_recipe_labels);
         TextView ingredientsView = (TextView) findViewById(R.id.view_recipe_ingredients);
         TextView preparationView = (TextView) findViewById(R.id.view_recipe_preparation);
         TextView notesView = (TextView) findViewById(R.id.view_recipe_notes);
@@ -118,7 +139,6 @@ public class ViewRecipeActivity extends RecipeActivity {
     }
 
     private Spannable getFormattedLabels() {
-
         RoundedCornersBackgroundSpan.TextPartsBuilder textPartsBuilder = new RoundedCornersBackgroundSpan.TextPartsBuilder(this)
                 .setTextPadding(convertDpToPx(this, 4))
                 .setCornersRadius(convertDpToPx(this, 4))
@@ -132,87 +152,6 @@ public class ViewRecipeActivity extends RecipeActivity {
             textPartsBuilder.addTextPart(string, getResources().getColor(R.color.recipeLabelBackground));
         }
 
-        Spannable firstText = textPartsBuilder.build();
-
-        return firstText;
-    }
-
-    @NonNull
-    private SpannableStringBuilder getFormattedLabels1() {
-
-        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
-        /*
-        stringBuilder.append("");
-        for (Label label : recipe.getLabels()) {
-            String thisTag = "  " + label.getName() + "  ";
-            stringBuilder.append(thisTag);
-            stringBuilder.setSpan(new RecipeLabelSpan(this),
-                    stringBuilder.length() - thisTag.length(),
-                    stringBuilder.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            stringBuilder.append("  ");
-        }
-        return stringBuilder;
-        */
-        //badgeBuilder.appendTag(tag.getName(), tag.getColorHex());
-
-        final String nbspSpacing = "\u202F\u202F"; // none-breaking spaces
-        labelsView.measure(0, 0);
-
-        for (Label label : recipe.getLabels()) {
-            String shortenedLabel = label.getName();
-
-
-            Paint paint = new Paint();
-            paint.setTypeface(labelsView.getTypeface());
-            paint.setTextSize(labelsView.getTextSize());
-            int maxCharsCount = paint.breakText(shortenedLabel, true, labelsView.getWidth(), null);
-            maxCharsCount = 20;
-            if (shortenedLabel.length() > maxCharsCount) {
-                shortenedLabel = shortenedLabel.substring(0, maxCharsCount - (nbspSpacing.length() * 3)) + "\u2026";
-            }
-
-            String badgeText = nbspSpacing + shortenedLabel + nbspSpacing;
-            stringBuilder.append(badgeText);
-            stringBuilder.setSpan(
-                    //new RecipeLabelSpan(lineHeight, Color.parseColor(textColor), Color.parseColor(badgeColor)),
-                    //new RecipeLabelSpan(this),
-                    //new PaddingBackgroundColorSpan(getResources().getColor(R.color.recipeLabelBackground), 2),
-                    new RecipeLabelSpan(15,
-                            getResources().getColor(R.color.recipeLabelText),
-                            getResources().getColor(R.color.recipeLabelBackground)),
-                    stringBuilder.length() - badgeText.length(),
-                    stringBuilder.length() - badgeText.length() + badgeText.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            );
-            stringBuilder.append(" ");
-        }
-
-        return stringBuilder;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_view_recipe, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.action_edit:
-                Intent intent = new Intent(this, EditRecipeActivity.class);
-                intent.putExtra(EditRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipe.getId());
-                startActivity(intent);
-                break;
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        return textPartsBuilder.build();
     }
 }
