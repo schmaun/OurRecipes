@@ -34,7 +34,7 @@ public class PhotoDialogFragment extends DialogFragment {
 
         Resources resources = getResources();
         String[] items = resources.getStringArray(R.array.edit_recipe_add_image_items);
-        Integer[] icons = new Integer[] {R.drawable.ic_image_photo_camera, R.drawable.ic_editor_insert_photo, R.drawable.ic_editor_insert_photo};
+        Integer[] icons = new Integer[] {R.drawable.camera, R.drawable.image, R.drawable.image};
         ListAdapter adapter = new ArrayWithIconAdapter(getActivity(), items, icons);
 
         builder.setTitle(R.string.edit_recipe_add_image)

@@ -4,12 +4,12 @@
     tools:context="de.schmaun.ourrecipes.EditRecipeActivity">
 
     <item android:id="@+id/action_delete" android:name="@string/edit_recipe_delete"
-        android:icon="@drawable/ic_action_action_delete"
+        android:icon="@drawable/delete"
         android:title="@string/edit_recipe_delete"
         android:orderInCategory="100" app:showAsAction="ifRoom" android:visible="false" />
 
     <item android:id="@+id/action_save" android:name="@string/edit_recipe_save"
         android:title="@string/edit_recipe_save"
-        android:icon="@drawable/ic_action_content_save"
+        android:icon="@drawable/save"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
 </menu>

@@ -15,7 +15,6 @@
         android:hint="@string/edit_recipe_labels"
 
         android:minLines="1"
-        android:gravity="top"
         app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_labels_helper_text"
         app:met_helperTextAlwaysShown="true"
@@ -25,6 +24,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
+        app:met_primaryColor="@color/colorAccent"
+        android:layout_marginBottom="@dimen/edit_text_margin_bottom"
 
         />
 
@@ -34,7 +35,6 @@
         android:hint="@string/edit_recipe_notes"
 
         android:minLines="1"
-        android:gravity="top"
         app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_notes_helper_text"
         app:met_helperTextAlwaysShown="true"
@@ -44,7 +44,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        app:met_primaryColor="@color/colorAccent"
+
         />
 
 </RelativeLayout>
