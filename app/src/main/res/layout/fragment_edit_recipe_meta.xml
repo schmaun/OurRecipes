@@ -7,14 +7,14 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="de.schmaun.ourrecipes.EditRecipeActivity$EditRecipeMetaFragment">
+    tools:context="de.schmaun.ourrecipes.EditRecipe.EditRecipeMetaFragment">
 
     <com.rengwuxian.materialedittext.MaterialMultiAutoCompleteTextView
         android:inputType="textMultiLine"
         android:id="@+id/edit_recipe_labels"
         android:hint="@string/edit_recipe_labels"
 
-        android:minLines="3"
+        android:minLines="1"
         android:gravity="top"
         app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_labels_helper_text"
@@ -33,7 +33,7 @@
         android:id="@+id/edit_recipe_notes"
         android:hint="@string/edit_recipe_notes"
 
-        android:minLines="3"
+        android:minLines="1"
         android:gravity="top"
         app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_notes_helper_text"
