@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
+import de.schmaun.ourrecipes.R;
 import de.schmaun.ourrecipes.RecipeViewHolder;
 import de.schmaun.ourrecipes.ViewRecipeActivity;
 
@@ -54,6 +56,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
 
         if (coverImage != null) {
             Glide.with(context).load(coverImage.getLocation()).centerCrop().into(recipeViewHolder.image);
+        } else {
+            recipeViewHolder.image.setImageDrawable(context.getResources().getDrawable(R.drawable.no_image));
+            recipeViewHolder.image.setScaleType(ImageView.ScaleType.CENTER);
         }
 
         if (recipe.isFavorite()) {
