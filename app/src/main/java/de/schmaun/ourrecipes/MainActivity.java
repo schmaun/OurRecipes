@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity
 
     public static final String TAG = "MainActivity";
     private NavigationView navigationView;
+    private DrawerLayout drawer;
+    private ActionBarDrawerToggle toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +47,11 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        );
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle.setHomeAsUpIndicator(null);
         }
     }
 
@@ -110,6 +116,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLabelsListLabelClick(Label label) {
         showRecipesListByLabelFragment(label);
+
+        toggle.setHomeAsUpIndicator(R.drawable.back);
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     private void showLabelsListFragmentOnCreate() {
