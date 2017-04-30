@@ -113,6 +113,9 @@ public class ViewRecipeActivity extends RecipeActivity {
         RecipeImage coverImage = recipe.getCoverImage();
         if (coverImage != null) {
             Glide.with(this).load(coverImage.getLocation()).centerCrop().into(coverImageView);
+        } else {
+            coverImageView.setImageDrawable(getResources().getDrawable(R.drawable.no_image));
+            coverImageView.setPadding(0,0,0,200);
         }
 
         toolbarLayout.setTitle(recipe.getName());
