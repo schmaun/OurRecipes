@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity
 
     public static final String TAG = "MainActivity";
     private NavigationView navigationView;
-    private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
 
     @Override
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close
@@ -116,15 +115,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLabelsListLabelClick(Label label) {
         showRecipesListByLabelFragment(label);
-
-        toggle.setHomeAsUpIndicator(R.drawable.back);
-        toggle.setDrawerIndicatorEnabled(false);
-        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
     }
 
     private void showLabelsListFragmentOnCreate() {
@@ -145,6 +135,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showRecipesListByLabelFragment(Label label) {
+        toggle.setHomeAsUpIndicator(R.drawable.back);
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         setTitle(label.getName());
         RecipesListByLabelFragment fragment = RecipesListByLabelFragment.newInstance(label);
         getSupportFragmentManager()
