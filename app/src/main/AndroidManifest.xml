@@ -49,6 +49,23 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.MainActivity" />
+        </activity>
+
+        <activity android:name=".LicensesActivity"
+            android:label="@string/title_activity_licenses"
+            android:parentActivityName=".SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.SettingsActivity" />
+        </activity>
     </application>
 
 </manifest>

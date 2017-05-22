@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_header_cooking_mode">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="example_switch"
+            android:summary="@string/pref_description_cooking_mode_display_on"
+            android:title="@string/pref_title_cooking_mode_display_on" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_header_about">
+        <Preference android:title="@string/pref_title_licences">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="de.schmaun.ourrecipes"
+                android:targetClass="de.schmaun.ourrecipes.LicensesActivity"
+                />
+        </Preference>
+
+        <Preference
+            android:summary="@string/pref_description_version"
+            android:title="@string/pref_title_version" />
+    </PreferenceCategory>
+</PreferenceScreen>
