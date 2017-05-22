@@ -9,6 +9,10 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_about">
+        <Preference
+            android:summary="@string/pref_description_version"
+            android:title="@string/pref_title_version" />
+
         <Preference android:title="@string/pref_title_licences">
             <intent
                 android:action="android.intent.action.VIEW"
@@ -16,9 +20,5 @@
                 android:targetClass="de.schmaun.ourrecipes.LicensesActivity"
                 />
         </Preference>
-
-        <Preference
-            android:summary="@string/pref_description_version"
-            android:title="@string/pref_title_version" />
     </PreferenceCategory>
 </PreferenceScreen>

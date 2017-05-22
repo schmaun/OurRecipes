@@ -34,4 +34,9 @@
     <style name="buttonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
         <item name="android:textColor">@color/button_color</item>
     </style>
+
+    <style name="RecipeView.Settings.Licences.Headline" parent="@android:style/TextAppearance.Material.Small" >
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:layout_marginBottom">@dimen/default_padding_bottom</item>
+    </style>
 </resources>
