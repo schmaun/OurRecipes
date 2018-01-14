@@ -167,7 +167,14 @@
     <string name="pref_description_version">Version 1.0</string>
 
     <string name="licenses_cooking_icon">The cooking icon made by <a href="http://www.freepik.com/">Freepik</a> from www.flaticon.com (http://www.flaticon.com/free-icon/pot_174407)</string>
-    <string name="licenses_launcher_icon">The launcher icon made by <a href="http://www.freepik.com/">Freepik</a> from www.flaticon.com (http://www.flaticon.com/free-icon/recipes_242428)</string>
+    <string name="licenses_launcher_icon_recipes">The launcher icon made by <a href="http://www.freepik.com/">Freepik</a> from www.flaticon.com (http://www.flaticon.com/free-icon/recipes_242428)</string>
+    <string name="licenses_launcher_icon_chef_1">The launcher icon made by <a href="http://www.freepik.com/">Freepik</a> from www.flaticon.com (http://www.flaticon.com/free-icon/chef_350415)</string>
+    <string name="licenses_launcher_icon_chef">The launcher icon made by <a href="http://www.freepik.com/">Freepik</a> from www.flaticon.com (http://www.flaticon.com/free-icon/chef_263951)</string>
+    <string name="licenses_launcher_icon_cooker">The launcher icon made by <a href="http://www.freepik.com/">Freepik</a> from www.flaticon.com (http://www.flaticon.com/free-icon/cooker_186147)</string>
+    <string name="licenses_launcher_icon_chef_3">The launcher icon made by <a href="http://www.vectorsmarket.com/">Vectors Market</a> from www.flaticon.com (http://www.flaticon.com/free-icon/cooker_186147)</string>
+    <string name="licenses_launcher_icon">The launcher icon made by <a href="http://www.vectorsmarket.com/">Vectors Market</a> from www.flaticon.com (http://www.flaticon.com/free-icon/cooker_186147)</string>
     <string name="licenses_cooking_icon_headline">Icons</string>
     <string name="licenses_other_headline">Other</string>
+    <string name="title_activity_cooking_mode">CookingModeActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

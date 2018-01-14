@@ -55,8 +55,16 @@ public class RecipeLabelRecyclerViewAdapter extends RecyclerView.Adapter<RecipeL
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.item = labels.get(position);
 
-        Glide.with(context).load(labels.get(position).getImageLocation()).centerCrop().into(holder.imageView);
         holder.nameView.setText(labels.get(position).getName());
+
+        String imageLocation = labels.get(position).getImageLocation();
+        if (imageLocation != null) {
+            Glide.with(context).load(imageLocation).centerCrop().into(holder.imageView);
+        } else {
+            holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.no_image));
+            holder.imageView.setScaleType(ImageView.ScaleType.CENTER);
+        }
+
         //holder.countRecipesView.setText(String.format(Locale.getDefault(), "%,d", labels.get(position).getCountRecipes()));
 
         holder.view.setOnClickListener(new View.OnClickListener() {

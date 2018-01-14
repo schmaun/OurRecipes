@@ -3,12 +3,13 @@
     package="de.schmaun.ourrecipes">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.screen.sensorLandscape"/>
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_recipes"
+        android:icon="@drawable/chef_3"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_recipes"
+        android:roundIcon="@drawable/chef_3"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
@@ -40,6 +41,31 @@
                 android:value="de.schmaun.ourrecipes.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.MainActivity" />
+        </activity>
+        <activity
+            android:name=".LicensesActivity"
+            android:label="@string/title_activity_licenses"
+            android:parentActivityName=".SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.SettingsActivity" />
+        </activity>
+
+        <activity
+            android:name=".CookingModeActivity"
+            android:label="@string/title_activity_cooking_mode"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
+        </activity>
+
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="de.schmaun.fileprovider"
@@ -49,23 +75,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.schmaun.ourrecipes.MainActivity" />
-        </activity>
-
-        <activity android:name=".LicensesActivity"
-            android:label="@string/title_activity_licenses"
-            android:parentActivityName=".SettingsActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.schmaun.ourrecipes.SettingsActivity" />
-        </activity>
     </application>
 
 </manifest>

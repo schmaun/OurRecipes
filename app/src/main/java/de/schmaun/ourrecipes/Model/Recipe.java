@@ -127,6 +127,10 @@ public class Recipe {
     }
 
     public void setNotes(String notes) {
+        if (notes == null) {
+            notes = "";
+        }
+
         this.notes = notes;
     }
 

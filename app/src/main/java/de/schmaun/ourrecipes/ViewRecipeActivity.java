@@ -49,7 +49,9 @@ public class ViewRecipeActivity extends RecipeActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // start cooking mode
+                Intent intent = new Intent(view.getContext(), CookingModeActivity.class);
+                intent.putExtra(CookingModeActivity.BUNDLE_KEY_RECIPE_ID, recipe.getId());
+                startActivity(intent);
             }
         });
     }
@@ -102,12 +104,20 @@ public class ViewRecipeActivity extends RecipeActivity {
 
         if (recipe.getIngredients().length() == 0) {
             ingredientsHeadlineView.setVisibility(View.GONE);
+            ingredientsView.setVisibility(View.GONE);
         }
         if (recipe.getPreparation().length() == 0) {
             preparationHeadlineView.setVisibility(View.GONE);
+            preparationView.setVisibility(View.GONE);
         }
         if (recipe.getNotes().length() == 0) {
             notesHeadlineView.setVisibility(View.GONE);
+            notesView.setVisibility(View.GONE);
+        }
+        if (recipe.getLabels().isEmpty()) {
+            labelsView.setVisibility(View.GONE);
+        } else {
+            labelsView.setText(getFormattedLabels());
         }
 
         RecipeImage coverImage = recipe.getCoverImage();
@@ -122,7 +132,6 @@ public class ViewRecipeActivity extends RecipeActivity {
         ingredientsView.setText(recipe.getIngredients());
         preparationView.setText(recipe.getPreparation());
         notesView.setText(recipe.getNotes());
-        labelsView.setText(getFormattedLabels());
         SimpleRecipeImageAdapter imageAdapter = new SimpleRecipeImageAdapter(this, recipe);
 
         imagesView.setHasFixedSize(true);
