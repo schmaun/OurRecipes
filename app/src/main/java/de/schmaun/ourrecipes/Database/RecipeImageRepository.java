@@ -3,8 +3,11 @@ package de.schmaun.ourrecipes.Database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
@@ -55,12 +58,17 @@ public class RecipeImageRepository {
         return images;
     }
 
-    public void save(long recipeId, ArrayList<RecipeImage> recipeImages)
-    {
-        for (int position = 0; position < recipeImages.size(); position++) {
-            RecipeImage recipeImage = recipeImages.get(position);
+    public void save(long recipeId, ArrayList<RecipeImage> recipeImages) {
+        SparseIntArray positions = new SparseIntArray();
+        int position;
+
+        for (RecipeImage recipeImage : recipeImages) {
+            position = positions.get(recipeImage.getParentType());
+
             recipeImage.setRecipeId(recipeId);
             recipeImage.setPosition(position);
+
+            positions.put(recipeImage.getParentType(), position + 1);
 
             if (recipeImage.getId() != 0) {
                 this.update(recipeImage);

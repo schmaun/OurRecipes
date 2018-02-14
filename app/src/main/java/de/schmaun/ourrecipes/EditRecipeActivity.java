@@ -18,14 +18,16 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.LabelsRepository;
 import de.schmaun.ourrecipes.Database.RecipeImageRepository;
 import de.schmaun.ourrecipes.Database.RecipeRepository;
-import de.schmaun.ourrecipes.EditRecipe.EditRecipeImagesFragment;
-import de.schmaun.ourrecipes.EditRecipe.EditRecipeMainFragment;
+import de.schmaun.ourrecipes.EditRecipe.EditRecipeIngredientsFragment;
 import de.schmaun.ourrecipes.EditRecipe.EditRecipeMetaFragment;
-import de.schmaun.ourrecipes.Model.Recipe;
+import de.schmaun.ourrecipes.EditRecipe.EditRecipePreparationFragment;
+import de.schmaun.ourrecipes.Model.RecipeImage;
 
 public class EditRecipeActivity extends RecipeActivity {
 
@@ -44,9 +46,9 @@ public class EditRecipeActivity extends RecipeActivity {
      */
     private ViewPager mViewPager;
 
-    private EditRecipeMainFragment mainFragment;
-    private EditRecipeImagesFragment imagesFragment;
     private EditRecipeMetaFragment metaFragment;
+    private EditRecipeIngredientsFragment ingredientsFragment;
+    private EditRecipePreparationFragment preparationFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,8 +151,8 @@ public class EditRecipeActivity extends RecipeActivity {
 
     private boolean validate()
     {
-        if (mainFragment != null) {
-            boolean valid = mainFragment.isValid();
+        if (metaFragment != null) {
+            boolean valid = metaFragment.isValid();
             if (!valid) {
                 mViewPager.setCurrentItem(0);
             }
@@ -163,13 +165,13 @@ public class EditRecipeActivity extends RecipeActivity {
 
     private boolean hasUnsavedChanges()
     {
-        if (mainFragment != null && mainFragment.hasUnsavedChanges()) {
-            return true;
-        }
-        if (imagesFragment != null && imagesFragment.hasUnsavedChanges()) {
-            return true;
-        }
         if (metaFragment != null && metaFragment.hasUnsavedChanges()) {
+            return true;
+        }
+        if (ingredientsFragment != null && ingredientsFragment.hasUnsavedChanges()) {
+            return true;
+        }
+        if (preparationFragment != null && preparationFragment.hasUnsavedChanges()) {
             return true;
         }
 
@@ -178,23 +180,28 @@ public class EditRecipeActivity extends RecipeActivity {
 
     private void collectDataFromFragments()
     {
-        if (mainFragment != null) {
-            Recipe recipe = mainFragment.getRecipe();
-
-            this.recipe.setName(recipe.getName());
-            this.recipe.setIngredients(recipe.getIngredients());
-            this.recipe.setPreparation(recipe.getPreparation());
-        }
-
-        if (imagesFragment != null) {
-            this.recipe.setImages(imagesFragment.getRecipe().getImages());
-            this.recipe.setImagesToDelete(imagesFragment.getRecipe().getImagesToDelete());
-        }
+        ArrayList<RecipeImage> mergedImages = new ArrayList<>();
+        ArrayList<RecipeImage> mergedImagesToDelete = new ArrayList<>();
 
         if (metaFragment != null) {
+            this.recipe.setName(metaFragment.getRecipe().getName());
             this.recipe.setLabels(metaFragment.getRecipe().getLabels());
             this.recipe.setNotes(metaFragment.getRecipe().getNotes());
         }
+        if (ingredientsFragment != null) {
+            this.recipe.setIngredients(ingredientsFragment.getRecipe().getIngredients());
+            mergedImages.addAll(ingredientsFragment.getRecipe().getImages());
+            mergedImagesToDelete.addAll(ingredientsFragment.getRecipe().getImagesToDelete());
+
+        }
+        if (preparationFragment != null) {
+            this.recipe.setPreparation(preparationFragment.getRecipe().getPreparation());
+            mergedImages.addAll(preparationFragment.getRecipe().getImages());
+            mergedImagesToDelete.addAll(preparationFragment.getRecipe().getImagesToDelete());
+        }
+
+        this.recipe.setImages(mergedImages);
+        this.recipe.setImagesToDelete(mergedImagesToDelete);
     }
 
     private void saveRecipe()
@@ -216,16 +223,16 @@ public class EditRecipeActivity extends RecipeActivity {
 
     private void onSavedRecipe()
     {
-        if (mainFragment != null) {
-            mainFragment.onSaved();
-        }
-
-        if (imagesFragment != null) {
-            imagesFragment.onSaved();
-        }
-
         if (metaFragment != null) {
             metaFragment.onSaved();
+        }
+
+        if (ingredientsFragment != null) {
+            ingredientsFragment.onSaved();
+        }
+
+        if (preparationFragment != null) {
+            preparationFragment.onSaved();
         }
     }
 
@@ -243,12 +250,12 @@ public class EditRecipeActivity extends RecipeActivity {
 
             switch (position) {
                 case 1:
-                    return EditRecipeImagesFragment.newInstance();
+                    return EditRecipeIngredientsFragment.newInstance();
                 case 2:
-                    return EditRecipeMetaFragment.newInstance();
+                    return EditRecipePreparationFragment.newInstance();
                 default:
                 case 0:
-                    return EditRecipeMainFragment.newInstance();
+                    return EditRecipeMetaFragment.newInstance();
             }
         }
 
@@ -261,11 +268,11 @@ public class EditRecipeActivity extends RecipeActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return getString(R.string.edit_recipe_page_title_main);
-                case 1:
-                    return getString(R.string.edit_recipe_page_title_images);
-                case 2:
                     return getString(R.string.edit_recipe_page_title_meta);
+                case 1:
+                    return getString(R.string.edit_recipe_page_title_ingredients);
+                case 2:
+                    return getString(R.string.edit_recipe_page_title_preparation);
             }
             return null;
         }
@@ -275,13 +282,13 @@ public class EditRecipeActivity extends RecipeActivity {
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             switch (position) {
                 case 0:
-                    mainFragment = (EditRecipeMainFragment) fragment;
+                    metaFragment = (EditRecipeMetaFragment) fragment;
                     break;
                 case 1:
-                    imagesFragment = (EditRecipeImagesFragment) fragment;
+                    ingredientsFragment = (EditRecipeIngredientsFragment) fragment;
                     break;
                 case 2:
-                    metaFragment = (EditRecipeMetaFragment) fragment;
+                    preparationFragment = (EditRecipePreparationFragment) fragment;
                     break;
             }
 

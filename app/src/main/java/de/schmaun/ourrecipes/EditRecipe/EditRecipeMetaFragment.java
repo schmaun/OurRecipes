@@ -23,6 +23,7 @@ import de.schmaun.ourrecipes.R;
 import de.schmaun.ourrecipes.RecipeFormInterface;
 
 public class EditRecipeMetaFragment extends EditRecipeFragment implements RecipeFormInterface {
+    private TextView nameView;
     private TextView notesView;
     private MaterialMultiAutoCompleteTextView labelsView;
 
@@ -40,11 +41,13 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_edit_recipe_meta, container, false);
 
+        nameView = (TextView) rootView.findViewById(R.id.edit_recipe_name);
         labelsView = (MaterialMultiAutoCompleteTextView) rootView.findViewById(R.id.edit_recipe_labels);
         notesView = (TextView) rootView.findViewById(R.id.edit_recipe_notes);
 
         Recipe recipe = recipeProvider.getRecipe();
         if (savedInstanceState == null) {
+            nameView.setText(recipe.getName());
             labelsView.setText(parseLabelsToText(recipe.getLabels()));
             notesView.setText(recipe.getNotes());
         }
@@ -58,6 +61,7 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
         labelsView.setAdapter(adapter);
         labelsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
 
+        nameView.addTextChangedListener(new EditRecipeTextWatcher(this));
         labelsView.addTextChangedListener(new EditRecipeTextWatcher(this));
         notesView.addTextChangedListener(new EditRecipeTextWatcher(this));
 
@@ -66,12 +70,18 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
 
     @Override
     public boolean isValid() {
+        if (nameView.length() == 0) {
+            nameView.setError(getString(R.string.edit_recipe_name_error_empty));
+            return false;
+        }
+
         return true;
     }
 
     @Override
     public Recipe getRecipe() {
         Recipe recipe = new Recipe();
+        recipe.setName(nameView.getText().toString());
         recipe.setNotes(notesView.getText().toString());
         recipe.setLabels(parseLabels());
 

@@ -3,9 +3,9 @@ package de.schmaun.ourrecipes.EditRecipe;
 import android.support.v7.widget.RecyclerView;
 
 public class EditRecipeImagesObserver extends RecyclerView.AdapterDataObserver {
-    private EditRecipeImagesFragment fragment;
+    private EditRecipeFragment fragment;
 
-    public EditRecipeImagesObserver(EditRecipeImagesFragment fragment) {
+    public EditRecipeImagesObserver(EditRecipeFragment fragment) {
         this.fragment = fragment;
     }
 

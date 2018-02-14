@@ -23,6 +23,9 @@ public class Recipe {
 
     private ArrayList<RecipeImage> images;
 
+    private ArrayList<RecipeImage> imagesIngredients;
+    private ArrayList<RecipeImage> imagesPreparation;
+
     private ArrayList<RecipeImage> imagesToDelete;
 
     private ArrayList<Label> labels;
@@ -97,6 +100,18 @@ public class Recipe {
     public ArrayList<RecipeImage> getImages() {
         return images;
     }
+
+    public ArrayList<RecipeImage> getImages(int parentType) {
+        ArrayList<RecipeImage> filteredImages = new ArrayList<>();
+        for (RecipeImage image : images) {
+            if (image.getParentType() == parentType) {
+                filteredImages.add(image);
+            }
+        }
+
+        return filteredImages;
+    }
+
 
     public void setImages(ArrayList<RecipeImage> images) {
         this.images = images;
@@ -174,5 +189,21 @@ public class Recipe {
         }
 
         return null;
+    }
+
+    public ArrayList<RecipeImage> getImagesIngredients() {
+        return imagesIngredients;
+    }
+
+    public void setImagesIngredients(ArrayList<RecipeImage> imagesIngredients) {
+        this.imagesIngredients = imagesIngredients;
+    }
+
+    public ArrayList<RecipeImage> getImagesPreparation() {
+        return imagesPreparation;
+    }
+
+    public void setImagesPreparation(ArrayList<RecipeImage> imagesPreparation) {
+        this.imagesPreparation = imagesPreparation;
     }
 }

@@ -10,6 +10,8 @@
     <string name="edit_recipe_page_title_main">Recipe</string>
     <string name="edit_recipe_page_title_images">Images</string>
     <string name="edit_recipe_page_title_meta">Meta</string>
+    <string name="edit_recipe_page_title_ingredients">Ingredients</string>
+    <string name="edit_recipe_page_title_preparation">Preparation</string>
 
     <string name="edit_recipe_save">Save</string>
     <string name="edit_recipe_delete">Delete</string>
