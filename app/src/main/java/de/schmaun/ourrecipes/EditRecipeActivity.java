@@ -40,7 +40,7 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeImageAda
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private PagerAdapter mSectionsPagerAdapter;
+    private PagerAdapter sectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -60,9 +60,9 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeImageAda
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mSectionsPagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        sectionsPagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(sectionsPagerAdapter);
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

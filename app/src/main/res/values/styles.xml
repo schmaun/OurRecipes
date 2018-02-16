@@ -46,4 +46,15 @@
         <!-- Support library compatibility -->
         <item name="windowActionBarOverlay">true</item>
     </style>
+
+
+    <style name="CookingMode.Title" parent="@android:style/TextAppearance.Material.Display2">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:layout_marginBottom">@dimen/cooking_mode_title_margin_bottom</item>
+    </style>
+
+    <style name="CookingMode.Text" parent="@android:style/TextAppearance.Material.Medium" >
+        <item name="android:textSize">@dimen/cooking_mode_text_size</item>
+    </style>
+
 </resources>

@@ -2,9 +2,6 @@ package de.schmaun.ourrecipes;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -12,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+
+import de.schmaun.ourrecipes.CookingMode.CookingModeIngredientsFragment;
+import de.schmaun.ourrecipes.CookingMode.CookingModeMetaFragment;
+import de.schmaun.ourrecipes.CookingMode.CookingModePreparationFragment;
+import de.schmaun.ourrecipes.EditRecipe.EditRecipeIngredientsFragment;
+import de.schmaun.ourrecipes.EditRecipe.EditRecipeMetaFragment;
+import de.schmaun.ourrecipes.EditRecipe.EditRecipePreparationFragment;
 
 public class CookingModeActivity extends RecipeActivity {
 
@@ -30,7 +35,7 @@ public class CookingModeActivity extends RecipeActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private PagerAdapter sectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -48,13 +53,9 @@ public class CookingModeActivity extends RecipeActivity {
 
         loadRecipeOnCreate(savedInstanceState, true);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
+        sectionsPagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(sectionsPagerAdapter);
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
@@ -96,7 +97,7 @@ public class CookingModeActivity extends RecipeActivity {
         switch (id) {
             case R.id.action_edit:
                 Intent intent = new Intent(this, EditRecipeActivity.class);
-                //intent.putExtra(EditRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipe.getId());
+                intent.putExtra(EditRecipeActivity.BUNDLE_KEY_RECIPE_ID, recipe.getId());
                 startActivity(intent);
                 break;
             case android.R.id.home:
@@ -107,62 +108,45 @@ public class CookingModeActivity extends RecipeActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    private class PagerAdapter extends FragmentPagerAdapter {
 
-        public PlaceholderFragment() {
-        }
+        private final String TAG = "PagerAdapter";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_cooking_mode, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
+        PagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            Log.d(TAG, String.format("getItem called: %d", position));
+
+            switch (position) {
+                case 1:
+                    return CookingModePreparationFragment.newInstance();
+                case 2:
+                    return CookingModeMetaFragment.newInstance();
+                default:
+                case 0:
+                    return CookingModeIngredientsFragment.newInstance();
+            }
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return getString(R.string.edit_recipe_page_title_ingredients);
+                case 1:
+                    return getString(R.string.edit_recipe_page_title_preparation);
+                case 2:
+                    return getString(R.string.edit_recipe_page_title_meta);
+            }
+            return null;
         }
     }
 }
