@@ -191,19 +191,9 @@ public class Recipe {
         return null;
     }
 
-    public ArrayList<RecipeImage> getImagesIngredients() {
-        return imagesIngredients;
-    }
-
-    public void setImagesIngredients(ArrayList<RecipeImage> imagesIngredients) {
-        this.imagesIngredients = imagesIngredients;
-    }
-
-    public ArrayList<RecipeImage> getImagesPreparation() {
-        return imagesPreparation;
-    }
-
-    public void setImagesPreparation(ArrayList<RecipeImage> imagesPreparation) {
-        this.imagesPreparation = imagesPreparation;
+    public void resetCoverImage() {
+        for (RecipeImage image : images) {
+            image.setCoverImage(false);
+        }
     }
 }

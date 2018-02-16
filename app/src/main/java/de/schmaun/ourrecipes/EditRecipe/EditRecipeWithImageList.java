@@ -1,5 +1,6 @@
 package de.schmaun.ourrecipes.EditRecipe;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import de.schmaun.ourrecipes.DownloadImageTask;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.PhotoDialogFragment;
 import de.schmaun.ourrecipes.R;
+import de.schmaun.ourrecipes.RecipeProviderInterface;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -43,8 +45,20 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_SELECT_PHOTO = 2;
     protected Uri newPhotoURI;
+    private RecipeImageAdapter.ImageListManager imageListManager;
 
     abstract int getParentImageType();
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            imageListManager = (RecipeImageAdapter.ImageListManager) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement RecipeImageAdapter.ImageListManager");
+        }
+    }
 
     protected void createView(View rootView, final EditRecipeWithImageList fragment) {
         imageListView = (RecyclerView) rootView.findViewById(R.id.edit_recipe_image_list);
@@ -82,12 +96,16 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
 
         imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, deletedImages, imageListView);
         imageAdapter.registerAdapterDataObserver(new EditRecipeImagesObserver(this));
+        imageAdapter.registerImageListsManager(imageListManager);
         imageListView.setAdapter(imageAdapter);
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ImageCardTouchHelperCallback(imageAdapter));
         itemTouchHelper.attachToRecyclerView(imageListView);
     }
 
+    public void resetCoverImageStatus() {
+        imageAdapter.resetCoverImageStatus();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

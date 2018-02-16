@@ -108,7 +108,6 @@ public class RecipeImage {
         this.parentType = parentType;
     }
 
-
     public RecipeImage clone()
     {
         RecipeImage clone = new RecipeImage();

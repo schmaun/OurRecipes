@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import de.schmaun.ourrecipes.Adapter.RecipeImageAdapter;
 import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.LabelsRepository;
 import de.schmaun.ourrecipes.Database.RecipeImageRepository;
@@ -29,7 +30,7 @@ import de.schmaun.ourrecipes.EditRecipe.EditRecipeMetaFragment;
 import de.schmaun.ourrecipes.EditRecipe.EditRecipePreparationFragment;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
-public class EditRecipeActivity extends RecipeActivity {
+public class EditRecipeActivity extends RecipeActivity implements RecipeImageAdapter.ImageListManager {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -233,6 +234,19 @@ public class EditRecipeActivity extends RecipeActivity {
 
         if (preparationFragment != null) {
             preparationFragment.onSaved();
+        }
+    }
+
+    @Override
+    public void resetCoverImageStatus() {
+        recipe.resetCoverImage();
+
+        if (ingredientsFragment != null) {
+            ingredientsFragment.resetCoverImageStatus();
+        }
+
+        if (preparationFragment != null) {
+            preparationFragment.resetCoverImageStatus();
         }
     }
 
