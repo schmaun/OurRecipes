@@ -23,9 +23,6 @@ public class Recipe {
 
     private ArrayList<RecipeImage> images;
 
-    private ArrayList<RecipeImage> imagesIngredients;
-    private ArrayList<RecipeImage> imagesPreparation;
-
     private ArrayList<RecipeImage> imagesToDelete;
 
     private ArrayList<Label> labels;

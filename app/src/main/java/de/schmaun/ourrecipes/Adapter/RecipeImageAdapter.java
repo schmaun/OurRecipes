@@ -47,6 +47,8 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
 
     public interface ImageListManager {
         void resetCoverImageStatus();
+
+        int getImageCount();
     }
 
     static class ImageHolder extends RecyclerView.ViewHolder implements ImageCardTouchHelperCallback.ItemTouchHelperViewHolder {
@@ -85,7 +87,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
 
     public void addImage(RecipeImage image) {
         this.images.add(image);
-        if (this.images.size() == 1) {
+        if (imageListManager.getImageCount() == 1) {
             onSetAsCoverImage(image);
         }
 
@@ -125,7 +127,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         images.remove(position);
         notifyItemRemoved(position);
 
-        if (images.size() == 1) {
+        if (imageListManager.getImageCount() == 1) {
             onSetAsCoverImage(0);
         }
 

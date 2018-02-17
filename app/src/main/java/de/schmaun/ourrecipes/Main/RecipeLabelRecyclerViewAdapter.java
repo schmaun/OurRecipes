@@ -20,8 +20,12 @@ import java.util.List;
 public class RecipeLabelRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLabelRecyclerViewAdapter.ViewHolder> {
 
     private Context context;
-    private final List<Label> labels;
+    private List<Label> labels;
     private final LabelsListFragment.LabelListInteractionListener interactionListener;
+
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;

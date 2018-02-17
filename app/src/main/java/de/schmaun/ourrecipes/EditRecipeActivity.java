@@ -250,6 +250,11 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeImageAda
         }
     }
 
+    @Override
+    public int getImageCount() {
+        return recipe.getImages().size();
+    }
+
     private class PagerAdapter extends FragmentPagerAdapter {
 
         private final String TAG = "PagerAdapter";

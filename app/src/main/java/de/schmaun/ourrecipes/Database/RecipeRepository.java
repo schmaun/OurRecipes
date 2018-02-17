@@ -203,20 +203,29 @@ public class RecipeRepository {
 
         recipe.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_ID)));
         recipe.setCategoryId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_CATEGORY_ID)));
-        recipe.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)));
+        recipe.setName(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_NAME)));
 
-        recipe.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
-        recipe.setIngredients(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_INGREDIENTS)));
-        recipe.setPreparation(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PREPARATION)));
-        recipe.setNotes(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NOTES)));
+        recipe.setDescription(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
+        recipe.setIngredients(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_INGREDIENTS)));
+        recipe.setPreparation(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_PREPARATION)));
+        recipe.setNotes(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_NOTES)));
 
         recipe.setRating(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_RATING)));
         recipe.setFavorite(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_FAVORITE)));
 
-        recipe.setCreatedAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CREATED_AT))));
-        recipe.setLastEditAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_LAST_EDIT_AT))));
+        recipe.setCreatedAt(createDate(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_CREATED_AT))));
+        recipe.setLastEditAt(createDate(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_LAST_EDIT_AT))));
 
         return recipe;
+    }
+
+    private String getStringFromCursor(Cursor cursor, int columnIndex) {
+        String string = cursor.getString(columnIndex);
+        if (string == null) {
+            string = "";
+        }
+
+        return string;
     }
 
     private Date createDate(String date) {
