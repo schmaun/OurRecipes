@@ -109,6 +109,12 @@ public class Recipe {
         return filteredImages;
     }
 
+    public ArrayList<RecipeImage> getImagesGroupedByParentType() {
+        ArrayList<RecipeImage> images = getImages(RecipeImage.PARENT_TYPE_INGREDIENTS);
+        images.addAll(getImages(RecipeImage.PARENT_TYPE_PREPARATION));
+
+        return images;
+    }
 
     public void setImages(ArrayList<RecipeImage> images) {
         this.images = images;

@@ -2,9 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.schmaun.ourrecipes.CookingMode.CookingModeMetaFragment">
+    tools:context="de.schmaun.ourrecipes.CookingMode.CookingModeIngredientsFragment">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <LinearLayout
+        android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -37,5 +42,13 @@
             android:ellipsize="end"
             android:textAppearance="@style/CookingMode.Text" />
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/cooking_mode_recipe_image_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false">
+
+        </android.support.v7.widget.RecyclerView>
     </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
 </FrameLayout>

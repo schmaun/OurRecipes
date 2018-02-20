@@ -21,9 +21,19 @@ import de.schmaun.ourrecipes.Model.RecipeImage;
 
 public class ImageViewDialogFragment extends DialogFragment {
 
+    private int parentType = 0;
     private RecipeProviderInterface recipeProvider;
     private int startImage;
     private RecipeImage currentImage;
+
+    public static ImageViewDialogFragment newInstance(RecipeProviderInterface recipeProvider, int startImage, int parentType) {
+        ImageViewDialogFragment f = new ImageViewDialogFragment();
+        f.parentType = parentType;
+        f.recipeProvider = recipeProvider;
+        f.startImage = startImage;
+
+        return f;
+    }
 
     public static ImageViewDialogFragment newInstance(RecipeProviderInterface recipeProvider, int startImage) {
         ImageViewDialogFragment f = new ImageViewDialogFragment();
@@ -47,24 +57,16 @@ public class ImageViewDialogFragment extends DialogFragment {
         Recipe recipe = recipeProvider.getRecipe();
         ArrayList<RecipeImage> images = new ArrayList<RecipeImage>();
         if (recipe != null) {
-            images = recipe.getImages();
+            if (parentType != 0) {
+                images = recipe.getImages(parentType);
+            } else {
+                images = recipe.getImagesGroupedByParentType();
+            }
         }
         currentImage = images.get(startImage);
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.dialog_view_image_action_bar);
- /*       toolbar.inflateMenu(R.menu.menu_view_image);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Intent editIntent = new Intent(Intent.ACTION_EDIT);
-                //Uri uri = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", photoFile);
-                Uri uri = Uri.parse(currentImage.getLocation());
 
-                editIntent.setDataAndType(uri, "image*//*");
-                startActivity(Intent.createChooser(editIntent, null));
-                return true;
-            }
-        });*/
         toolbar.setTitle(getString(R.string.dialog_view_image_title, startImage + 1, images.size()));
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

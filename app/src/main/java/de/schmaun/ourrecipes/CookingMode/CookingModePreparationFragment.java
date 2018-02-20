@@ -1,30 +1,22 @@
 package de.schmaun.ourrecipes.CookingMode;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import de.schmaun.ourrecipes.Model.Recipe;
+import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
-import de.schmaun.ourrecipes.RecipeProviderInterface;
 
-public class CookingModePreparationFragment extends Fragment {
-    protected RecipeProviderInterface recipeProvider;
+public class CookingModePreparationFragment extends CookingModeWithImages {
 
     public CookingModePreparationFragment() {
     }
 
     public static CookingModePreparationFragment newInstance() {
         return new CookingModePreparationFragment();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -40,22 +32,13 @@ public class CookingModePreparationFragment extends Fragment {
         preparationStepsView.setText(recipe.getPreparation());
         titleView.setText(recipe.getName());
 
+        createView(rootView);
+
         return rootView;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-            recipeProvider = (RecipeProviderInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement RecipeProviderInterface");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
+    int getParentImageType() {
+        return RecipeImage.PARENT_TYPE_PREPARATION;
     }
 }
