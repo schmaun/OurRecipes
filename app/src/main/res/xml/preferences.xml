@@ -3,7 +3,7 @@
     <PreferenceCategory android:title="@string/pref_header_cooking_mode">
         <SwitchPreference
             android:defaultValue="true"
-            android:key="example_switch"
+            android:key="cooking_mode_display_on"
             android:summary="@string/pref_description_cooking_mode_display_on"
             android:title="@string/pref_title_cooking_mode_display_on" />
     </PreferenceCategory>

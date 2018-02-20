@@ -161,6 +161,7 @@
 
     <string name="pref_header_cooking_mode">Cooking Mode</string>
     <string name="pref_title_cooking_mode_display_on">Keep display on</string>
+    <string name="pref_key_cooking_mode_display_on">cooking_mode_display_on</string>
     <string name="pref_description_cooking_mode_display_on">Prevents the display from fading black while cooking</string>
 
     <string name="pref_header_about">About</string>
