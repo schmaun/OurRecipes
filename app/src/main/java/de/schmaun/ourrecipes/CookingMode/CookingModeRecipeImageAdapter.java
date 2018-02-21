@@ -1,6 +1,7 @@
 package de.schmaun.ourrecipes.CookingMode;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -54,7 +55,7 @@ public class CookingModeRecipeImageAdapter extends RecyclerView.Adapter<CookingM
             @Override
             public void onClick(View v) {
                 FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
-                ImageViewDialogFragment imageViewDialog = ImageViewDialogFragment.newInstance((RecipeProviderInterface)context, currentImagePosition, image.getParentType());
+                ImageViewDialogFragment imageViewDialog = ImageViewDialogFragment.newInstance((RecipeProviderInterface) context, currentImagePosition, image.getParentType(), ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
                 imageViewDialog.show(transaction, "imageViewDialog");
             }
         });

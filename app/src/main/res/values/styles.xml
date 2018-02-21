@@ -47,6 +47,9 @@
         <item name="windowActionBarOverlay">true</item>
     </style>
 
+    <style name="CookingMode" parent="android:Theme.Material">
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
     <style name="CookingMode.Title" parent="@android:style/TextAppearance.Material.Display2">
         <item name="android:textColor">@color/colorAccent</item>

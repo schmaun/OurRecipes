@@ -1,7 +1,10 @@
 package de.schmaun.ourrecipes;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -21,13 +24,15 @@ import de.schmaun.ourrecipes.Model.RecipeImage;
 
 public class ImageViewDialogFragment extends DialogFragment {
 
+    private int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     private int parentType = 0;
     private RecipeProviderInterface recipeProvider;
     private int startImage;
     private RecipeImage currentImage;
 
-    public static ImageViewDialogFragment newInstance(RecipeProviderInterface recipeProvider, int startImage, int parentType) {
+    public static ImageViewDialogFragment newInstance(RecipeProviderInterface recipeProvider, int startImage, int parentType, int screenOrientation) {
         ImageViewDialogFragment f = new ImageViewDialogFragment();
+        f.screenOrientation = screenOrientation;
         f.parentType = parentType;
         f.recipeProvider = recipeProvider;
         f.startImage = startImage;
@@ -48,6 +53,13 @@ public class ImageViewDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.imageViewDialog);
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        ((Activity) context).setRequestedOrientation(screenOrientation);
     }
 
     @Override

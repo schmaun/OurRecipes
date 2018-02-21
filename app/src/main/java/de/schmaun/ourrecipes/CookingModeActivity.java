@@ -48,6 +48,7 @@ public class CookingModeActivity extends RecipeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.CookingMode);
         setContentView(R.layout.activity_cooking_mode);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
