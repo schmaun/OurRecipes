@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
             Preference preference = findPreference(BACKUP_TO_GOOGLE_DRIVE_ACCOUNT_NAME);
 
             if (account != null) {
-                preference.setSummary(account.getDisplayName());
+                preference.setSummary(String.format("%s (%s)", account.getDisplayName(), account.getEmail()));
             } else {
                 preference.setSummary(getString(R.string.pref_description_backup_to_google_drive_account_na));
             }

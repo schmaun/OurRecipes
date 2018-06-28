@@ -15,6 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import de.schmaun.ourrecipes.Main.LabelsListFragment;
 import de.schmaun.ourrecipes.Main.RecipesListByLabelFragment;
@@ -63,6 +68,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null && account.getPhotoUrl() != null) {
+            final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            final View header = navigationView.getHeaderView(0);
+            final ImageView navigationDrawerImage = (ImageView) header.findViewById(R.id.nav_header_image);
+
+            Glide.with(this).load(account.getPhotoUrl()).into(navigationDrawerImage);
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -87,11 +106,15 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            startSettings();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startSettings() {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     @Override
@@ -105,6 +128,7 @@ public class MainActivity extends AppCompatActivity
                 showRecipesListFavoritesFragment();
                 break;
             case R.id.nav_settings:
+                startSettings();
                 break;
         }
 
