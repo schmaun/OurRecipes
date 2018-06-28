@@ -193,4 +193,13 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="pref_header_sync_n_backup">Sync and Backup</string>
+    <string name="pref_description_backup_to_google_drive">Backup recipes and their images to your Google Drive</string>
+    <string name="pref_title_backup_to_google_drive">Backup to Google Drive</string>
+    <string name="pref_title_backup_to_google_drive_account">Account</string>
+    <string name="pref_description_backup_to_google_drive_account_na">Click here to sign in.</string>
+    <string name="title_activity_sign_in">Sign in</string>
+    <string name="sign_out_button">Sign Out</string>
+    <string name="sign_in_description">In order to use the backup functionality you have to sign in with your Google Account.</string>
+    <string name="sign_in_current_account_headline">Signed in with</string>
 </resources>

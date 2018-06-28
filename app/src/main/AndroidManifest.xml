@@ -75,7 +75,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-        <provider
+
+        <!--
+            <provider
             android:name=".sync.Provider"
             android:authorities="de.schmaun.ourrecipes.provider"
             android:enabled="true"
@@ -99,6 +101,15 @@
             <meta-data android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+        -->
+        <activity
+            android:name=".SignInActivity"
+            android:label="@string/title_activity_sign_in"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
