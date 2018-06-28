@@ -39,6 +39,17 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
     private ArrayList<RecipeImage> deletedImages = new ArrayList<>();
     private RecipeImage deletedRecipeImage;
     private int deletedRecipeImagePosition;
+    private ImageListManager imageListManager;
+
+    public void registerImageListsManager(ImageListManager imageListManager) {
+        this.imageListManager = imageListManager;
+    }
+
+    public interface ImageListManager {
+        void resetCoverImageStatus();
+
+        int getImageCount();
+    }
 
     static class ImageHolder extends RecyclerView.ViewHolder implements ImageCardTouchHelperCallback.ItemTouchHelperViewHolder {
         Button deleteButton;
@@ -76,7 +87,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
 
     public void addImage(RecipeImage image) {
         this.images.add(image);
-        if (this.images.size() == 1) {
+        if (imageListManager.getImageCount() == 1) {
             onSetAsCoverImage(image);
         }
 
@@ -116,7 +127,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         images.remove(position);
         notifyItemRemoved(position);
 
-        if (images.size() == 1) {
+        if (imageListManager.getImageCount() == 1) {
             onSetAsCoverImage(0);
         }
 
@@ -142,11 +153,16 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
     }
 
     private void onSetAsCoverImage(RecipeImage image) {
+        imageListManager.resetCoverImageStatus();
+
+        image.setCoverImage(true);
+        notifyDataSetChanged();
+    }
+
+    public void resetCoverImageStatus() {
         for(RecipeImage notCoverImage: images) {
             notCoverImage.setCoverImage(false);
         }
-
-        image.setCoverImage(true);
         notifyDataSetChanged();
     }
 

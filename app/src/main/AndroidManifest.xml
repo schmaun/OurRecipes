@@ -2,10 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.schmaun.ourrecipes">
 
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS"
+        android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature android:name="android.hardware.screen.sensorLandscape"/>
+
+    <uses-feature android:name="android.hardware.screen.sensorLandscape" />
 
     <application
+        android:name=".Application"
         android:allowBackup="true"
         android:icon="@drawable/chef_3"
         android:label="@string/app_name"
@@ -40,7 +45,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.schmaun.ourrecipes.MainActivity" />
         </activity>
-
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -57,14 +61,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.schmaun.ourrecipes.SettingsActivity" />
         </activity>
-
         <activity
             android:name=".CookingModeActivity"
             android:label="@string/title_activity_cooking_mode"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -75,6 +75,41 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!--
+            <provider
+            android:name=".sync.Provider"
+            android:authorities="de.schmaun.ourrecipes.provider"
+            android:enabled="true"
+            android:exported="false"
+            android:syncable="true" />
+
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.MainActivity" />
+        </activity>
+
+        <service
+            android:name=".sync.AuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+        -->
+        <activity
+            android:name=".SignInActivity"
+            android:label="@string/title_activity_sign_in"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

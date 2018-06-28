@@ -3,7 +3,6 @@ package de.schmaun.ourrecipes.Database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -15,17 +14,14 @@ import java.util.Locale;
 
 import de.schmaun.ourrecipes.Model.Recipe;
 
-public class RecipeRepository {
+public class RecipeRepository extends Repository {
     private final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss.sss";
     private final String TAG = "RecipeRepository";
 
-    private static RecipeRepository mInstance;
-
-    private DbHelper dbHelper;
+    private static RecipeRepository instance;
 
     public static final String TABLE_NAME = "recipes";
 
-    public static final String COLUMN_NAME_ID = "_id";
     public static final String COLUMN_NAME_CATEGORY_ID = "categoryId";
 
     public static final String COLUMN_NAME_NAME = "name";
@@ -41,15 +37,15 @@ public class RecipeRepository {
     public static final String COLUMN_NAME_LAST_EDIT_AT = "lastEditAt";
 
     public RecipeRepository(DbHelper dbHelper) {
-        this.dbHelper = dbHelper;
+        super(dbHelper);
     }
 
     public static RecipeRepository getInstance(DbHelper dbHelper) {
-        if (mInstance == null) {
-            mInstance = new RecipeRepository(dbHelper);
+        if (instance == null) {
+            instance = new RecipeRepository(dbHelper);
         }
 
-        return mInstance;
+        return instance;
     }
 
     public List<Recipe> getFavoriteRecipes()
@@ -172,9 +168,9 @@ public class RecipeRepository {
         db.close();
     }
 
-    public void delete(long recipeId) {
+    public int delete(long recipeId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipeId)});
+        return db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipeId)});
     }
 
     private ContentValues createContentValues(Recipe recipe)
@@ -203,20 +199,29 @@ public class RecipeRepository {
 
         recipe.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_ID)));
         recipe.setCategoryId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_CATEGORY_ID)));
-        recipe.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)));
+        recipe.setName(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_NAME)));
 
-        recipe.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
-        recipe.setIngredients(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_INGREDIENTS)));
-        recipe.setPreparation(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PREPARATION)));
-        recipe.setNotes(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NOTES)));
+        recipe.setDescription(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
+        recipe.setIngredients(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_INGREDIENTS)));
+        recipe.setPreparation(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_PREPARATION)));
+        recipe.setNotes(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_NOTES)));
 
         recipe.setRating(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_RATING)));
         recipe.setFavorite(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_FAVORITE)));
 
-        recipe.setCreatedAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CREATED_AT))));
-        recipe.setLastEditAt(createDate(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_LAST_EDIT_AT))));
+        recipe.setCreatedAt(createDate(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_CREATED_AT))));
+        recipe.setLastEditAt(createDate(getStringFromCursor(cursor, cursor.getColumnIndex(COLUMN_NAME_LAST_EDIT_AT))));
 
         return recipe;
+    }
+
+    private String getStringFromCursor(Cursor cursor, int columnIndex) {
+        String string = cursor.getString(columnIndex);
+        if (string == null) {
+            string = "";
+        }
+
+        return string;
     }
 
     private Date createDate(String date) {
@@ -286,5 +291,4 @@ public class RecipeRepository {
                 break;
         }
     }
-
 }

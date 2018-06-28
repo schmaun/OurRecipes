@@ -21,7 +21,10 @@ public class RecipesListFavoritesFragment extends RecipeListBaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
+    @Override
+    protected void loadRecipes() {
         StopWatch stopWatch = StopWatch.createAndStart();
         recipes = RecipeRepository.getInstance(new DbHelper(getContext())).getFavoriteRecipes();
         Log.d(TAG, "getRecipesForLabel duration: " + Long.toString(stopWatch.stop()));

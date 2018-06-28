@@ -24,6 +24,7 @@ public class LabelsListFragment extends Fragment {
     public static final String TAG = "LabelsListFragment";
     private LabelListInteractionListener interactionListener;
     private List<Label> labels;
+    private RecipeLabelRecyclerViewAdapter labelAdapter;
 
     public LabelsListFragment() {
     }
@@ -40,17 +41,7 @@ public class LabelsListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DbHelper db = new DbHelper(getContext());
-
-        StopWatch stopWatch = StopWatch.createAndStart();
-        labels = LabelsRepository.getInstance(db).getLabelsForMain();
-
-        Label label = new Label();
-        label.setId(-1);
-        label.setName(getString(R.string.not_labeled));
-        labels.add(label);
-
-        Log.d(TAG, "getLabelsForMain duration: " + Long.toString(stopWatch.stop()));
+        loadLabels();
     }
 
     @Override
@@ -61,7 +52,9 @@ public class LabelsListFragment extends Fragment {
 
         LayoutManager layoutManager = new LinearLayoutManager(getContext());
         view.setLayoutManager(layoutManager);
-        view.setAdapter(new RecipeLabelRecyclerViewAdapter(getContext(), labels, interactionListener));
+
+        labelAdapter = new RecipeLabelRecyclerViewAdapter(getContext(), labels, interactionListener);
+        view.setAdapter(labelAdapter);
         view.addItemDecoration(new SpacesItemDecoration((int) (scale*4f), 1));
 
         return view;
@@ -87,6 +80,24 @@ public class LabelsListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().setTitle(R.string.app_name);
+
+        loadLabels();
+        labelAdapter.setLabels(labels);
+        labelAdapter.notifyDataSetChanged();
+    }
+
+    private void loadLabels() {
+        DbHelper db = new DbHelper(getContext());
+
+        StopWatch stopWatch = StopWatch.createAndStart();
+        labels = LabelsRepository.getInstance(db).getLabelsForMain();
+
+        Label label = new Label();
+        label.setId(-1);
+        label.setName(getString(R.string.not_labeled));
+        labels.add(label);
+
+        Log.d(TAG, "getLabelsForMain duration: " + Long.toString(stopWatch.stop()));
     }
 
     public interface LabelListInteractionListener {

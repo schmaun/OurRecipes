@@ -3,9 +3,30 @@
     <PreferenceCategory android:title="@string/pref_header_cooking_mode">
         <SwitchPreference
             android:defaultValue="true"
-            android:key="example_switch"
+            android:key="cooking_mode_display_on"
             android:summary="@string/pref_description_cooking_mode_display_on"
             android:title="@string/pref_title_cooking_mode_display_on" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_header_sync_n_backup">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="backup_to_google_drive_enabled"
+            android:summary="@string/pref_description_backup_to_google_drive"
+            android:title="@string/pref_title_backup_to_google_drive" />
+
+        <Preference
+            android:title="@string/pref_title_backup_to_google_drive_account"
+            android:summary="@string/pref_description_backup_to_google_drive_account_na"
+            android:dependency="backup_to_google_drive_enabled"
+            android:key="backup_to_google_drive_account_name"
+            >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="de.schmaun.ourrecipes"
+                android:targetClass="de.schmaun.ourrecipes.SignInActivity"
+                />
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_about">

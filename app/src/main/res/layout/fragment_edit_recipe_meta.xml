@@ -9,43 +9,53 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.schmaun.ourrecipes.EditRecipe.EditRecipeMetaFragment">
 
-    <com.rengwuxian.materialedittext.MaterialMultiAutoCompleteTextView
-        android:inputType="textMultiLine"
-        android:id="@+id/edit_recipe_labels"
-        android:hint="@string/edit_recipe_labels"
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/edit_recipe_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="@dimen/edit_text_margin_bottom"
+        android:hint="@string/edit_recipe_name"
+        android:inputType="text"
+        app:met_primaryColor="@color/colorAccent"
+        app:met_floatingLabel="highlight"
+        app:met_helperText="@string/edit_recipe_name_helper_text"
+        app:met_helperTextAlwaysShown="true"
+        app:met_validateOnFocusLost="true" />
 
+    <com.rengwuxian.materialedittext.MaterialMultiAutoCompleteTextView
+        android:id="@+id/edit_recipe_labels"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/edit_text_margin_bottom"
+
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edit_recipe_name"
+        android:hint="@string/edit_recipe_labels"
+        android:inputType="textMultiLine"
         android:minLines="1"
         app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_labels_helper_text"
         app:met_helperTextAlwaysShown="true"
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        app:met_primaryColor="@color/colorAccent"
-        android:layout_marginBottom="@dimen/edit_text_margin_bottom"
-
-        />
+        app:met_primaryColor="@color/colorAccent" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:inputType="textMultiLine"
         android:id="@+id/edit_recipe_notes"
-        android:hint="@string/edit_recipe_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/edit_text_margin_bottom"
 
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edit_recipe_labels"
+        android:hint="@string/edit_recipe_notes"
+        android:inputType="textMultiLine"
         android:minLines="1"
         app:met_floatingLabel="highlight"
         app:met_helperText="@string/edit_recipe_notes_helper_text"
         app:met_helperTextAlwaysShown="true"
-
-        android:layout_below="@+id/edit_recipe_labels"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        app:met_primaryColor="@color/colorAccent"
-
-        />
+        app:met_primaryColor="@color/colorAccent" />
 
 </RelativeLayout>

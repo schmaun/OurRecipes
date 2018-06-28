@@ -1,10 +1,15 @@
 package de.schmaun.ourrecipes;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 public class SettingsActivity extends AppCompatActivity {
     @Override
@@ -13,11 +18,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
@@ -34,10 +37,26 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragment {
+        private static final String BACKUP_TO_GOOGLE_DRIVE_ACCOUNT_NAME = "backup_to_google_drive_account_name";
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+            Preference preference = findPreference(BACKUP_TO_GOOGLE_DRIVE_ACCOUNT_NAME);
+
+            if (account != null) {
+                preference.setSummary(account.getDisplayName());
+            } else {
+                preference.setSummary(getString(R.string.pref_description_backup_to_google_drive_account_na));
+            }
         }
     }
 }

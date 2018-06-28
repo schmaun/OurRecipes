@@ -10,6 +10,8 @@
     <string name="edit_recipe_page_title_main">Recipe</string>
     <string name="edit_recipe_page_title_images">Images</string>
     <string name="edit_recipe_page_title_meta">Meta</string>
+    <string name="edit_recipe_page_title_ingredients">Ingredients</string>
+    <string name="edit_recipe_page_title_preparation">Preparation</string>
 
     <string name="edit_recipe_save">Save</string>
     <string name="edit_recipe_delete">Delete</string>
@@ -159,6 +161,7 @@
 
     <string name="pref_header_cooking_mode">Cooking Mode</string>
     <string name="pref_title_cooking_mode_display_on">Keep display on</string>
+    <string name="pref_key_cooking_mode_display_on">cooking_mode_display_on</string>
     <string name="pref_description_cooking_mode_display_on">Prevents the display from fading black while cooking</string>
 
     <string name="pref_header_about">About</string>
@@ -176,5 +179,27 @@
     <string name="licenses_cooking_icon_headline">Icons</string>
     <string name="licenses_other_headline">Other</string>
     <string name="title_activity_cooking_mode">CookingModeActivity</string>
-    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="pref_header_sync_n_backup">Sync and Backup</string>
+    <string name="pref_description_backup_to_google_drive">Backup recipes and their images to your Google Drive</string>
+    <string name="pref_title_backup_to_google_drive">Backup to Google Drive</string>
+    <string name="pref_title_backup_to_google_drive_account">Account</string>
+    <string name="pref_description_backup_to_google_drive_account_na">Click here to sign in.</string>
+    <string name="title_activity_sign_in">Sign in</string>
+    <string name="sign_out_button">Sign Out</string>
+    <string name="sign_in_description">In order to use the backup functionality you have to sign in with your Google Account.</string>
+    <string name="sign_in_current_account_headline">Signed in with</string>
 </resources>

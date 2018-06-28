@@ -1,7 +1,10 @@
 package de.schmaun.ourrecipes;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -21,9 +24,21 @@ import de.schmaun.ourrecipes.Model.RecipeImage;
 
 public class ImageViewDialogFragment extends DialogFragment {
 
+    private int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+    private int parentType = 0;
     private RecipeProviderInterface recipeProvider;
     private int startImage;
     private RecipeImage currentImage;
+
+    public static ImageViewDialogFragment newInstance(RecipeProviderInterface recipeProvider, int startImage, int parentType, int screenOrientation) {
+        ImageViewDialogFragment f = new ImageViewDialogFragment();
+        f.screenOrientation = screenOrientation;
+        f.parentType = parentType;
+        f.recipeProvider = recipeProvider;
+        f.startImage = startImage;
+
+        return f;
+    }
 
     public static ImageViewDialogFragment newInstance(RecipeProviderInterface recipeProvider, int startImage) {
         ImageViewDialogFragment f = new ImageViewDialogFragment();
@@ -41,30 +56,29 @@ public class ImageViewDialogFragment extends DialogFragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        ((Activity) context).setRequestedOrientation(screenOrientation);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_view_image, container, false);
 
         Recipe recipe = recipeProvider.getRecipe();
         ArrayList<RecipeImage> images = new ArrayList<RecipeImage>();
         if (recipe != null) {
-            images = recipe.getImages();
+            if (parentType != 0) {
+                images = recipe.getImages(parentType);
+            } else {
+                images = recipe.getImagesGroupedByParentType();
+            }
         }
         currentImage = images.get(startImage);
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.dialog_view_image_action_bar);
- /*       toolbar.inflateMenu(R.menu.menu_view_image);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Intent editIntent = new Intent(Intent.ACTION_EDIT);
-                //Uri uri = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", photoFile);
-                Uri uri = Uri.parse(currentImage.getLocation());
 
-                editIntent.setDataAndType(uri, "image*//*");
-                startActivity(Intent.createChooser(editIntent, null));
-                return true;
-            }
-        });*/
         toolbar.setTitle(getString(R.string.dialog_view_image_title, startImage + 1, images.size()));
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

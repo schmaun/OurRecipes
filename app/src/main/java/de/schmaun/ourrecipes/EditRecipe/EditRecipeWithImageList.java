@@ -1,6 +1,6 @@
 package de.schmaun.ourrecipes.EditRecipe;
 
-
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,9 +11,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -28,39 +26,41 @@ import java.util.Locale;
 
 import de.schmaun.ourrecipes.Adapter.RecipeImageAdapter;
 import de.schmaun.ourrecipes.DownloadImageTask;
-import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.PhotoDialogFragment;
 import de.schmaun.ourrecipes.R;
-import de.schmaun.ourrecipes.RecipeFormInterface;
+import de.schmaun.ourrecipes.RecipeProviderInterface;
 
 import static android.app.Activity.RESULT_OK;
 
-public class EditRecipeImagesFragment extends EditRecipeFragment implements PhotoDialogFragment.PictureIntentHandler, DownloadImageTask.DownloadImageHandler {
-    private RecyclerView imageListView;
-    private RecipeImageAdapter imageAdapter;
-    private ArrayList<RecipeImage> recipeImages;
+abstract public class EditRecipeWithImageList extends EditRecipeFragment implements PhotoDialogFragment.PictureIntentHandler, DownloadImageTask.DownloadImageHandler {
+    protected int layout;
+    protected RecyclerView imageListView;
+    protected RecipeImageAdapter imageAdapter;
+    protected ArrayList<RecipeImage> recipeImages;
 
-    private static final String STATE_IMAGES = "images";
-    private static final String STATE_DELETED_ITEMS = "deletedImages";
-    private static final String TAG = "EditRecipeImagesF";
+    protected static final String STATE_IMAGES = "images";
+    protected static final String STATE_DELETED_ITEMS = "deletedImages";
+    protected static final String TAG = "EditRecipeImagesF";
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_SELECT_PHOTO = 2;
-    private Uri newPhotoURI;
+    protected Uri newPhotoURI;
+    private RecipeImageAdapter.ImageListManager imageListManager;
 
-    public EditRecipeImagesFragment() {
-    }
-
-    public static EditRecipeImagesFragment newInstance() {
-        return new EditRecipeImagesFragment();
-    }
+    abstract int getParentImageType();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-        View rootView = inflater.inflate(R.layout.fragment_edit_recipe_images, container, false);
+        try {
+            imageListManager = (RecipeImageAdapter.ImageListManager) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement RecipeImageAdapter.ImageListManager");
+        }
+    }
 
+    protected void createView(View rootView, final EditRecipeWithImageList fragment) {
         imageListView = (RecyclerView) rootView.findViewById(R.id.edit_recipe_image_list);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
 
@@ -68,7 +68,6 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Phot
         imageListView.setItemAnimator(new DefaultItemAnimator());
         imageListView.setHasFixedSize(true);
 
-        final EditRecipeImagesFragment fragment = this;
         Button addImageButton = (Button) rootView.findViewById(R.id.edit_recipe_add_image);
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,8 +77,6 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Phot
                 newFragment.show(getActivity().getSupportFragmentManager(), "add_photo");
             }
         });
-
-        return rootView;
     }
 
     @Override
@@ -93,16 +90,21 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Phot
         } else {
             recipeImages = new ArrayList<>();
             if (recipeProvider.getRecipe().getId() != 0) {
-                recipeImages = recipeProvider.getRecipe().getImages();
+                recipeImages = recipeProvider.getRecipe().getImages(getParentImageType());
             }
         }
 
         imageAdapter = new RecipeImageAdapter(getContext(), recipeImages, deletedImages, imageListView);
         imageAdapter.registerAdapterDataObserver(new EditRecipeImagesObserver(this));
+        imageAdapter.registerImageListsManager(imageListManager);
         imageListView.setAdapter(imageAdapter);
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ImageCardTouchHelperCallback(imageAdapter));
         itemTouchHelper.attachToRecyclerView(imageListView);
+    }
+
+    public void resetCoverImageStatus() {
+        imageAdapter.resetCoverImageStatus();
     }
 
     @Override
@@ -118,6 +120,7 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Phot
 
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             RecipeImage image = new RecipeImage();
+            image.setParentType(getParentImageType());
             image.setLocation(newPhotoURI.toString());
             imageAdapter.addImage(image);
         }
@@ -156,8 +159,15 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Phot
         }
     }
 
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        File storageDir = getActivity().getExternalFilesDir("images");
+
+        return File.createTempFile(timeStamp, ".jpg", storageDir);
+    }
+
     public void dispatchSelectPictureFromGallery() {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startSelectPictureIntent(photoPickerIntent);
     }
 
@@ -176,30 +186,13 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Phot
         }
     }
 
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        File storageDir = getActivity().getExternalFilesDir("images");
+    protected void removeDeletedImageFiles() {
+        for (RecipeImage recipeImage : imageAdapter.getDeletedImages()) {
+            File file = new File(recipeImage.getLocation());
+            boolean deleted = file.delete();
 
-        return File.createTempFile(timeStamp, ".jpg", storageDir);
-    }
-
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    public Recipe getRecipe() {
-        Recipe recipe = new Recipe();
-        recipe.setImages(recipeImages);
-        recipe.setImagesToDelete(imageAdapter.getDeletedImages());
-
-        return recipe;
-    }
-
-    @Override
-    public void onSaved() {
-        removeDeletedImageFiles();
+            Log.d("deleteImageFile", Boolean.toString(deleted));
+        }
     }
 
     @Override
@@ -214,14 +207,5 @@ public class EditRecipeImagesFragment extends EditRecipeFragment implements Phot
         RecipeImage image = new RecipeImage();
         image.setLocation(uri.toString());
         imageAdapter.addImage(image);
-    }
-
-    protected void removeDeletedImageFiles() {
-        for (RecipeImage recipeImage : imageAdapter.getDeletedImages()) {
-            File file = new File(recipeImage.getLocation());
-            boolean deleted = file.delete();
-
-            Log.d("deleteImageFile", Boolean.toString(deleted));
-        }
     }
 }

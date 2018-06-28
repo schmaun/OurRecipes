@@ -14,7 +14,7 @@ import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.RecipeRepository;
 import de.schmaun.ourrecipes.Model.Recipe;
 
-class RecipeActivity extends AppCompatActivity implements RecipeProviderInterface {
+abstract class RecipeActivity extends AppCompatActivity implements RecipeProviderInterface {
     public static final String BUNDLE_KEY_RECIPE_ID = "recipeId";
     private static final String TAG_LIFECYCLE = "RA:lifecycle";
 

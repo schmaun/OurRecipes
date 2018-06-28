@@ -32,7 +32,9 @@ public class RecipesListByLabelFragment extends RecipeListBaseFragment {
         if (getArguments() != null) {
             labelId = getArguments().getLong(ARG_LABEL_ID);
         }
+    }
 
+    protected void loadRecipes() {
         DbHelper db = new DbHelper(getContext());
         StopWatch stopWatch = StopWatch.createAndStart();
 

@@ -20,6 +20,12 @@ public class RecipeImage {
 
     private int isCoverImage;
 
+    private int parentType;
+
+    public static final int PARENT_TYPE_INGREDIENTS = 1;
+
+    public static final int PARENT_TYPE_PREPARATION = 2;
+
     public RecipeImage() {
     }
 
@@ -94,6 +100,14 @@ public class RecipeImage {
         return (isCoverImage == 1);
     }
 
+    public int getParentType() {
+        return parentType;
+    }
+
+    public void setParentType(int parentType) {
+        this.parentType = parentType;
+    }
+
     public RecipeImage clone()
     {
         RecipeImage clone = new RecipeImage();
@@ -104,6 +118,7 @@ public class RecipeImage {
         clone.setPosition(this.getPosition());
         clone.setRecipeId(this.getRecipeId());
         clone.setCoverImage(this.getCoverImage());
+        clone.setParentType(this.getParentType());
 
         return clone;
     }

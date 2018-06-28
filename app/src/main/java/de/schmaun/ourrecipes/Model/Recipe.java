@@ -98,6 +98,24 @@ public class Recipe {
         return images;
     }
 
+    public ArrayList<RecipeImage> getImages(int parentType) {
+        ArrayList<RecipeImage> filteredImages = new ArrayList<>();
+        for (RecipeImage image : images) {
+            if (image.getParentType() == parentType) {
+                filteredImages.add(image);
+            }
+        }
+
+        return filteredImages;
+    }
+
+    public ArrayList<RecipeImage> getImagesGroupedByParentType() {
+        ArrayList<RecipeImage> images = getImages(RecipeImage.PARENT_TYPE_INGREDIENTS);
+        images.addAll(getImages(RecipeImage.PARENT_TYPE_PREPARATION));
+
+        return images;
+    }
+
     public void setImages(ArrayList<RecipeImage> images) {
         this.images = images;
     }
@@ -174,5 +192,11 @@ public class Recipe {
         }
 
         return null;
+    }
+
+    public void resetCoverImage() {
+        for (RecipeImage image : images) {
+            image.setCoverImage(false);
+        }
     }
 }
