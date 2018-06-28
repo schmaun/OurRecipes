@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class CookingModeRecipeImageAdapter extends RecyclerView.Adapter<CookingM
             }
         });
 
-        Glide.with(context).load(image.getLocation()).fitCenter().into(imageHolder.imageView);
+        Glide.with(context).load(image.getLocation()).apply(new RequestOptions().fitCenter()).into(imageHolder.imageView);
     }
 
     @Override

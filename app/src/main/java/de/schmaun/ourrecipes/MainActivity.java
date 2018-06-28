@@ -16,8 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -72,12 +74,17 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null && account.getPhotoUrl() != null) {
-            final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            final View header = navigationView.getHeaderView(0);
-            final ImageView navigationDrawerImage = (ImageView) header.findViewById(R.id.nav_header_image);
+        if (account != null) {
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            View header = navigationView.getHeaderView(0);
 
-            Glide.with(this).load(account.getPhotoUrl()).into(navigationDrawerImage);
+            TextView navigationDrawerName = (TextView) header.findViewById(R.id.nav_header_name);
+            navigationDrawerName.setText(account.getDisplayName());
+
+            if (account.getPhotoUrl() != null) {
+                ImageView navigationDrawerImage = (ImageView) header.findViewById(R.id.nav_header_image);
+                Glide.with(this).load(account.getPhotoUrl()).apply(RequestOptions.circleCropTransform()).into(navigationDrawerImage);
+            }
         }
     }
 

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeViewHolder>{
         }
 
         if (coverImage != null) {
-            Glide.with(context).load(coverImage.getLocation()).centerCrop().into(recipeViewHolder.image);
+            Glide.with(context).load(coverImage.getLocation()).apply(new RequestOptions().centerCrop()).into(recipeViewHolder.image);
         } else {
             recipeViewHolder.image.setImageDrawable(context.getResources().getDrawable(R.drawable.no_image));
             recipeViewHolder.image.setScaleType(ImageView.ScaleType.CENTER);

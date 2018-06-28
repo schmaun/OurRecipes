@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class SimpleRecipeImageAdapter extends RecyclerView.Adapter<SimpleRecipeI
             }
         });
 
-        Glide.with(context).load(image.getLocation()).centerCrop().into(imageHolder.imageView);
+        Glide.with(context).load(image.getLocation()).apply(new RequestOptions().centerCrop()).into(imageHolder.imageView);
     }
 
     @Override

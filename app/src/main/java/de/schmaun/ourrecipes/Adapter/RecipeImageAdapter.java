@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -179,7 +180,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         final RecipeImageAdapter that = this;
 
         RecipeImage image = images.get(i);
-        Glide.with(context).load(image.getLocation()).centerCrop().into(imageHolder.imageView);
+        Glide.with(context).load(image.getLocation()).apply(new RequestOptions().centerCrop()).into(imageHolder.imageView);
 
         imageHolder.imageTextView.setText(R.string.edit_recipe_image_description);
         imageHolder.imageTextView.setTypeface(null, Typeface.ITALIC);

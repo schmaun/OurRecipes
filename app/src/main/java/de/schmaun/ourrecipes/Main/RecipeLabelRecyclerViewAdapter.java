@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import de.schmaun.ourrecipes.Main.LabelsListFragment.LabelListInteractionListener;
 import de.schmaun.ourrecipes.Model.Label;
@@ -63,7 +64,7 @@ public class RecipeLabelRecyclerViewAdapter extends RecyclerView.Adapter<RecipeL
 
         String imageLocation = labels.get(position).getImageLocation();
         if (imageLocation != null) {
-            Glide.with(context).load(imageLocation).centerCrop().into(holder.imageView);
+            Glide.with(context).load(imageLocation).apply(new RequestOptions().centerCrop()).into(holder.imageView);
         } else {
             holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.no_image));
             holder.imageView.setScaleType(ImageView.ScaleType.CENTER);
