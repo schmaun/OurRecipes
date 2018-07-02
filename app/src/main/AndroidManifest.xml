@@ -110,6 +110,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.schmaun.ourrecipes.MainActivity" />
         </activity>
+        <activity
+            android:name=".backup.GoogleDriveActivity"
+            android:label="@string/title_activity_backup_google_drive"
+            android:parentActivityName=".SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.schmaun.ourrecipes.SettingsActivity" />
+        </activity>
+
+        <service
+            android:name=".backup.BackupService"
+            android:exported="false" />
+        <service
+            android:name=".backup.MyIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

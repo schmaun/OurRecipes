@@ -197,9 +197,22 @@
     <string name="pref_description_backup_to_google_drive">Backup recipes and their images to your Google Drive</string>
     <string name="pref_title_backup_to_google_drive">Backup to Google Drive</string>
     <string name="pref_title_backup_to_google_drive_account">Account</string>
-    <string name="pref_description_backup_to_google_drive_account_na">Click here to sign in.</string>
+    <string name="pref_title_backup_to_google_drive_status">Backup Status</string>
+    <string name="pref_description_backup_to_google_drive_account_na">Click here to sign in</string>
+    <string name="pref_description_backup_to_google_drive_status">Click here to view backup status or create a backup manually</string>
     <string name="title_activity_sign_in">Sign in</string>
     <string name="sign_out_button">Sign Out</string>
     <string name="sign_in_description">To use the backup functionality you have to sign in with your Google Account.</string>
     <string name="sign_in_current_account_headline">Signed in with</string>
+    <string name="backup_google_drive_start_backup">Start Backup</string>
+    <string name="backup_google_drive_status">Status</string>
+    <string name="backup_google_drive_last_backup_completed_at">Last Backup completed at: %s</string>
+    <string name="backup_google_drive_last_backup_completed_at_na">N/A</string>
+    <string name="title_activity_backup_google_drive">Google Drive Backup</string>
+    <string name="backup_google_drive_description">Backing up your data to Google Drive allows you to restore all your recipes on a new device.</string>
+    <string name="backup_google_drive_notification_title">Backup to Google Drive</string>
+    <string name="backup_google_drive_notification_progress_message">Backing up recipes and images</string>
+    <string name="backup_notification_channel_name">Backup</string>
+    <string name="backup_notification_channel_description">Notifications about the backup progress</string>
+    <string name="backup_google_drive_notification_finished_message">Backup to Google Drive finished! 👏</string>
 </resources>

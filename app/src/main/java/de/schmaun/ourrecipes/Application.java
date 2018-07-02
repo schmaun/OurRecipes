@@ -8,5 +8,6 @@ public class Application extends android.app.Application {
     {
         super.onCreate();
         VolleyManager.getInstance(this);
+        NotificationChannels.create(this);
     }
 }

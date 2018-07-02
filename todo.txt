@@ -1,0 +1,8 @@
+FAB in edit/new to save
+select multiple images
+bilder drehen
+scrolling in edit blöde tabs fixen
+
+zufallsgenerator "was gibs heute zu essen"
+
+recipe tab input feld nicht sichtbar

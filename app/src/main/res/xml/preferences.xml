@@ -27,6 +27,18 @@
                 android:targetClass="de.schmaun.ourrecipes.SignInActivity"
                 />
         </Preference>
+
+        <Preference
+            android:title="@string/pref_title_backup_to_google_drive_status"
+            android:summary="@string/pref_description_backup_to_google_drive_status"
+            android:dependency="backup_to_google_drive_enabled"
+            >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="de.schmaun.ourrecipes"
+                android:targetClass="de.schmaun.ourrecipes.backup.GoogleDriveActivity"
+                />
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_about">
