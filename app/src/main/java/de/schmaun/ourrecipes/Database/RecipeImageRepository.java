@@ -3,12 +3,15 @@ package de.schmaun.ourrecipes.Database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
 public class RecipeImageRepository {
@@ -41,22 +44,18 @@ public class RecipeImageRepository {
         return mInstance;
     }
 
+    public ArrayList<RecipeImage> getForBackup() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null, null);
+
+        return getRecipeImages(db, cursor);
+    }
+
     public ArrayList<RecipeImage> load(long recipeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_RECIPE_ID + " = ?", new String[]{Long.toString(recipeId)}, null, null, COLUMN_NAME_POSITION + " ASC", null);
 
-        ArrayList<RecipeImage> images = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                RecipeImage image = getFromCursor(cursor);
-                images.add(image);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-
-        return images;
+        return getRecipeImages(db, cursor);
     }
 
     public void save(long recipeId, ArrayList<RecipeImage> recipeImages) {
@@ -115,6 +114,23 @@ public class RecipeImageRepository {
             }
         }
         db.close();
+    }
+
+
+    @NonNull
+    private ArrayList<RecipeImage> getRecipeImages(SQLiteDatabase db, Cursor cursor) {
+        ArrayList<RecipeImage> images = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                RecipeImage image = getFromCursor(cursor);
+                images.add(image);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        
+        return images;
     }
 
     private RecipeImage getFromCursor(Cursor cursor) {
@@ -185,6 +201,4 @@ public class RecipeImageRepository {
                 break;
         }
     }
-
-
 }

@@ -25,11 +25,11 @@ import java.util.Date;
 import java.util.Locale;
 
 import de.schmaun.ourrecipes.Adapter.RecipeImageAdapter;
+import de.schmaun.ourrecipes.Configuration;
 import de.schmaun.ourrecipes.DownloadImageTask;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.PhotoDialogFragment;
 import de.schmaun.ourrecipes.R;
-import de.schmaun.ourrecipes.RecipeProviderInterface;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -161,9 +161,9 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
 
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        File storageDir = getActivity().getExternalFilesDir("images");
+        File storageDir = getActivity().getExternalFilesDir(Configuration.IMAGE_PATH);
 
-        return File.createTempFile(timeStamp, ".jpg", storageDir);
+        return File.createTempFile(timeStamp, Configuration.IMAGE_ENDING, storageDir);
     }
 
     public void dispatchSelectPictureFromGallery() {

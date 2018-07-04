@@ -215,4 +215,5 @@
     <string name="backup_notification_channel_name">Backup</string>
     <string name="backup_notification_channel_description">Notifications about the backup progress</string>
     <string name="backup_google_drive_notification_finished_message">Backup to Google Drive finished! 👏</string>
+    <string name="backup_google_drive_notification_error_message">Backup to Google Drive error!</string>
 </resources>

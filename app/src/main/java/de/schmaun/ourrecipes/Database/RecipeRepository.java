@@ -48,8 +48,13 @@ public class RecipeRepository extends Repository {
         return instance;
     }
 
-    public List<Recipe> getFavoriteRecipes()
-    {
+    public List<Recipe> getForBackup() {
+        String sql = "SELECT recipe.* FROM " + TABLE_NAME + " AS recipe ";
+
+        return loadRecipes(sql);
+    }
+
+    public List<Recipe> getFavoriteRecipes() {
         String sql = "SELECT recipe.* FROM " + TABLE_NAME + " AS recipe " +
                 "WHERE recipe." + RecipeRepository.COLUMN_NAME_FAVORITE + "=1 " +
                 "ORDER BY recipe." + COLUMN_NAME_NAME;
@@ -126,8 +131,7 @@ public class RecipeRepository extends Repository {
         return recipe;
     }
 
-    public long save(Recipe recipe)
-    {
+    public long save(Recipe recipe) {
         if (recipe.getId() != 0) {
             update(recipe);
             return recipe.getId();
@@ -148,8 +152,7 @@ public class RecipeRepository extends Repository {
         return id;
     }
 
-    private void update(Recipe recipe)
-    {
+    private void update(Recipe recipe) {
         recipe.setLastEditAt(new Date());
         ContentValues contentValues = createContentValues(recipe);
         contentValues.put(COLUMN_NAME_ID, recipe.getId());
@@ -173,8 +176,7 @@ public class RecipeRepository extends Repository {
         return db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(recipeId)});
     }
 
-    private ContentValues createContentValues(Recipe recipe)
-    {
+    private ContentValues createContentValues(Recipe recipe) {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NAME_CATEGORY_ID, recipe.getCategoryId());
@@ -239,8 +241,7 @@ public class RecipeRepository extends Repository {
         }
     }
 
-    private String formatDate(Date date)
-    {
+    private String formatDate(Date date) {
         if (date == null) {
             return null
                     ;

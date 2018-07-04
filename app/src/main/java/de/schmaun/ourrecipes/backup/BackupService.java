@@ -1,16 +1,17 @@
 package de.schmaun.ourrecipes.backup;
 
 import android.app.IntentService;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-import de.schmaun.ourrecipes.NotificationChannels;
-import de.schmaun.ourrecipes.R;
+import java.util.Date;
+
+import de.schmaun.ourrecipes.Configuration;
+import de.schmaun.ourrecipes.Notifications;
 
 
 public class BackupService extends IntentService {
@@ -21,10 +22,8 @@ public class BackupService extends IntentService {
     static final int JOB_ID_RESTORE = 1002;
     private static final int BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID = 1000;
     private static final int BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID = 1001;
+    private static final String TAG = "BackupService";
 
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     */
     public BackupService() {
         super("BackupService");
     }
@@ -33,8 +32,6 @@ public class BackupService extends IntentService {
         Intent intent = new Intent(context, BackupService.class);
         intent.setAction(ACTION_BACKUP);
 
-        //enqueueWork(context, BackupService.class, JOB_ID_BACKUP, intent);
-
         context.startService(intent);
     }
 
@@ -42,12 +39,8 @@ public class BackupService extends IntentService {
         Intent intent = new Intent(context, BackupService.class);
         intent.setAction(ACTION_RESTORE);
 
-        //enqueueWork(context, BackupService.class, JOB_ID_RESTORE, intent);
-
         context.startService(intent);
-
     }
-
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -71,45 +64,52 @@ public class BackupService extends IntentService {
     }
 
     private void handleActionBackup() {
-        Intent contentIntent = new Intent(this, GoogleDriveActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
+        startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.createBackupInProgress(this));
 
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, NotificationChannels.BACKUP_CHANNEL_ID)
-                        .setContentTitle(getText(R.string.backup_google_drive_notification_title))
-                        .setContentText(getText(R.string.backup_google_drive_notification_progress_message))
-                        .setSmallIcon(R.drawable.chef_3)
-                        .setContentIntent(pendingIntent)
-                        .setTicker(getText(R.string.backup_google_drive_notification_progress_message))
-                        .setPriority(NotificationCompat.PRIORITY_LOW)
-                        .setProgress(0, 0, true);
-
-        startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, builder.build());
-
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        int progress = 0;
-        do {
-            try {
-                Thread.sleep(100);
-                progress++;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
+        googleDriveBackup.doBackup(new GoogleDriveBackup.OnResultListener() {
+            @Override
+            public void onSuccess() {
+                BackupService.this.onSuccess();
             }
 
-            builder.setProgress(100, progress, false);
-            notificationManager.notify(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, builder.build());
-        } while (progress < 100);
-
-        builder.setProgress(0, 0, false)
-                .setContentTitle(getText(R.string.backup_google_drive_notification_title))
-                .setContentText(getText(R.string.backup_google_drive_notification_finished_message))
-                .setTicker(getText(R.string.backup_google_drive_notification_finished_message));
-
-        notificationManager.notify(BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID, builder.build());
+            @Override
+            public void onError(Exception e) {
+                BackupService.this.onError(e);
+            }
+        });
     }
 
+    private void onSuccess() {
+        updatePreferencesSuccess();
 
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID, Notifications.createBackupFinished(this));
+    }
+
+    private void onError(Exception e) {
+        updatePreferencesError(e);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID, Notifications.createBackupFailed(this));
+    }
+
+    private void updatePreferencesError(Exception e) {
+        SharedPreferences sharedPref = getSharedPreferences(Configuration.PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(Configuration.PREF_KEY_LAST_BACKUP_STATUS, false);
+        editor.putString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, e.getMessage());
+        editor.apply();
+    }
+
+    private void updatePreferencesSuccess() {
+        SharedPreferences sharedPref = getSharedPreferences(Configuration.PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(Configuration.PREF_KEY_LAST_BACKUP_STATUS, true);
+        editor.putString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, "Success");
+        editor.putLong(Configuration.PREF_KEY_LAST_BACKUP_DATE, (new Date()).getTime());
+        editor.apply();
+    }
 
     private void handleActionRestore() {
     }

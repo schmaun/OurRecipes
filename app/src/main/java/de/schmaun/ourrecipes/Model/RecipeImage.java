@@ -1,7 +1,12 @@
 package de.schmaun.ourrecipes.Model;
 
+import android.net.Uri;
+import android.support.v4.content.FileProvider;
+
 import org.parceler.Parcel;
 import org.parceler.Transient;
+
+import java.net.URL;
 
 @Parcel(Parcel.Serialization.BEAN)
 public class RecipeImage {
