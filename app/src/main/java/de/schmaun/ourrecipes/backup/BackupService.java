@@ -1,12 +1,14 @@
 package de.schmaun.ourrecipes.backup;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.Date;
 
@@ -17,6 +19,7 @@ import de.schmaun.ourrecipes.Notifications;
 public class BackupService extends IntentService {
     private static final String ACTION_BACKUP = "de.schmaun.ourrecipes.backup.action.BACKUP";
     private static final String ACTION_RESTORE = "de.schmaun.ourrecipes.backup.action.RESTORE";
+    public static final String ACTION_BACKUP_FINISHED = "de.schmaun.ourrecipes.backup.action.BACKUP_FINISHED";
 
     static final int JOB_ID_BACKUP = 1001;
     static final int JOB_ID_RESTORE = 1002;
@@ -51,6 +54,11 @@ public class BackupService extends IntentService {
             } else if (ACTION_RESTORE.equals(action)) {
                 handleActionRestore();
             }
+
+            Intent intentToSend = new Intent();
+            intentToSend.setAction(ACTION_BACKUP_FINISHED);
+
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intentToSend);
         }
     }
 
@@ -113,5 +121,6 @@ public class BackupService extends IntentService {
 
     private void handleActionRestore() {
     }
+
 
 }

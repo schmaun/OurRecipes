@@ -1,7 +1,10 @@
 package de.schmaun.ourrecipes.backup;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -9,15 +12,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.util.Date;
-
 import de.schmaun.ourrecipes.Configuration;
 import de.schmaun.ourrecipes.R;
 
 public class GoogleDriveActivity extends AppCompatActivity {
 
     private Button startBackup;
+    private android.content.BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,18 @@ public class GoogleDriveActivity extends AppCompatActivity {
             }
         });
 
+        broadcastReceiver = new BroadcastReceiver();
+        IntentFilter filter = new IntentFilter(BackupService.ACTION_BACKUP_FINISHED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
+
         updateView();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     private void startBackup() {
@@ -51,14 +63,22 @@ public class GoogleDriveActivity extends AppCompatActivity {
 
         String lastBackupDateString = getString(R.string.backup_google_drive_last_backup_completed_at_na);
         if (lastBackupDate > 0) {
-            Date date = new Date(lastBackupDate);
-            DateFormat dateFormat = android.text.format.DateFormat.getLongDateFormat(getApplicationContext());
-            lastBackupDateString = dateFormat.format(date);
-
-            lastBackupDateString = DateUtils.formatDateTime(getApplicationContext(), lastBackupDate, DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR);
+            lastBackupDateString = DateUtils.formatDateTime(
+                    getApplicationContext(),
+                    lastBackupDate,
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
+            );
         }
 
         TextView statusView = (TextView) findViewById(R.id.backup_google_drive_status);
         statusView.setText(String.format(getString(R.string.backup_google_drive_last_backup_completed_at), lastBackupDateString));
+    }
+
+    private class BroadcastReceiver extends android.content.BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            onFinishBackup();
+        }
     }
 }
