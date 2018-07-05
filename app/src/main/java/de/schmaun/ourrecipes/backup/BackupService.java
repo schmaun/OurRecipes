@@ -1,7 +1,6 @@
 package de.schmaun.ourrecipes.backup;
 
 import android.app.IntentService;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,9 +16,10 @@ import de.schmaun.ourrecipes.Notifications;
 
 
 public class BackupService extends IntentService {
+//public class BackupService extends IntentService {
     private static final String ACTION_BACKUP = "de.schmaun.ourrecipes.backup.action.BACKUP";
     private static final String ACTION_RESTORE = "de.schmaun.ourrecipes.backup.action.RESTORE";
-    public static final String ACTION_BACKUP_FINISHED = "de.schmaun.ourrecipes.backup.action.BACKUP_FINISHED";
+    public static final String ACTION_BACKUP_NOTIFY = "de.schmaun.ourrecipes.backup.action.BACKUP_NOTIFY";
 
     static final int JOB_ID_BACKUP = 1001;
     static final int JOB_ID_RESTORE = 1002;
@@ -54,11 +54,6 @@ public class BackupService extends IntentService {
             } else if (ACTION_RESTORE.equals(action)) {
                 handleActionRestore();
             }
-
-            Intent intentToSend = new Intent();
-            intentToSend.setAction(ACTION_BACKUP_FINISHED);
-
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intentToSend);
         }
     }
 
@@ -72,6 +67,9 @@ public class BackupService extends IntentService {
     }
 
     private void handleActionBackup() {
+        updatePreferencesRunning();
+        LocalBroadcastManager.getInstance(this).sendBroadcast((new Intent()).setAction(ACTION_BACKUP_NOTIFY));
+
         startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.createBackupInProgress(this));
 
         GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
@@ -86,6 +84,8 @@ public class BackupService extends IntentService {
                 BackupService.this.onError(e);
             }
         });
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast((new Intent()).setAction(ACTION_BACKUP_NOTIFY));
     }
 
     private void onSuccess() {
@@ -103,20 +103,29 @@ public class BackupService extends IntentService {
     }
 
     private void updatePreferencesError(Exception e) {
-        SharedPreferences sharedPref = getSharedPreferences(Configuration.PREFERENCES_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(Configuration.PREF_KEY_LAST_BACKUP_STATUS, false);
-        editor.putString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, e.getMessage());
-        editor.apply();
+        getPreferencesEditor()
+                .putInt(Configuration.PREF_KEY_BACKUP_STATUS, Configuration.PREF_KEY_BACKUP_STATUS_ERROR)
+                .putString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, e.getMessage())
+                .apply();
     }
 
     private void updatePreferencesSuccess() {
+        getPreferencesEditor()
+                .putInt(Configuration.PREF_KEY_BACKUP_STATUS, Configuration.PREF_KEY_BACKUP_STATUS_SUCCESS)
+                .putString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, "Success")
+                .putLong(Configuration.PREF_KEY_LAST_BACKUP_DATE, (new Date()).getTime())
+                .apply();
+    }
+
+    private void updatePreferencesRunning() {
+        getPreferencesEditor()
+                .putInt(Configuration.PREF_KEY_BACKUP_STATUS, Configuration.PREF_KEY_BACKUP_STATUS_RUNNING)
+                .apply();
+    }
+
+    private SharedPreferences.Editor getPreferencesEditor() {
         SharedPreferences sharedPref = getSharedPreferences(Configuration.PREFERENCES_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(Configuration.PREF_KEY_LAST_BACKUP_STATUS, true);
-        editor.putString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, "Success");
-        editor.putLong(Configuration.PREF_KEY_LAST_BACKUP_DATE, (new Date()).getTime());
-        editor.apply();
+        return sharedPref.edit();
     }
 
     private void handleActionRestore() {

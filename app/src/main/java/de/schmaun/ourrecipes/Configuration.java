@@ -4,7 +4,10 @@ public final class Configuration {
     public final static String PREFERENCES_NAME = "de.schmaun.ourrecipes.backup";
 
     public final static String PREF_KEY_LAST_BACKUP_DATE = "lastBackup";
-    public final static String PREF_KEY_LAST_BACKUP_STATUS = "lastBackupStatus";
+    public final static String PREF_KEY_BACKUP_STATUS = "backupStatus";
+    public final static int PREF_KEY_BACKUP_STATUS_SUCCESS = 1;
+    public final static int PREF_KEY_BACKUP_STATUS_ERROR = 2;
+    public final static int PREF_KEY_BACKUP_STATUS_RUNNING = 3;
     public final static String PREF_KEY_LAST_BACKUP_MESSAGE = "lastBackupMessage";
 
 
