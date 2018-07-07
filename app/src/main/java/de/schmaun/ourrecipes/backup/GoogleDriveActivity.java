@@ -50,7 +50,7 @@ public class GoogleDriveActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BackupService.ACTION_BACKUP_NOTIFY);
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
 
-        updateView(Configuration.PREF_KEY_BACKUP_STATUS_ERROR);
+        updateView();
     }
 
     @Override
