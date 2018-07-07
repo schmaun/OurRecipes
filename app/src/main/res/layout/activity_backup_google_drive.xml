@@ -4,30 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".backup.GoogleDriveActivity"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
     android:layout_marginRight="@dimen/activity_horizontal_margin"
-    >
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    tools:context=".backup.GoogleDriveActivity">
 
     <TextView
         android:id="@+id/backup_google_drive_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:textAppearance="@style/RecipeView.Text"
         android:text="@string/backup_google_drive_description"
-        />
+        android:textAppearance="@style/RecipeView.Text" />
 
     <TextView
         android:id="@+id/backup_google_drive_last_backup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:ellipsize="end"
         android:text="@string/backup_google_drive_last_backup_completed_at"
         android:textAppearance="@style/RecipeView.Text"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_description" />
 
@@ -56,21 +54,38 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_status_text"
         android:indeterminate="true"
         android:visibility="gone"
-        />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_status_text" />
 
-    <Button
-        android:visibility="gone"
-        android:id="@+id/backup_google_drive_cancel_backup"
-        style="@style/Widget.AppCompat.Button.Colored"
+    <ToggleButton
+        android:id="@+id/backup_google_drive_show_last_run_information"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:paddingStart="0dp"
+        android:textAppearance="@style/RecipeView.Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:text="@string/backup_google_drive_cancel_backup"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableEnd="@drawable/show_details"
+        android:checked="false"
+        android:textAlignment="viewEnd"
+        android:visibility="gone"
+        android:textOff="@string/backup_google_drive_show_last_run_information"
+        android:textOn="@string/backup_google_drive_show_last_run_information"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_progressbar" />
+
+    <TextView
+        android:id="@+id/backup_google_drive_last_run_information"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/RecipeView.Text"
+        android:visibility="gone"
+        android:text="fojqf o qfweojefwo qfeqewfnff44f43q fqf4f444ff4f44ff434f34gtrgrhtstg 3434mvdfbomnp  qä4qä4täq4 t q4tq4q3t434"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_show_last_run_information" />
+
+
 </android.support.constraint.ConstraintLayout>

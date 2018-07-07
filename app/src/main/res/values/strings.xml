@@ -205,6 +205,7 @@
     <string name="sign_in_description">To use the backup functionality you have to sign in with your Google Account.</string>
     <string name="sign_in_current_account_headline">Signed in with</string>
     <string name="backup_google_drive_start_backup">Start Backup</string>
+    <string name="backup_google_drive_show_last_run_information">Show Details</string>
     <string name="backup_google_drive_cancel_backup">Cancel Backup</string>
     <string name="backup_google_drive_status">Status</string>
     <string name="backup_google_drive_last_backup_completed_at">Last backup completed at: %s</string>

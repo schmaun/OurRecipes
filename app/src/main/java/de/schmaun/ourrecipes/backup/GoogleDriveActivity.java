@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import de.schmaun.ourrecipes.Configuration;
 import de.schmaun.ourrecipes.R;
@@ -19,8 +20,10 @@ import de.schmaun.ourrecipes.R;
 public class GoogleDriveActivity extends AppCompatActivity {
 
     private Button startBackupButton;
-    private Button cancelBackupButton;
+    //private Button cancelBackupButton;
     private android.content.BroadcastReceiver broadcastReceiver;
+    private ToggleButton toggleInformationButton;
+    private TextView lastRunInformationText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +31,26 @@ public class GoogleDriveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_backup_google_drive);
 
         startBackupButton = (Button) findViewById(R.id.backup_google_drive_start_backup);
+        toggleInformationButton = (ToggleButton) findViewById(R.id.backup_google_drive_show_last_run_information);
         startBackupButton.setOnClickListener(v -> startBackup());
-        cancelBackupButton = (Button) findViewById(R.id.backup_google_drive_cancel_backup);
-        cancelBackupButton.setOnClickListener(v -> cancelBackup());
+        lastRunInformationText = (TextView) findViewById(R.id.backup_google_drive_last_run_information);
 
+
+        toggleInformationButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ToggleButton button = (ToggleButton) v;
+                if (button.isChecked()) {
+                    lastRunInformationText.setVisibility(View.VISIBLE);
+                } else {
+                    lastRunInformationText.setVisibility(View.GONE);
+                }
+            }
+        });
         broadcastReceiver = new BroadcastReceiver();
         IntentFilter filter = new IntentFilter(BackupService.ACTION_BACKUP_NOTIFY);
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
 
-        updateView();
+        updateView(Configuration.PREF_KEY_BACKUP_STATUS_ERROR);
     }
 
     @Override
@@ -44,9 +58,6 @@ public class GoogleDriveActivity extends AppCompatActivity {
         super.onDestroy();
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-    }
-
-    private void cancelBackup() {
     }
 
     private void startBackup() {
@@ -85,16 +96,22 @@ public class GoogleDriveActivity extends AppCompatActivity {
                 startBackupButton.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 statusText.setText("");
+                toggleInformationButton.setVisibility(View.GONE);
+                lastRunInformationText.setVisibility(View.GONE);
                 break;
             case Configuration.PREF_KEY_BACKUP_STATUS_ERROR:
                 startBackupButton.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 statusText.setText(R.string.backup_google_drive_status_error);
+                toggleInformationButton.setVisibility(View.VISIBLE);
+                lastRunInformationText.setVisibility(View.GONE);
+                lastRunInformationText.setText(sharedPref.getString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, ""));
                 break;
             case Configuration.PREF_KEY_BACKUP_STATUS_RUNNING:
                 startBackupButton.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
                 statusText.setText(R.string.backup_google_drive_status_running);
+                lastRunInformationText.setVisibility(View.GONE);
                 break;
         }
     }
