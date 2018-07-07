@@ -51,7 +51,7 @@ public class RecipeImagesPagerAdapter extends PagerAdapter {
         RecipeImage image = recipeImages.get(position);
 
         try {
-            Bitmap bm = MediaStore.Images.Media.getBitmap(this.context.getContentResolver(), Uri.parse(image.getLocation()));
+            Bitmap bm = MediaStore.Images.Media.getBitmap(this.context.getContentResolver(), Uri.parse(image.getLocation(this.context)));
             imageView.setImageBitmap(bm);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);

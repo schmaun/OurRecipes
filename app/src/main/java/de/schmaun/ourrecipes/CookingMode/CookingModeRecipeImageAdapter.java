@@ -61,7 +61,7 @@ public class CookingModeRecipeImageAdapter extends RecyclerView.Adapter<CookingM
             }
         });
 
-        Glide.with(context).load(image.getLocation()).apply(new RequestOptions().fitCenter()).into(imageHolder.imageView);
+        Glide.with(context).load(image.getLocation(context)).apply(new RequestOptions().fitCenter()).into(imageHolder.imageView);
     }
 
     @Override

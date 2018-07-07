@@ -180,7 +180,7 @@ public class RecipeImageAdapter extends RecyclerView.Adapter<RecipeImageAdapter.
         final RecipeImageAdapter that = this;
 
         RecipeImage image = images.get(i);
-        Glide.with(context).load(image.getLocation()).apply(new RequestOptions().centerCrop()).into(imageHolder.imageView);
+        Glide.with(context).load(image.getLocation(context)).apply(new RequestOptions().centerCrop()).into(imageHolder.imageView);
 
         imageHolder.imageTextView.setText(R.string.edit_recipe_image_description);
         imageHolder.imageTextView.setTypeface(null, Typeface.ITALIC);

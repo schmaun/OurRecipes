@@ -28,6 +28,7 @@ public class RecipeImageRepository {
     public static final String COLUMN_NAME_NAME = "name";
     public static final String COLUMN_NAME_DESCRIPTION = "description";
     public static final String COLUMN_NAME_LOCATION = "location";
+    public static final String COLUMN_NAME_FILENAME = "fileName";
     public static final String COLUMN_NAME_POSITION = "position";
     public static final String COLUMN_NAME_IS_COVER_IMAGE = "isCoverImage";
     public static final String COLUMN_NAME_PARENT_TYPE = "parentType";
@@ -89,8 +90,7 @@ public class RecipeImageRepository {
         return id;
     }
 
-    public void update(RecipeImage image)
-    {
+    public void update(RecipeImage image) {
         ContentValues contentValues = createContentValues(image);
         contentValues.put(COLUMN_NAME_ID, image.getId());
 
@@ -109,7 +109,7 @@ public class RecipeImageRepository {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         for (RecipeImage image : imagesToDelete) {
-            if(image.getId() > 0) {
+            if (image.getId() > 0) {
                 db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{Long.toString(image.getId())});
             }
         }
@@ -129,7 +129,7 @@ public class RecipeImageRepository {
 
         cursor.close();
         db.close();
-        
+
         return images;
     }
 
@@ -141,7 +141,7 @@ public class RecipeImageRepository {
 
         image.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)));
         image.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DESCRIPTION)));
-        image.setLocation(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_LOCATION)));
+        image.setFileName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_FILENAME)));
         image.setPosition(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_POSITION)));
         image.setCoverImage(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_IS_COVER_IMAGE)));
         image.setParentType(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_PARENT_TYPE)));
@@ -149,15 +149,14 @@ public class RecipeImageRepository {
         return image;
     }
 
-    private ContentValues createContentValues(RecipeImage recipeImage)
-    {
+    private ContentValues createContentValues(RecipeImage recipeImage) {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NAME_RECIPE_ID, recipeImage.getRecipeId());
 
         values.put(COLUMN_NAME_NAME, recipeImage.getName());
         values.put(COLUMN_NAME_DESCRIPTION, recipeImage.getDescription());
-        values.put(COLUMN_NAME_LOCATION, recipeImage.getLocation());
+        values.put(COLUMN_NAME_FILENAME, recipeImage.getFileName());
         values.put(COLUMN_NAME_POSITION, recipeImage.getPosition());
         values.put(COLUMN_NAME_IS_COVER_IMAGE, recipeImage.getCoverImage());
         values.put(COLUMN_NAME_PARENT_TYPE, recipeImage.getParentType());
@@ -173,13 +172,14 @@ public class RecipeImageRepository {
                 + COLUMN_NAME_NAME + " TEXT,"
                 + COLUMN_NAME_DESCRIPTION + " TEXT,"
                 + COLUMN_NAME_LOCATION + " TEXT,"
+                + COLUMN_NAME_FILENAME + " TEXT,"
                 + COLUMN_NAME_POSITION + " INTEGER,"
                 + COLUMN_NAME_IS_COVER_IMAGE + " INTEGER,"
                 + COLUMN_NAME_PARENT_TYPE + " INTEGER"
 
                 + ")");
-        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_position ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " +  COLUMN_NAME_POSITION + ");");
-        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_cover ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " +  COLUMN_NAME_IS_COVER_IMAGE + ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_position ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " + COLUMN_NAME_POSITION + ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_cover ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " + COLUMN_NAME_IS_COVER_IMAGE + ");");
         db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_IS_COVER_IMAGE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_IS_COVER_IMAGE + ");");
     }
 
@@ -193,12 +193,23 @@ public class RecipeImageRepository {
         switch (newVersion) {
             case 6:
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_IS_COVER_IMAGE + " INTEGER");
-                db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_cover ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " +  COLUMN_NAME_IS_COVER_IMAGE + ");");
+                db.execSQL("CREATE INDEX IF NOT EXISTS recipeId_cover ON " + TABLE_NAME + "(" + COLUMN_NAME_RECIPE_ID + ", " + COLUMN_NAME_IS_COVER_IMAGE + ");");
                 db.execSQL("CREATE INDEX IF NOT EXISTS " + COLUMN_NAME_IS_COVER_IMAGE + " ON " + TABLE_NAME + "(" + COLUMN_NAME_IS_COVER_IMAGE + ");");
                 break;
             case 8:
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_PARENT_TYPE + " INTEGER");
                 break;
+            case 9:
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_FILENAME + " TEXT");
+                migrateLocationToFileName(db);
+                break;
+            case 10:
+                migrateLocationToFileName(db);
+                break;
         }
+    }
+
+    private static void migrateLocationToFileName(SQLiteDatabase db) {
+        db.execSQL(String.format("UPDATE %s SET %s=replace(location, rtrim(location, replace(location, '/', '')), '')", TABLE_NAME, COLUMN_NAME_FILENAME));
     }
 }

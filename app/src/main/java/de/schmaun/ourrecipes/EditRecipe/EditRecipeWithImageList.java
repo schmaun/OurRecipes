@@ -121,7 +121,7 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             RecipeImage image = new RecipeImage();
             image.setParentType(getParentImageType());
-            image.setLocation(newPhotoURI.toString());
+            image.setFileName(newPhotoURI.getLastPathSegment());
             imageAdapter.addImage(image);
         }
 
@@ -150,7 +150,7 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
             }
 
             if (photoFile != null) {
-                newPhotoURI = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", photoFile);
+                newPhotoURI = FileProvider.getUriForFile(getActivity(), Configuration.FILE_AUTHORITY_IMAGES, photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, newPhotoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
@@ -188,7 +188,7 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
 
     protected void removeDeletedImageFiles() {
         for (RecipeImage recipeImage : imageAdapter.getDeletedImages()) {
-            File file = new File(recipeImage.getLocation());
+            File file = new File(recipeImage.getLocation(getActivity()));
             boolean deleted = file.delete();
 
             Log.d("deleteImageFile", Boolean.toString(deleted));
@@ -202,10 +202,8 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
 
     @Override
     public void onSuccess(File file) {
-        Uri uri = FileProvider.getUriForFile(getActivity(), "de.schmaun.fileprovider", file);
-
         RecipeImage image = new RecipeImage();
-        image.setLocation(uri.toString());
+        image.setFileName(file.getName());
         imageAdapter.addImage(image);
     }
 }

@@ -66,7 +66,7 @@ public class SimpleRecipeImageAdapter extends RecyclerView.Adapter<SimpleRecipeI
             }
         });
 
-        Glide.with(context).load(image.getLocation()).apply(new RequestOptions().centerCrop()).into(imageHolder.imageView);
+        Glide.with(context).load(image.getLocation(context)).apply(new RequestOptions().centerCrop()).into(imageHolder.imageView);
     }
 
     @Override

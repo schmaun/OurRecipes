@@ -1,12 +1,16 @@
 package de.schmaun.ourrecipes.Model;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 
 import org.parceler.Parcel;
 import org.parceler.Transient;
 
+import java.io.File;
 import java.net.URL;
+
+import de.schmaun.ourrecipes.Configuration;
 
 @Parcel(Parcel.Serialization.BEAN)
 public class RecipeImage {
@@ -26,6 +30,8 @@ public class RecipeImage {
     private int isCoverImage;
 
     private int parentType;
+
+    private String fileName;
 
     public static final int PARENT_TYPE_INGREDIENTS = 1;
 
@@ -70,12 +76,22 @@ public class RecipeImage {
         this.description = description;
     }
 
-    public String getLocation() {
-        return location;
+    public String getLocation(Context context) {
+        File storageDir = context.getExternalFilesDir(Configuration.IMAGE_PATH);
+
+        return FileProvider.getUriForFile(context, Configuration.FILE_AUTHORITY_IMAGES, new File(storageDir + File.separator + this.fileName)).toString();
     }
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getFileName() {
+        return this.fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void setPosition(int position) {
@@ -118,7 +134,7 @@ public class RecipeImage {
         RecipeImage clone = new RecipeImage();
         clone.setId(this.getId());
         clone.setDescription(this.getDescription());
-        clone.setLocation(this.getLocation());
+        clone.setFileName(this.getFileName());
         clone.setName(this.getName());
         clone.setPosition(this.getPosition());
         clone.setRecipeId(this.getRecipeId());

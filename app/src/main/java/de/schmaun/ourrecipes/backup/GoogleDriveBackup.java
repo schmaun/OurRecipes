@@ -94,7 +94,7 @@ public class GoogleDriveBackup {
         driveResourceClient = Drive.getDriveResourceClient(this.context.getApplicationContext(), signInAccount);
     }
 
-
+    @NonNull
     private Task<DriveFile> uploadDatabase(Task<DriveFolder> backupFolderTask) {
         final Task<DriveContents> createContentsTask = getDriveResourceClient().createContents();
 
@@ -116,6 +116,7 @@ public class GoogleDriveBackup {
                 .addOnFailureListener(e -> Log.e(TAG, "uploadDatabase failed", e));
     }
 
+    @NonNull
     private Task<DriveFile> uploadRecipes(Task<DriveFolder> backupFolderTask) {
         final Task<DriveContents> createContentsTask = getDriveResourceClient().createContents();
         final List<Recipe> recipes = RecipeRepository.getInstance(new DbHelper(this.context)).getForBackup();
@@ -236,12 +237,13 @@ public class GoogleDriveBackup {
         @Override
         public Task<DriveFile> then(@NonNull Task<DriveContents> createContentsTask) throws Exception {
             DriveContents contents = createContentsTask.getResult();
-            InputStream in = context.getContentResolver().openInputStream(Uri.parse(image.getLocation()));
+            String imageLocation = image.getLocation(context);
+            InputStream in = context.getContentResolver().openInputStream(Uri.parse(imageLocation));
             Stream.copy(in, contents.getOutputStream());
 
-            String mimeType = getMimeTypeFromUrl(image.getLocation());
+            String mimeType = getMimeTypeFromUrl(imageLocation);
             MetadataChangeSet.Builder changeSetBuilder = new MetadataChangeSet.Builder()
-                    .setTitle(Long.toString(image.getId()))
+                    .setTitle(image.getFileName())
                     .setCustomProperty(new CustomPropertyKey("id", CustomPropertyKey.PUBLIC), Long.toString(image.getId()))
                     .setCustomProperty(new CustomPropertyKey("recipeId", CustomPropertyKey.PUBLIC), Long.toString(image.getRecipeId()));
 
