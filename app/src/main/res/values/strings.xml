@@ -193,13 +193,13 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="pref_header_sync_n_backup">Sync and Backup</string>
+    <string name="pref_header_backup_restore">Backup and Restore</string>
     <string name="pref_description_backup_to_google_drive">Backup recipes and their images to your Google Drive</string>
     <string name="pref_title_backup_to_google_drive">Backup to Google Drive</string>
     <string name="pref_title_backup_to_google_drive_account">Account</string>
-    <string name="pref_title_backup_to_google_drive_status">Backup Status</string>
+    <string name="pref_title_backup_to_google_drive_status">Backup and Restore</string>
     <string name="pref_description_backup_to_google_drive_account_na">Click here to sign in</string>
-    <string name="pref_description_backup_to_google_drive_status">Click here to view backup status or create a backup manually</string>
+    <string name="pref_description_backup_to_google_drive_status">Click here to view backup status or create a backup manually or restore a backup</string>
     <string name="title_activity_sign_in">Sign in</string>
     <string name="sign_out_button">Sign Out</string>
     <string name="sign_in_description">To use the backup functionality you have to sign in with your Google Account.</string>
@@ -221,4 +221,19 @@
     <string name="backup_google_drive_status_running">Backup is in progress…</string>
     <string name="backup_google_drive_status_success">Backup successful!</string>
     <string name="backup_google_drive_status_error">Backup not successful!</string>
+    <string name="backup_google_drive_restore_description">Restore the last backup. This will overwrite the current recipes and images on this device. Use it carefully. There is no undo!</string>
+    <string name="backup_google_drive_start_restore">Restore backup</string>
+    <string name="backup_google_drive_restore_last_backup_info">Latest backup found: %s</string>
+    <string name="backup_google_drive_restore_last_backup_at_na">N/A</string>
+    <string name="backup_google_drive_restore_notification_title">Restoring backup</string>
+    <string name="backup_google_drive_restore_notification_progress_message">Restoring recipes and images</string>
+    <string name="backup_google_drive_restore_notification_finished_message">Restoring from Google Drive finished! 👏</string>
+    <string name="backup_google_drive_restore_notification_error_message">Restoring recipes and images failed!</string>
+    <string name="backup_google_drive_backup_headline">Backup</string>
+    <string name="backup_google_drive_restore_headline">Restore</string>
+    <string name="backup_google_drive_restore_dialog_title">Restore backup</string>
+    <string name="backup_google_drive_restore_dialog_content">Restore backup from %s? This will overwrite all your current recipes and images!</string>
+    <string name="backup_google_drive_restore_dialog_negative">No, Cancel</string>
+    <string name="backup_google_drive_restore_dialog_positive">Yes, restore!</string>
+
 </resources>

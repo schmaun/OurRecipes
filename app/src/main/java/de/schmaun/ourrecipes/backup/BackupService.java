@@ -4,11 +4,20 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+import android.os.AsyncTask;
+import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import de.schmaun.ourrecipes.Configuration;
@@ -16,10 +25,15 @@ import de.schmaun.ourrecipes.Notifications;
 
 
 public class BackupService extends IntentService {
-//public class BackupService extends IntentService {
-    private static final String ACTION_BACKUP = "de.schmaun.ourrecipes.backup.action.BACKUP";
+    public static final String ACTION_BACKUP = "de.schmaun.ourrecipes.backup.action.BACKUP";
     private static final String ACTION_RESTORE = "de.schmaun.ourrecipes.backup.action.RESTORE";
     public static final String ACTION_BACKUP_NOTIFY = "de.schmaun.ourrecipes.backup.action.BACKUP_NOTIFY";
+    public static final String ACTION_BACKUP_RESTORE = "de.schmaun.ourrecipes.backup.action.RESTORE_NOTIFY";
+
+    public static final int MESSAGE_REGISTER = 1;
+    public static final int MESSAGE_UNREGISTER = 2;
+    public static final int MESSAGE_STATUS = 3;
+    public static final int MESSAGE_PLEASE_UNBIND_FROM_ME = 4;
 
     static final int JOB_ID_BACKUP = 1001;
     static final int JOB_ID_RESTORE = 1002;
@@ -27,79 +41,124 @@ public class BackupService extends IntentService {
     private static final int BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID = 1001;
     private static final String TAG = "BackupService";
 
+    private boolean running;
+    ArrayList<Messenger> clients = new ArrayList<Messenger>();
+    final Messenger messenger = new Messenger(new IncomingHandler());
+
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message message) {
+            Log.d(TAG, "handleMessage: " + Integer.toString(message.what));
+
+            switch (message.what) {
+                case MESSAGE_REGISTER:
+                    clients.add(message.replyTo);
+                    break;
+                case MESSAGE_UNREGISTER:
+                    clients.remove(message.replyTo);
+                    break;
+                case MESSAGE_STATUS:
+                    sendCurrentStatusToClients();
+                default:
+                    super.handleMessage(message);
+            }
+        }
+    }
+
+
     public BackupService() {
         super("BackupService");
-    }
-
-    public static void startActionBackup(Context context) {
-        Intent intent = new Intent(context, BackupService.class);
-        intent.setAction(ACTION_BACKUP);
-
-        context.startService(intent);
-    }
-
-    public static void startActionRestore(Context context) {
-        Intent intent = new Intent(context, BackupService.class);
-        intent.setAction(ACTION_RESTORE);
-
-        context.startService(intent);
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_BACKUP.equals(action)) {
+            String currentAction = intent.getAction();
+            running = true;
+            sendCurrentStatusToClients();
+            if (ACTION_BACKUP.equals(currentAction)) {
                 handleActionBackup();
-            } else if (ACTION_RESTORE.equals(action)) {
+            } else if (ACTION_RESTORE.equals(currentAction)) {
                 handleActionRestore();
             }
         }
     }
 
-    protected void onHandleWork(@NonNull Intent intent) {
-        final String action = intent.getAction();
-        if (ACTION_BACKUP.equals(action)) {
-            handleActionBackup();
-        } else if (ACTION_RESTORE.equals(action)) {
-            handleActionRestore();
-        }
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return messenger.getBinder();
     }
 
     private void handleActionBackup() {
-        updatePreferencesRunning();
-        LocalBroadcastManager.getInstance(this).sendBroadcast((new Intent()).setAction(ACTION_BACKUP_NOTIFY));
-
         startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.createBackupInProgress(this));
 
         GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
-        googleDriveBackup.doBackup(new GoogleDriveBackup.OnResultListener() {
+        googleDriveBackup.backup(new GoogleDriveBackup.OnResultListener() {
             @Override
             public void onSuccess() {
-                BackupService.this.onSuccess();
+                onSuccessBackup();
             }
 
             @Override
             public void onError(Exception e) {
-                BackupService.this.onError(e);
+                onErrorBackup(e);
             }
         });
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast((new Intent()).setAction(ACTION_BACKUP_NOTIFY));
+        //NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        //notificationManager.cancel(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID);
     }
 
-    private void onSuccess() {
+    private void handleActionRestore() {
+        startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.restoreBackupInProgress(this));
+
+        GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
+        googleDriveBackup.backup(new GoogleDriveBackup.OnResultListener() {
+            @Override
+            public void onSuccess() {
+                BackupService.this.onSuccessRestore();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                BackupService.this.onErrorRestore(e);
+            }
+        });
+    }
+
+    private void onSuccessBackup() {
         updatePreferencesSuccess();
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID, Notifications.createBackupFinished(this));
+
+        finished();
     }
 
-    private void onError(Exception e) {
+    private void onErrorBackup(Exception e) {
         updatePreferencesError(e);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID, Notifications.createBackupFailed(this));
+
+        finished();
+    }
+
+    private void onSuccessRestore() {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID, Notifications.restoreBackupFinished(this));
+        notificationManager.cancel(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID);
+
+        finished();
+    }
+
+    private void onErrorRestore(Exception e) {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID, Notifications.restoreBackupFailed(this));
+        notificationManager.cancel(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID);
+
+        finished();
     }
 
     private void updatePreferencesError(Exception e) {
@@ -117,19 +176,40 @@ public class BackupService extends IntentService {
                 .apply();
     }
 
-    private void updatePreferencesRunning() {
-        getPreferencesEditor()
-                .putInt(Configuration.PREF_KEY_BACKUP_STATUS, Configuration.PREF_KEY_BACKUP_STATUS_RUNNING)
-                .apply();
-    }
-
     private SharedPreferences.Editor getPreferencesEditor() {
         SharedPreferences sharedPref = getSharedPreferences(Configuration.PREFERENCES_NAME, Context.MODE_PRIVATE);
         return sharedPref.edit();
     }
 
-    private void handleActionRestore() {
+    private void finished() {
+        running = false;
+
+        sendCurrentStatusToClients();
+        sendMessageToClients(Message.obtain(null, MESSAGE_PLEASE_UNBIND_FROM_ME));
+        stopSelf();
     }
 
+    private void sendCurrentStatusToClients() {
+        Message replyMessage = Message.obtain(null, MESSAGE_STATUS);
 
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("data", running);
+        replyMessage.setData(bundle);
+
+        sendMessageToClients(replyMessage);
+    }
+
+    private void sendMessageToClients(Message message) {
+        Log.d(TAG, "sendMessageToClients: " + Integer.toString(message.what));
+
+        for (int i = clients.size() - 1; i >= 0; i--) {
+            try {
+                clients.get(i).send(message);
+                Log.d(TAG, "sendMessageToClients: client " + Integer.toString(i));
+            } catch (RemoteException e) {
+                clients.remove(i);
+                Log.d(TAG, "sendMessageToClients: removed client");
+            }
+        }
+    }
 }

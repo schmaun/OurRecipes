@@ -12,9 +12,15 @@ import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.drive.Metadata;
+import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.metadata.CustomPropertyKey;
+import com.google.android.gms.drive.query.Filters;
+import com.google.android.gms.drive.query.Query;
+import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.gson.Gson;
@@ -31,6 +37,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import de.schmaun.ourrecipes.Configuration;
 import de.schmaun.ourrecipes.Database.DbHelper;
@@ -39,6 +48,7 @@ import de.schmaun.ourrecipes.Database.RecipeRepository;
 import de.schmaun.ourrecipes.Exception.NotSignedInException;
 import de.schmaun.ourrecipes.Model.Recipe;
 import de.schmaun.ourrecipes.Model.RecipeImage;
+import de.schmaun.ourrecipes.R;
 import de.schmaun.ourrecipes.Utils.Stream;
 
 import static de.schmaun.ourrecipes.Utils.File.getMimeTypeFromUrl;
@@ -46,8 +56,10 @@ import static de.schmaun.ourrecipes.Utils.File.getMimeTypeFromUrl;
 public class GoogleDriveBackup {
 
     private static final String TAG = "GoogleDriveBackup";
+    public static final String BACKUP_ROOT_FOLDER_NAME = "OurRecipesBackup";
     private Context context;
     private DriveResourceClient driveResourceClient;
+    private ThreadPoolExecutor executor;
 
     interface OnResultListener {
         public void onSuccess();
@@ -55,33 +67,151 @@ public class GoogleDriveBackup {
         public void onError(Exception e);
     }
 
+    interface LoadBackupsOnResultListener {
+        public void onSuccess(ArrayList<Backup> backups);
+
+        public void onError(Exception e);
+    }
+
+
     GoogleDriveBackup(Context context) {
         this.context = context;
     }
 
-    public void doBackup(OnResultListener onResultListener) {
-        final Task<DriveFolder> appFolderTask;
-
+    public void backup(OnResultListener onResultListener) {
         try {
             initDriveClient();
-            if (Configuration.FEATURE_USE_GDRIVE_APPFOLDER) {
-                appFolderTask = getDriveResourceClient().getAppFolder();
-            } else {
-                appFolderTask = createApplicationRoot();
-            }
 
-            Task<DriveFolder> backupFolderTask = createBackupFolder(appFolderTask);
+            if (Configuration.FEATURE_USE_GOOGLE_DRIVE_APPFOLDER) {
+                Task<DriveFolder> appFolder = getDriveResourceClient().getAppFolder();
+                doBackup(onResultListener, appFolder);
+            } else {
+                int numCores = Runtime.getRuntime().availableProcessors();
+                executor = new ThreadPoolExecutor(numCores * 2, numCores * 2,
+                        60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+
+                loadApplicationRoot()
+                        .addOnSuccessListener(executor, rootMetadataBuffer -> {
+                            DriveFolder appFolder = null;
+                            for (Metadata row : rootMetadataBuffer) {
+                                if (row.isFolder()) {
+                                    appFolder = row.getDriveId().asDriveFolder();
+                                    break;
+                                }
+                            }
+
+                            if (appFolder != null) {
+                                doBackup(onResultListener, appFolder);
+                            } else {
+                                Task<DriveFolder> applicationRoot = createApplicationRoot();
+                                doBackup(onResultListener, applicationRoot);
+                            }
+                        });
+            }
+        } catch (NotSignedInException e) {
+            onResultListener.onError(e);
+        }
+    }
+
+    private void doBackup(OnResultListener onResultListener, Task<DriveFolder> parentFolder) {
+        try {
+            Task<DriveFolder> backupFolderTask = createBackupFolder(parentFolder);
             Task<DriveFolder> imageFolderTask = createImageFolder(backupFolderTask);
 
             Tasks.await(Tasks.whenAll(
-                    uploadDatabase(backupFolderTask), uploadRecipes(backupFolderTask)
+                    uploadDatabase(backupFolderTask),
+                    uploadRecipes(backupFolderTask)
             ));
             Tasks.await(imageFolderTask);
-            uploadImages(imageFolderTask);
+            //uploadImages(imageFolderTask);
 
             onResultListener.onSuccess();
-        } catch (NotSignedInException | ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             onResultListener.onError(e);
+        }
+    }
+
+    private void doBackup(OnResultListener onResultListener, DriveFolder parentFolder) {
+        try {
+            Task<DriveFolder> backupFolderTask = createBackupFolder(parentFolder);
+            Task<DriveFolder> imageFolderTask = createImageFolder(backupFolderTask);
+
+            Tasks.await(Tasks.whenAll(
+                    uploadDatabase(backupFolderTask),
+                    uploadRecipes(backupFolderTask)
+            ));
+            Tasks.await(imageFolderTask);
+            //uploadImages(imageFolderTask);
+
+            onResultListener.onSuccess();
+        } catch (ExecutionException | InterruptedException e) {
+            onResultListener.onError(e);
+        }
+    }
+
+    public void loadBackups(final LoadBackupsOnResultListener onResultListener) {
+        try {
+            initDriveClient();
+        } catch (NotSignedInException e) {
+            onResultListener.onError(e);
+        }
+
+        final Task<DriveFolder> folder;
+        if (Configuration.FEATURE_USE_GOOGLE_DRIVE_APPFOLDER) {
+            folder = getDriveResourceClient().getAppFolder();
+
+            folder.continueWithTask(task -> {
+                return getDriveResourceClient().listChildren(task.getResult());
+            })
+                    .addOnSuccessListener(metadataBuffer -> {
+                        ArrayList<Backup> backups = new ArrayList<>();
+                        for (Metadata row : metadataBuffer) {
+                            backups.add(new Backup()
+                                    .setCreatedAt(row.getCreatedDate())
+                                    .setTitle(row.getTitle()));
+                        }
+
+                        metadataBuffer.release();
+                        onResultListener.onSuccess(backups);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "loading backups (loadBackups)", e);
+                        onResultListener.onError(e);
+                    });
+        } else {
+            loadApplicationRoot()
+                    .addOnSuccessListener(rootMetadataBuffer -> {
+                        DriveFolder driveFolder = null;
+                        for (Metadata row : rootMetadataBuffer) {
+                            if (row.isFolder()) {
+                                driveFolder = row.getDriveId().asDriveFolder();
+                                break;
+                            }
+                        }
+
+                        if (driveFolder != null) {
+                            getDriveResourceClient().listChildren(driveFolder)
+                                    .addOnSuccessListener(metadataBuffer -> {
+                                        ArrayList<Backup> backups = new ArrayList<>();
+                                        for (Metadata row : metadataBuffer) {
+                                            backups.add(new Backup()
+                                                    .setCreatedAt(row.getCreatedDate())
+                                                    .setTitle(row.getTitle()));
+                                        }
+
+                                        metadataBuffer.release();
+                                        onResultListener.onSuccess(backups);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e(TAG, "loading backups (loadBackups)", e);
+                                        onResultListener.onError(e);
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "loading application root (loadBackups)", e);
+                        onResultListener.onError(e);
+                    });
         }
     }
 
@@ -184,23 +314,37 @@ public class GoogleDriveBackup {
     @NonNull
     private Task<DriveFolder> createBackupFolder(Task<DriveFolder> appFolderTask) {
         return appFolderTask.continueWithTask(
-                task -> {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+                task -> createBackupFolder(task.getResult()));
+    }
 
-                    DriveFolder parentFolder = task.getResult();
-                    Date date = new Date();
-                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                            .setTitle("Backup " + (simpleDateFormat.format(date)))
-                            .setMimeType(DriveFolder.MIME_TYPE)
-                            .setCustomProperty(new CustomPropertyKey("backupDate", CustomPropertyKey.PUBLIC), Long.toString(date.getTime()))
-                            .build();
+    @NonNull
+    private Task<DriveFolder> createBackupFolder(DriveFolder parentFolder) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
 
-                    return getDriveResourceClient().createFolder(parentFolder, changeSet);
-                })
+        Date date = new Date();
+        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                .setTitle("Backup " + (simpleDateFormat.format(date)))
+                .setMimeType(DriveFolder.MIME_TYPE)
+                .setCustomProperty(new CustomPropertyKey("backupDate", CustomPropertyKey.PUBLIC), Long.toString(date.getTime()))
+                .build();
+
+        return getDriveResourceClient().createFolder(parentFolder, changeSet)
                 .addOnSuccessListener(driveFolder -> {
                     Log.d(TAG, "Folder created (createBackupFolder): " + driveFolder.getDriveId().encodeToString());
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Unable to create folder (createBackupFolder)", e));
+    }
+
+    private Task<MetadataBuffer> loadApplicationRoot() {
+        return getDriveResourceClient()
+                .getRootFolder()
+                .continueWithTask(task -> {
+                    Query query = new Query.Builder()
+                            .addFilter(Filters.eq(SearchableField.TITLE, BACKUP_ROOT_FOLDER_NAME))
+                            .build();
+
+                    return getDriveResourceClient().queryChildren(task.getResult(), query);
+                });
     }
 
     @NonNull
@@ -210,7 +354,7 @@ public class GoogleDriveBackup {
                 .continueWithTask(task -> {
                     DriveFolder parentFolder = task.getResult();
                     MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                            .setTitle("OurRecipesBackup")
+                            .setTitle(BACKUP_ROOT_FOLDER_NAME)
                             .setMimeType(DriveFolder.MIME_TYPE)
                             .build();
                     return getDriveResourceClient().createFolder(parentFolder, changeSet);
@@ -240,6 +384,10 @@ public class GoogleDriveBackup {
             String imageLocation = image.getLocation(context);
             InputStream in = context.getContentResolver().openInputStream(Uri.parse(imageLocation));
             Stream.copy(in, contents.getOutputStream());
+
+            if (Configuration.FEATURE_FAIL_BACKUP && image.getId() == 1) {
+                throw new Exception("fweawfawef");
+            }
 
             String mimeType = getMimeTypeFromUrl(imageLocation);
             MetadataChangeSet.Builder changeSetBuilder = new MetadataChangeSet.Builder()

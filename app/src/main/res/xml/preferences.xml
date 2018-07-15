@@ -8,7 +8,7 @@
             android:title="@string/pref_title_cooking_mode_display_on" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_header_sync_n_backup">
+    <PreferenceCategory android:title="@string/pref_header_backup_restore">
         <SwitchPreference
             android:defaultValue="false"
             android:key="backup_to_google_drive_enabled"
@@ -44,7 +44,9 @@
     <PreferenceCategory android:title="@string/pref_header_about">
         <Preference
             android:summary="@string/pref_description_version"
-            android:title="@string/pref_title_version" />
+            android:title="@string/pref_title_version"
+            android:key="version"
+            />
 
         <Preference android:title="@string/pref_title_licences">
             <intent

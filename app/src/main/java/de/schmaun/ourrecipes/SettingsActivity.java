@@ -37,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static class SettingsFragment extends PreferenceFragment {
         private static final String BACKUP_TO_GOOGLE_DRIVE_ACCOUNT_NAME = "backup_to_google_drive_account_name";
+        private static final String VERSION = "version";
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -48,13 +49,22 @@ public class SettingsActivity extends AppCompatActivity {
         public void onResume() {
             super.onResume();
 
-            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-            Preference preference = findPreference(BACKUP_TO_GOOGLE_DRIVE_ACCOUNT_NAME);
+            setSummaryVersion();
+            setSummaryGoogleDriveAccountName();
+        }
 
+        private void setSummaryVersion() {
+            Preference appVersion = findPreference(VERSION);
+            appVersion.setSummary(BuildConfig.VERSION_NAME);
+        }
+
+        private void setSummaryGoogleDriveAccountName() {
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+            Preference backupToGoogleDrive = findPreference(BACKUP_TO_GOOGLE_DRIVE_ACCOUNT_NAME);
             if (account != null) {
-                preference.setSummary(String.format("%s (%s)", account.getDisplayName(), account.getEmail()));
+                backupToGoogleDrive.setSummary(String.format("%s (%s)", account.getDisplayName(), account.getEmail()));
             } else {
-                preference.setSummary(getString(R.string.pref_description_backup_to_google_drive_account_na));
+                backupToGoogleDrive.setSummary(getString(R.string.pref_description_backup_to_google_drive_account_na));
             }
         }
     }

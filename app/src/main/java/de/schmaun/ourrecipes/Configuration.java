@@ -15,7 +15,8 @@ public final class Configuration {
     public static final String IMAGE_ENDING = ".jpg";
     public static final String IMAGE_MIME_TYPE = "image/jpeg";
 
-    public static final boolean FEATURE_USE_GDRIVE_APPFOLDER = false;
+    public static final boolean FEATURE_USE_GOOGLE_DRIVE_APPFOLDER = true;
+    public static final boolean FEATURE_FAIL_BACKUP = false;
 
     public final static String FILE_AUTHORITY_IMAGES = "de.schmaun.fileprovider";
 }
