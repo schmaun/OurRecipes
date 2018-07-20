@@ -210,7 +210,7 @@
     <string name="backup_google_drive_status">Status</string>
     <string name="backup_google_drive_last_backup_completed_at">Last backup completed at: %s</string>
     <string name="backup_google_drive_last_backup_completed_at_na">N/A</string>
-    <string name="title_activity_backup_google_drive">Google Drive Backup</string>
+    <string name="title_activity_backup_google_drive">Backup and Restore</string>
     <string name="backup_google_drive_description">Backing up your data to Google Drive allows you to restore all your recipes on a new device.</string>
     <string name="backup_google_drive_notification_title">Backup to Google Drive</string>
     <string name="backup_google_drive_notification_progress_message">Backing up recipes and images</string>
@@ -220,8 +220,8 @@
     <string name="backup_google_drive_notification_error_message">Backup to Google Drive error!</string>
     <string name="backup_google_drive_status_running">Backup is in progress…</string>
     <string name="backup_google_drive_status_success">Backup successful!</string>
-    <string name="backup_google_drive_status_error">Backup not successful!</string>
-    <string name="backup_google_drive_restore_description">Restore the last backup. This will overwrite the current recipes and images on this device. Use it carefully. There is no undo!</string>
+    <string name="backup_google_drive_status_error">Last backup not successful!</string>
+    <string name="backup_google_drive_restore_description">You can restore on of the last 10 backups. This will overwrite the current recipes and images on this device. Use it carefully. There is no undo!</string>
     <string name="backup_google_drive_start_restore">Restore backup</string>
     <string name="backup_google_drive_restore_last_backup_info">Latest backup found: %s</string>
     <string name="backup_google_drive_restore_last_backup_at_na">N/A</string>
@@ -235,5 +235,7 @@
     <string name="backup_google_drive_restore_dialog_content">Restore backup from %s? This will overwrite all your current recipes and images!</string>
     <string name="backup_google_drive_restore_dialog_negative">No, Cancel</string>
     <string name="backup_google_drive_restore_dialog_positive">Yes, restore!</string>
-
+    <string name="backup_google_drive_restore_finished_dialog_content">Restore of database finished. You can use the app while the images are being restored in the background. We now need a restart of this App.</string>
+    <string name="backup_google_drive_restore_finished_dialog_ok">Restart OurRecipes</string>
+    <string name="backup_google_drive_restore_error_dialog_content">Sorry. Restore failed. Let\'s hope nothing is broken after that :(</string>
 </resources>

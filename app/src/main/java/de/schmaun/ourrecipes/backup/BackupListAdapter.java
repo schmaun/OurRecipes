@@ -1,26 +1,37 @@
 package de.schmaun.ourrecipes.backup;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.drive.DriveId;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import de.schmaun.ourrecipes.MainActivity;
 import de.schmaun.ourrecipes.R;
 
 public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Holder> {
 
+    private RestoreHandler restoreHandler;
     private final ArrayList<Backup> backups;
     private Context context;
+
+    interface RestoreHandler {
+        void startDatabaseRestore(DriveId backupFolderId, GoogleDriveBackup.OnResultListener onResultListener);
+    }
 
     static class Holder extends RecyclerView.ViewHolder {
         private final TextView backupName;
@@ -33,8 +44,9 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ho
         }
     }
 
-    public BackupListAdapter(Context context, ArrayList<Backup> backups) {
+    public BackupListAdapter(Context context, RestoreHandler restoreHandler, ArrayList<Backup> backups) {
         this.context = context;
+        this.restoreHandler = restoreHandler;
         this.backups = backups;
     }
 
@@ -52,20 +64,65 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ho
 
         String title = SimpleDateFormat.getDateTimeInstance().format(backup.getCreatedAt());
         holder.backupName.setText(title);
-        holder.restoreButton.setOnClickListener(v -> {
-            String formattedDate = SimpleDateFormat.getDateTimeInstance().format(backup.getCreatedAt());
-            /*String formattedDate = DateUtils.formatDateTime(
-                    context,
-                    backup.getCreatedAt(),
-                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR);
-                    */
+        holder.restoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MaterialDialog.Builder(context)
+                        .title(R.string.backup_google_drive_restore_dialog_title)
+                        .content(String.format(context.getString(R.string.backup_google_drive_restore_dialog_content), title))
+                        .positiveText(R.string.backup_google_drive_restore_dialog_positive)
+                        .negativeText(R.string.backup_google_drive_restore_dialog_negative)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
 
-            new MaterialDialog.Builder(this.context)
-                    .title(context.getString(R.string.backup_google_drive_restore_dialog_title))
-                    .content(String.format(context.getString(R.string.backup_google_drive_restore_dialog_content), title))
-                    .positiveText(context.getString(R.string.backup_google_drive_restore_dialog_positive))
-                    .negativeText(context.getString(R.string.backup_google_drive_restore_dialog_negative))
-                    .show();
+                                MaterialDialog progressDialog = new MaterialDialog.Builder(context)
+                                        .title(R.string.backup_google_drive_restore_dialog_title)
+                                        .progress(true, 0)
+                                        .progressIndeterminateStyle(true)
+                                        .cancelable(false)
+                                        .show();
+
+                                restoreHandler.startDatabaseRestore(backup.getFolderId(), new GoogleDriveBackup.OnResultListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        progressDialog.dismiss();
+
+                                        new MaterialDialog.Builder(context)
+                                                .title(R.string.backup_google_drive_restore_dialog_title)
+                                                .content(R.string.backup_google_drive_restore_finished_dialog_content)
+                                                .positiveText(R.string.backup_google_drive_restore_finished_dialog_ok)
+                                                .cancelable(false)
+                                                .onAny(new MaterialDialog.SingleButtonCallback() {
+                                                    @Override
+                                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                        PendingIntent mPendingIntent = PendingIntent.getActivity(context, 1337, new Intent(context, MainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
+
+                                                        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                                                        alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                                                        System.exit(0);
+                                                    }
+                                                })
+                                                .show();
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        progressDialog.dismiss();
+
+                                        new MaterialDialog.Builder(context)
+                                                .title(R.string.backup_google_drive_restore_dialog_title)
+                                                .content(R.string.backup_google_drive_restore_error_dialog_content)
+                                                .positiveText(R.string.backup_google_drive_restore_finished_dialog_ok)
+                                                .cancelable(false)
+                                                .show();
+                                    }
+                                });
+                            }
+                        })
+                        .show();
+            }
         });
     }
 

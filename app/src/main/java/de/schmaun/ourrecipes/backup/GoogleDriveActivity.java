@@ -3,7 +3,6 @@ package de.schmaun.ourrecipes.backup;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -11,7 +10,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -25,47 +25,40 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import com.google.android.gms.drive.DriveId;
 
-import de.schmaun.ourrecipes.Adapter.SimpleRecipeImageAdapter;
+import java.util.ArrayList;
+
 import de.schmaun.ourrecipes.Configuration;
 import de.schmaun.ourrecipes.R;
 
-public class GoogleDriveActivity extends AppCompatActivity {
+public class GoogleDriveActivity extends AppCompatActivity implements BackupListAdapter.RestoreHandler {
 
     private static final String TAG = "GoogleDriveActivity";
+    public static final int NUMBER_OF_BACKUPS_TO_DISPLAY = 10;
     private Button startBackupButton;
-    //private Button cancelBackupButton;
-    private android.content.BroadcastReceiver broadcastReceiver;
     private ToggleButton toggleInformationButton;
     private TextView lastRunInformationText;
-    private Button startRestoreButton;
-    private TextView restoreLatesBackupInformation;
     private RecyclerView backupListView;
 
     final Messenger messenger = new Messenger(new IncomingHandler());
     private Messenger messageService;
-    BackupService backupService;
 
     private ServiceConnection backupServiceConnection = new BackupServiceConnection();
-    private boolean isRunning = false;
+    private boolean isRunningBackup = false;
 
     class BackupServiceConnection implements ServiceConnection {
         public void onServiceConnected(ComponentName className, IBinder service) {
             messageService = new Messenger(service);
 
             sendMessageToService(Message.obtain(null, BackupService.MESSAGE_REGISTER));
-            sendMessageToService(Message.obtain(null, BackupService.MESSAGE_STATUS));
+            sendMessageToService(Message.obtain(null, BackupService.MESSAGE_BACKUP_STATUS));
         }
 
         public void onServiceDisconnected(ComponentName className) {
             Log.d(TAG, "onServiceDisconnected");
         }
     }
-
-    ;
 
     class IncomingHandler extends Handler {
         @Override
@@ -74,16 +67,11 @@ public class GoogleDriveActivity extends AppCompatActivity {
                 case BackupService.MESSAGE_PLEASE_UNBIND_FROM_ME:
                     Log.d(TAG, "handleMessage: MESSAGE_PLEASE_UNBIND_FROM_ME");
                     unbindService(backupServiceConnection);
+                    backupServiceConnection = null;
                     break;
-                case BackupService.MESSAGE_STATUS:
-                    isRunning = message.getData().getBoolean("data");
-
-                    int backupStatus = Configuration.PREF_KEY_BACKUP_STATUS_SUCCESS;
-                    if (isRunning) {
-                        backupStatus = Configuration.PREF_KEY_BACKUP_STATUS_RUNNING;
-                    }
-
-                    updateView(backupStatus);
+                case BackupService.MESSAGE_BACKUP_STATUS:
+                    isRunningBackup = message.getData().getBoolean("data");
+                    updateView();
                     break;
                 default:
                     super.handleMessage(message);
@@ -101,22 +89,23 @@ public class GoogleDriveActivity extends AppCompatActivity {
         startBackupButton.setOnClickListener(v -> startBackup());
         lastRunInformationText = (TextView) findViewById(R.id.backup_google_drive_last_run_information);
 
-        restoreLatesBackupInformation = (TextView) findViewById(R.id.backup_google_drive_restore_last_backup_info);
-
-        toggleInformationButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ToggleButton button = (ToggleButton) v;
-                if (button.isChecked()) {
-                    lastRunInformationText.setVisibility(View.VISIBLE);
-                } else {
-                    lastRunInformationText.setVisibility(View.GONE);
-                }
+        toggleInformationButton.setOnClickListener(v -> {
+            ToggleButton button = (ToggleButton) v;
+            if (button.isChecked()) {
+                lastRunInformationText.setVisibility(View.VISIBLE);
+            } else {
+                lastRunInformationText.setVisibility(View.GONE);
             }
         });
 
         backupListView = findViewById(R.id.backup_google_drive_backups_to_restore);
+        backupListView.setAdapter(createBackupListAdapter(new ArrayList<>()));
         backupListView.setHasFixedSize(true);
-        backupListView.setLayoutManager(new LinearLayoutManager(this));
+        backupListView.setNestedScrollingEnabled(false);
+        ViewCompat.setNestedScrollingEnabled(backupListView, false);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        backupListView.setLayoutManager(layoutManager);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(backupListView.getContext(), LinearLayoutManager.VERTICAL);
         backupListView.addItemDecoration(dividerItemDecoration);
@@ -125,19 +114,11 @@ public class GoogleDriveActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
 
         bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
-
-        sendMessageToService(Message.obtain(null, BackupService.MESSAGE_STATUS));
+        sendMessageToService(Message.obtain(null, BackupService.MESSAGE_BACKUP_STATUS));
     }
 
     @Override
@@ -148,6 +129,7 @@ public class GoogleDriveActivity extends AppCompatActivity {
 
         if (backupServiceConnection != null) {
             unbindService(backupServiceConnection);
+            backupServiceConnection = null;
         }
     }
 
@@ -169,27 +151,55 @@ public class GoogleDriveActivity extends AppCompatActivity {
         bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
     }
 
-    private void updateView() {
-        //SharedPreferences sharedPref = getSharedPreferences(Configuration.PREFERENCES_NAME, Context.MODE_PRIVATE);
-
-        //int backupStatus = sharedPref.getInt(Configuration.PREF_KEY_BACKUP_STATUS, 0);
-
-/*
-        int backupStatus = Configuration.PREF_KEY_BACKUP_STATUS_SUCCESS;
-        if (backupService != null) {
-            if (backupService.isRunning()) {
-                backupStatus = Configuration.PREF_KEY_BACKUP_STATUS_RUNNING;
-            }
-        }
-*/
-
-        updateView(Configuration.PREF_KEY_BACKUP_STATUS_SUCCESS);
+    public void startDatabaseRestore(DriveId backupFolderId,  GoogleDriveBackup.OnResultListener restoreFinishedCallback) {
+        GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
+        googleDriveBackup.restoreDatabase(backupFolderId, restoreFinishedCallback);
     }
 
-    private void updateView(int backupStatus) {
+    public void startImagesRestore() {
+        Intent intent = new Intent(this, BackupService.class);
+        intent.setAction(BackupService.ACTION_RESTORE_IMAGES);
+        startService(intent);
+
+        bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private void updateView() {
         SharedPreferences sharedPref = getSharedPreferences(Configuration.PREFERENCES_NAME, Context.MODE_PRIVATE);
         long lastBackupDate = sharedPref.getLong(Configuration.PREF_KEY_LAST_BACKUP_DATE, 0L);
+        int backupStatus = sharedPref.getInt(Configuration.PREF_KEY_BACKUP_STATUS, Configuration.PREF_KEY_BACKUP_STATUS_SUCCESS);
 
+        updateLastBackupDateView(lastBackupDate);
+        updateViewCurrentStatus();
+        updateViewLastRunStatus(sharedPref, backupStatus);
+        updateViewRestore();
+    }
+
+    private void updateViewLastRunStatus(SharedPreferences sharedPref, int backupStatus) {
+        TextView statusText = (TextView) findViewById(R.id.backup_google_drive_status_text);
+        statusText.setVisibility(View.GONE);
+        toggleInformationButton.setVisibility(View.GONE);
+        lastRunInformationText.setVisibility(View.GONE);
+        if (backupStatus == Configuration.PREF_KEY_BACKUP_STATUS_ERROR) {
+            statusText.setText(R.string.backup_google_drive_status_error);
+            statusText.setVisibility(View.VISIBLE);
+            toggleInformationButton.setVisibility(View.VISIBLE);
+            lastRunInformationText.setVisibility(View.VISIBLE);
+            lastRunInformationText.setText(sharedPref.getString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, ""));
+        }
+    }
+
+    private void updateViewCurrentStatus() {
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.backup_google_drive_progressbar);
+        startBackupButton.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        if (isRunningBackup) {
+            startBackupButton.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateLastBackupDateView(long lastBackupDate) {
         String lastBackupDateString = getString(R.string.backup_google_drive_last_backup_completed_at_na);
         if (lastBackupDate > 0) {
             lastBackupDateString = DateUtils.formatDateTime(
@@ -201,80 +211,26 @@ public class GoogleDriveActivity extends AppCompatActivity {
 
         TextView lastBackup = (TextView) findViewById(R.id.backup_google_drive_last_backup);
         lastBackup.setText(String.format(getString(R.string.backup_google_drive_last_backup_completed_at), lastBackupDateString));
-
-        TextView statusText = (TextView) findViewById(R.id.backup_google_drive_status_text);
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.backup_google_drive_progressbar);
-
-        switch (backupStatus) {
-            case Configuration.PREF_KEY_BACKUP_STATUS_SUCCESS:
-                startBackupButton.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                statusText.setText("");
-                statusText.setVisibility(View.GONE);
-                toggleInformationButton.setVisibility(View.GONE);
-                lastRunInformationText.setVisibility(View.GONE);
-                lastRunInformationText.setText(sharedPref.getString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, ""));
-                break;
-            case Configuration.PREF_KEY_BACKUP_STATUS_ERROR:
-                startBackupButton.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                statusText.setText(R.string.backup_google_drive_status_error);
-                statusText.setVisibility(View.VISIBLE);
-                toggleInformationButton.setVisibility(View.VISIBLE);
-                lastRunInformationText.setVisibility(View.GONE);
-                lastRunInformationText.setText(sharedPref.getString(Configuration.PREF_KEY_LAST_BACKUP_MESSAGE, ""));
-                break;
-            case Configuration.PREF_KEY_BACKUP_STATUS_RUNNING:
-                startBackupButton.setVisibility(View.GONE);
-                progressBar.setVisibility(View.VISIBLE);
-                statusText.setText(R.string.backup_google_drive_status_running);
-                statusText.setVisibility(View.VISIBLE);
-                toggleInformationButton.setVisibility(View.GONE);
-                lastRunInformationText.setVisibility(View.GONE);
-                break;
-        }
-
-        updateRestoreView();
     }
 
-    private void updateRestoreView() {
-        boolean restorePossible = true;
-        Long backupToBeRestoredDate = new Date().getTime();
-
-
+    private void updateViewRestore() {
         GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
-        googleDriveBackup.loadBackups(new GoogleDriveBackup.LoadBackupsOnResultListener() {
+        googleDriveBackup.loadBackups(NUMBER_OF_BACKUPS_TO_DISPLAY, new GoogleDriveBackup.LoadBackupsOnResultListener() {
             @Override
             public void onSuccess(ArrayList<Backup> backups) {
-                backupListView.setAdapter(new BackupListAdapter(getApplicationContext(), backups));
+                Log.d(TAG, "updateViewRestore: display loaded backups");
+                backupListView.swapAdapter(createBackupListAdapter(backups), true);
+                ViewCompat.setNestedScrollingEnabled(backupListView, false);
             }
 
             @Override
             public void onError(Exception e) {
             }
         });
-
-
-        /*
-        if (restorePossible) {
-            startRestoreButton.setEnabled(true);
-
-            String readableBackupToBeRestoredDate = getString(R.string.backup_google_drive_restore_last_backup_at_na);
-            readableBackupToBeRestoredDate = DateUtils.formatDateTime(
-                    getApplicationContext(),
-                    backupToBeRestoredDate,
-                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
-            );
-            restoreLatesBackupInformation.setText(String.format(getString(R.string.backup_google_drive_restore_last_backup_info), readableBackupToBeRestoredDate));
-        }
-        */
     }
 
-    private class BroadcastReceiver extends android.content.BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            updateView();
-        }
+    @NonNull
+    private BackupListAdapter createBackupListAdapter(ArrayList<Backup> backups) {
+        return new BackupListAdapter(GoogleDriveActivity.this, GoogleDriveActivity.this, backups);
     }
 }

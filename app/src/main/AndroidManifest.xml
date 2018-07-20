@@ -105,10 +105,10 @@
         <activity
             android:name=".SignInActivity"
             android:label="@string/title_activity_sign_in"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.schmaun.ourrecipes.MainActivity" />
+                android:value="de.schmaun.ourrecipes.SettingsActivity" />
         </activity>
         <activity
             android:name=".backup.GoogleDriveActivity"

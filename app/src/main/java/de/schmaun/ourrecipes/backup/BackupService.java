@@ -4,8 +4,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,7 +12,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -26,13 +23,14 @@ import de.schmaun.ourrecipes.Notifications;
 
 public class BackupService extends IntentService {
     public static final String ACTION_BACKUP = "de.schmaun.ourrecipes.backup.action.BACKUP";
-    private static final String ACTION_RESTORE = "de.schmaun.ourrecipes.backup.action.RESTORE";
+    public static final String ACTION_RESTORE_IMAGES = "de.schmaun.ourrecipes.backup.action.RESTORE_IMAGES";
+
     public static final String ACTION_BACKUP_NOTIFY = "de.schmaun.ourrecipes.backup.action.BACKUP_NOTIFY";
     public static final String ACTION_BACKUP_RESTORE = "de.schmaun.ourrecipes.backup.action.RESTORE_NOTIFY";
 
     public static final int MESSAGE_REGISTER = 1;
     public static final int MESSAGE_UNREGISTER = 2;
-    public static final int MESSAGE_STATUS = 3;
+    public static final int MESSAGE_BACKUP_STATUS = 3;
     public static final int MESSAGE_PLEASE_UNBIND_FROM_ME = 4;
 
     static final int JOB_ID_BACKUP = 1001;
@@ -57,7 +55,7 @@ public class BackupService extends IntentService {
                 case MESSAGE_UNREGISTER:
                     clients.remove(message.replyTo);
                     break;
-                case MESSAGE_STATUS:
+                case MESSAGE_BACKUP_STATUS:
                     sendCurrentStatusToClients();
                 default:
                     super.handleMessage(message);
@@ -78,8 +76,8 @@ public class BackupService extends IntentService {
             sendCurrentStatusToClients();
             if (ACTION_BACKUP.equals(currentAction)) {
                 handleActionBackup();
-            } else if (ACTION_RESTORE.equals(currentAction)) {
-                handleActionRestore();
+            } else if (ACTION_RESTORE_IMAGES.equals(currentAction)) {
+                handleActionRestoreImages();
             }
         }
     }
@@ -105,16 +103,13 @@ public class BackupService extends IntentService {
                 onErrorBackup(e);
             }
         });
-
-        //NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        //notificationManager.cancel(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID);
     }
 
-    private void handleActionRestore() {
-        startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.restoreBackupInProgress(this));
+    private void handleActionRestoreImages() {
+/*        startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.restoreBackupInProgress(this));
 
         GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
-        googleDriveBackup.backup(new GoogleDriveBackup.OnResultListener() {
+        googleDriveBackup.restoreImages(new GoogleDriveBackup.OnResultListener() {
             @Override
             public void onSuccess() {
                 BackupService.this.onSuccessRestore();
@@ -124,7 +119,7 @@ public class BackupService extends IntentService {
             public void onError(Exception e) {
                 BackupService.this.onErrorRestore(e);
             }
-        });
+        });*/
     }
 
     private void onSuccessBackup() {
@@ -190,7 +185,7 @@ public class BackupService extends IntentService {
     }
 
     private void sendCurrentStatusToClients() {
-        Message replyMessage = Message.obtain(null, MESSAGE_STATUS);
+        Message replyMessage = Message.obtain(null, MESSAGE_BACKUP_STATUS);
 
         Bundle bundle = new Bundle();
         bundle.putBoolean("data", running);

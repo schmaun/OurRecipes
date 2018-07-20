@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
         tools:context=".backup.GoogleDriveActivity">
+
+        <!--<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">-->
 
         <TextView
             android:id="@+id/backup_google_drive_backup_headline"
@@ -94,7 +103,7 @@
             android:id="@+id/backup_google_drive_last_run_information"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="fojqf o qfweojefwo qfeqewfnff44f43q fqf4f444ff4f44ff434f34gtrgrhtstg 3434mvdfbomnp  qä4qä4täq4 t q4tq4q3t434"
+            android:text="Ihr sitzt bestimmt den ganzen Tag vor'm Bildschirm und ihr surft durchs Internet."
             android:textAppearance="@style/RecipeView.Text"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
@@ -115,8 +124,8 @@
             android:layout_marginTop="@dimen/activity_horizontal_margin"
             android:text="@string/backup_google_drive_restore_headline"
             android:textAppearance="@style/RecipeView.Headline"
-            app:layout_constraintTop_toBottomOf="@+id/divider"
-            />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <TextView
             android:id="@+id/backup_google_drive_restore_description"
@@ -126,83 +135,15 @@
             android:ellipsize="end"
             android:text="@string/backup_google_drive_restore_description"
             android:textAppearance="@style/RecipeView.Text"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_restore_headline" />
-
-        <TextView
-            android:id="@+id/backup_google_drive_restore_last_backup_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:ellipsize="end"
-            android:text="@string/backup_google_drive_restore_last_backup_info"
-            android:textAppearance="@style/RecipeView.Text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_restore_description" />
-
-        <Button
-            android:id="@+id/backup_google_drive_start_restore"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:enabled="false"
-            android:text="@string/backup_google_drive_start_restore"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_restore_last_backup_info"
-            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/backup_google_drive_backups_to_restore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_start_restore"
-            />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            app:layout_constraintTop_toBottomOf="@+id/backup_google_drive_restore_description" />
     </android.support.constraint.ConstraintLayout>
-</ScrollView>
+    <!--</LinearLayout>-->
+</android.support.v4.widget.NestedScrollView>
