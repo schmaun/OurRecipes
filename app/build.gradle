@@ -27,7 +27,7 @@ android {
 
         versionProps['VERSION_PATCH'] = (versionProps['VERSION_PATCH'].toInteger() + value).toString()
         versionProps['VERSION_NUMBER'] = (versionProps['VERSION_NUMBER'].toInteger() + value).toString()
-        versionProps['VERSION_BUILD'] = (versionProps['VERSION_BUILD'].toInteger() + 1).toString()
+        versionProps['VERSION_BUILD'] = (versionProps['VERSION_BUILD'].toInteger() + value).toString()
 
         versionProps.store(versionPropsFile.newWriter(), null)
 
@@ -56,12 +56,11 @@ android {
         }
     }
 
-    task copyApkFiles(type: Copy){
+    task copyApkFiles(type: Copy) {
         from 'build/outputs/apk/release'
         into '../apk'
         include mFileName
     }
-
 
     /*
     defaultConfig {

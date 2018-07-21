@@ -1,14 +1,12 @@
 package de.schmaun.ourrecipes.Model;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v4.content.FileProvider;
 
 import org.parceler.Parcel;
 import org.parceler.Transient;
 
 import java.io.File;
-import java.net.URL;
 
 import de.schmaun.ourrecipes.Configuration;
 
@@ -23,8 +21,6 @@ public class RecipeImage {
 
     private String description;
 
-    private String location;
-
     private int position;
 
     private int isCoverImage;
@@ -38,10 +34,6 @@ public class RecipeImage {
     public static final int PARENT_TYPE_PREPARATION = 2;
 
     public RecipeImage() {
-    }
-
-    public RecipeImage(String location) {
-        this.location = location;
     }
 
     public long getId() {
@@ -80,10 +72,6 @@ public class RecipeImage {
         File storageDir = context.getExternalFilesDir(Configuration.IMAGE_PATH);
 
         return FileProvider.getUriForFile(context, Configuration.FILE_AUTHORITY_IMAGES, new File(storageDir + File.separator + this.fileName)).toString();
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getFileName() {
