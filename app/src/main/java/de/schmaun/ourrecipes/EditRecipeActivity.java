@@ -3,6 +3,7 @@ package de.schmaun.ourrecipes;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 
@@ -63,6 +64,7 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeImageAda
         sectionsPagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(sectionsPagerAdapter);
+        mViewPager.setOffscreenPageLimit(2);
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -188,6 +190,8 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeImageAda
             this.recipe.setName(metaFragment.getRecipe().getName());
             this.recipe.setLabels(metaFragment.getRecipe().getLabels());
             this.recipe.setNotes(metaFragment.getRecipe().getNotes());
+            mergedImages.addAll(metaFragment.getRecipe().getImages());
+            mergedImagesToDelete.addAll(metaFragment.getRecipe().getImagesToDelete());
         }
         if (ingredientsFragment != null) {
             this.recipe.setIngredients(ingredientsFragment.getRecipe().getIngredients());
@@ -240,6 +244,10 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeImageAda
     @Override
     public void resetCoverImageStatus() {
         recipe.resetCoverImage();
+
+        if (metaFragment != null) {
+            metaFragment.resetCoverImageStatus();
+        }
 
         if (ingredientsFragment != null) {
             ingredientsFragment.resetCoverImageStatus();
@@ -298,6 +306,8 @@ public class EditRecipeActivity extends RecipeActivity implements RecipeImageAda
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
+            Log.d(TAG, String.format("instantiateItem called: %d", position));
+
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             switch (position) {
                 case 0:

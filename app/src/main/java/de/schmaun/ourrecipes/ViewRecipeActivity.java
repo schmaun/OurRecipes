@@ -3,9 +3,7 @@ package de.schmaun.ourrecipes;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DividerItemDecoration;
@@ -14,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
@@ -28,7 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.github.iojjj.rcbs.RoundedCornersBackgroundSpan;
 import com.like.LikeButton;
 
-import de.schmaun.ourrecipes.Adapter.SimpleRecipeImageAdapter;
+import de.schmaun.ourrecipes.Adapter.ViewRecipeImageAdapter;
 import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.RecipeImage;
 
@@ -133,7 +130,7 @@ public class ViewRecipeActivity extends RecipeActivity {
         ingredientsView.setText(recipe.getIngredients());
         preparationView.setText(recipe.getPreparation());
         notesView.setText(recipe.getNotes());
-        SimpleRecipeImageAdapter imageAdapter = new SimpleRecipeImageAdapter(this, recipe);
+        ViewRecipeImageAdapter imageAdapter = new ViewRecipeImageAdapter(this, recipe);
 
         imagesView.setHasFixedSize(true);
         imagesView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));

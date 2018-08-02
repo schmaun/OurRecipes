@@ -1,64 +1,60 @@
-<android.support.v4.widget.NestedScrollView
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="match_parent">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="de.schmaun.ourrecipes.EditRecipe.EditRecipeIngredientsFragment">
-
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:layout_marginBottom="@dimen/edit_text_margin_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:id="@+id/edit_recipe_ingredients"
-        android:hint="@string/edit_recipe_ingredients"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:minLines="1"
-        android:gravity="top"
-        app:met_primaryColor="@color/colorAccent"
-        app:met_floatingLabel="highlight"
-        app:met_helperText="@string/edit_recipe_ingredients_helper_text"
-        app:met_helperTextAlwaysShown="true"
-        />
-
-    <LinearLayout
-        android:id="@+id/edit_recipe_image_header"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="12dp"
-        android:layout_below="@+id/edit_recipe_ingredients"
-        android:gravity="end"
-        android:orientation="vertical">
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context="de.schmaun.ourrecipes.EditRecipe.EditRecipeIngredientsFragment">
 
-        <Button
-            android:id="@+id/edit_recipe_add_image"
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edit_recipe_ingredients"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/edit_recipe_add_image"
-            style="@style/Widget.AppCompat.Button.Colored"
-            />
-    </LinearLayout>
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="@dimen/edit_text_margin_bottom"
+            android:gravity="top"
+            android:hint="@string/edit_recipe_ingredients"
+            android:inputType="textMultiLine"
+            android:minLines="1"
+            app:met_floatingLabel="highlight"
+            app:met_helperText="@string/edit_recipe_ingredients_helper_text"
+            app:met_helperTextAlwaysShown="true"
+            app:met_primaryColor="@color/colorAccent" />
 
-    <android.support.v7.widget.RecyclerView
-        android:nestedScrollingEnabled="false"
-        android:id="@+id/edit_recipe_image_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_recipe_image_header"
-         >
+        <LinearLayout
+            android:id="@+id/edit_recipe_image_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edit_recipe_ingredients"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="12dp"
+            android:gravity="end"
+            android:orientation="vertical">
 
-    </android.support.v7.widget.RecyclerView>
+            <Button
+                android:id="@+id/edit_recipe_add_image"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_recipe_add_image" />
+        </LinearLayout>
 
-</RelativeLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/edit_recipe_image_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edit_recipe_image_header"
+            android:nestedScrollingEnabled="false">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </RelativeLayout>
 </android.support.v4.widget.NestedScrollView>

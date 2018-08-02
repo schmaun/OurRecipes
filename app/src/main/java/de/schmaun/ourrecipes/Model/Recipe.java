@@ -110,7 +110,8 @@ public class Recipe {
     }
 
     public ArrayList<RecipeImage> getImagesGroupedByParentType() {
-        ArrayList<RecipeImage> images = getImages(RecipeImage.PARENT_TYPE_INGREDIENTS);
+        ArrayList<RecipeImage> images = getImages(RecipeImage.PARENT_TYPE_META);
+        images.addAll(getImages(RecipeImage.PARENT_TYPE_INGREDIENTS));
         images.addAll(getImages(RecipeImage.PARENT_TYPE_PREPARATION));
 
         return images;

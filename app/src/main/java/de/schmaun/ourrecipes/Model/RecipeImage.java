@@ -30,8 +30,8 @@ public class RecipeImage {
     private String fileName;
 
     public static final int PARENT_TYPE_INGREDIENTS = 1;
-
     public static final int PARENT_TYPE_PREPARATION = 2;
+    public static final int PARENT_TYPE_META = 3;
 
     public RecipeImage() {
     }

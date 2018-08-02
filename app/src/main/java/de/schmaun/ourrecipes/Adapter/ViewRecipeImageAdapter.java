@@ -1,9 +1,6 @@
 package de.schmaun.ourrecipes.Adapter;
 
-import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +12,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.schmaun.ourrecipes.ImageViewDialogFragment;
@@ -24,10 +20,9 @@ import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
 import de.schmaun.ourrecipes.RecipeProviderInterface;
 
-public class SimpleRecipeImageAdapter extends RecyclerView.Adapter<SimpleRecipeImageAdapter.ImageHolder> {
+public class ViewRecipeImageAdapter extends RecyclerView.Adapter<ViewRecipeImageAdapter.ImageHolder> {
 
     private Context context;
-    private Recipe recipe;
     private List<RecipeImage> images;
 
     static class ImageHolder extends RecyclerView.ViewHolder {
@@ -39,9 +34,8 @@ public class SimpleRecipeImageAdapter extends RecyclerView.Adapter<SimpleRecipeI
         }
     }
 
-    public SimpleRecipeImageAdapter(Context context, Recipe recipe) {
+    public ViewRecipeImageAdapter(Context context, Recipe recipe) {
         this.context = context;
-        this.recipe = recipe;
         this.images = recipe.getImagesGroupedByParentType();
     }
 

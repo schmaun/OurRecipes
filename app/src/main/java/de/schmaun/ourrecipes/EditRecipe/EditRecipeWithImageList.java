@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -52,6 +56,7 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d(TAG, "onAttach");
 
         try {
             imageListManager = (RecipeImageAdapter.ImageListManager) context;
@@ -85,9 +90,13 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
 
         ArrayList<RecipeImage> deletedImages = new ArrayList<>();
         if (savedInstanceState != null) {
+            Log.d(TAG, "onActivityCreated: savedInstanceState != null");
+
             recipeImages = Parcels.unwrap(savedInstanceState.getParcelable(STATE_IMAGES));
             deletedImages = Parcels.unwrap(savedInstanceState.getParcelable(STATE_DELETED_ITEMS));
         } else {
+            Log.d(TAG, "onActivityCreated: savedInstanceState == null");
+
             recipeImages = new ArrayList<>();
             if (recipeProvider.getRecipe().getId() != 0) {
                 recipeImages = recipeProvider.getRecipe().getImages(getParentImageType());
@@ -205,5 +214,102 @@ abstract public class EditRecipeWithImageList extends EditRecipeFragment impleme
         RecipeImage image = new RecipeImage();
         image.setFileName(file.getName());
         imageAdapter.addImage(image);
+    }
+
+
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onInflate(Context context, AttributeSet attrs, Bundle savedInstanceState) {
+        super.onInflate(context, attrs, savedInstanceState);
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        Log.d(TAG, String.format("%s: %s", this.getClass(), getMethodName()));
+    }
+
+    public static String getMethodName() {
+        return Thread.currentThread().getStackTrace()[4].getMethodName();
     }
 }

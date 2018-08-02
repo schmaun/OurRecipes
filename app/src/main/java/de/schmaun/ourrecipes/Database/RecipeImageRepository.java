@@ -198,6 +198,7 @@ public class RecipeImageRepository {
                 break;
             case 8:
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_PARENT_TYPE + " INTEGER");
+                db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMN_NAME_PARENT_TYPE + "=" + RecipeImage.PARENT_TYPE_META);
                 break;
             case 9:
                 db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_NAME_FILENAME + " TEXT");

@@ -3,6 +3,11 @@ package de.schmaun.ourrecipes.EditRecipe;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +24,11 @@ import de.schmaun.ourrecipes.Database.DbHelper;
 import de.schmaun.ourrecipes.Database.LabelsRepository;
 import de.schmaun.ourrecipes.Model.Label;
 import de.schmaun.ourrecipes.Model.Recipe;
+import de.schmaun.ourrecipes.Model.RecipeImage;
 import de.schmaun.ourrecipes.R;
 import de.schmaun.ourrecipes.RecipeFormInterface;
 
-public class EditRecipeMetaFragment extends EditRecipeFragment implements RecipeFormInterface {
+public class EditRecipeMetaFragment extends EditRecipeWithImageList {
     private TextView nameView;
     private TextView notesView;
     private MaterialMultiAutoCompleteTextView labelsView;
@@ -32,14 +38,19 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    int getParentImageType() {
+        return RecipeImage.PARENT_TYPE_META;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.d(TAG, "EditRecipeIngredientsFragment: onCreateView");
+
         View rootView = inflater.inflate(R.layout.fragment_edit_recipe_meta, container, false);
+
+        createView(rootView, this);
 
         nameView = (TextView) rootView.findViewById(R.id.edit_recipe_name);
         labelsView = (MaterialMultiAutoCompleteTextView) rootView.findViewById(R.id.edit_recipe_labels);
@@ -84,6 +95,8 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
         recipe.setName(nameView.getText().toString());
         recipe.setNotes(notesView.getText().toString());
         recipe.setLabels(parseLabels());
+        recipe.setImages(recipeImages);
+        recipe.setImagesToDelete(imageAdapter.getDeletedImages());
 
         return recipe;
     }
@@ -118,5 +131,6 @@ public class EditRecipeMetaFragment extends EditRecipeFragment implements Recipe
 
     @Override
     public void onSaved() {
+        removeDeletedImageFiles();
     }
 }
