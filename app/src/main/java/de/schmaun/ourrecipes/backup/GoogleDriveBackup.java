@@ -196,6 +196,7 @@ public class GoogleDriveBackup {
             initDriveClient();
         } catch (NotSignedInException e) {
             onResultListener.onError(e);
+            return;
         }
 
         final Task<DriveFolder> folder;

@@ -22,6 +22,18 @@
         android:text="@string/sign_in_description"
         />
 
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/sign_in_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:ellipsize="end"
+        android:textAppearance="@style/RecipeView.Text"
+        android:text="@string/sign_in_error"
+        android:textColor="@color/colorAccent"
+        />
+
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"

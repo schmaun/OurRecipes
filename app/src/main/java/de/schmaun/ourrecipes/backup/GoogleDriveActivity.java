@@ -117,6 +117,10 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
     protected void onStart() {
         super.onStart();
 
+        if (backupServiceConnection == null) {
+            backupServiceConnection = new BackupServiceConnection();
+        }
+
         bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
         sendMessageToService(Message.obtain(null, BackupService.MESSAGE_BACKUP_STATUS));
     }

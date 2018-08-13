@@ -29,6 +29,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     private Button signOutButton;
     private TextView currentAccount;
     private TextView currentAccountHeadline;
+    private TextView signInError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         signOutButton = (Button) findViewById(R.id.sign_out_button);
         currentAccountHeadline = (TextView) findViewById(R.id.sign_in_current_account_headline);
         currentAccount = (TextView) findViewById(R.id.sign_in_current_account);
+        signInError = (TextView) findViewById(R.id.sign_in_error);
 
         signInButton.setOnClickListener(this);
         signOutButton.setOnClickListener(this);
@@ -62,6 +64,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void updateView(GoogleSignInAccount account) {
+        signInError.setVisibility(View.GONE);
         if (account != null) {
             signInButton.setVisibility(View.GONE);
 
@@ -77,6 +80,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             currentAccountHeadline.setVisibility(View.GONE);
             currentAccount.setVisibility(View.GONE);
         }
+    }
+
+    private void showError(ApiException e) {
+        signInError.setVisibility(View.VISIBLE);
+        Log.e(TAG, "Error", e);
     }
 
     @Override
@@ -123,6 +131,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         } catch (ApiException e) {
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             updateView(null);
+            showError(e);
         }
     }
 }

@@ -32,6 +32,8 @@
             android:title="@string/pref_title_backup_to_google_drive_status"
             android:summary="@string/pref_description_backup_to_google_drive_status"
             android:dependency="backup_to_google_drive_enabled"
+            android:key="backup_to_google_drive"
+            android:enabled="false"
             >
             <intent
                 android:action="android.intent.action.VIEW"

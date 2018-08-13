@@ -200,6 +200,7 @@
     <string name="pref_title_backup_to_google_drive_status">Backup and Restore</string>
     <string name="pref_description_backup_to_google_drive_account_na">Click here to sign in</string>
     <string name="pref_description_backup_to_google_drive_status">Click here to view backup status or create a backup manually or restore a backup</string>
+    <string name="pref_description_backup_to_google_drive_status_not_logged_in">Click here to view backup status or create a backup manually or restore a backup. Please sign in first.</string>
     <string name="title_activity_sign_in">Sign in</string>
     <string name="sign_out_button">Sign Out</string>
     <string name="sign_in_description">To use the backup functionality you have to sign in with your Google Account.</string>
@@ -238,4 +239,5 @@
     <string name="backup_google_drive_restore_finished_dialog_content">Restore of database finished. You can use the app while the images are being restored in the background. We now need a restart of this App.</string>
     <string name="backup_google_drive_restore_finished_dialog_ok">Restart OurRecipes</string>
     <string name="backup_google_drive_restore_error_dialog_content">Sorry. Restore failed. Let\'s hope nothing is broken after that :(</string>
+    <string name="sign_in_error">Error while signing in. Please check your network connection or other random things might causing this.</string>
 </resources>

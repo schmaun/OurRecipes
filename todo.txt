@@ -6,3 +6,32 @@ scrolling in edit blöde tabs fixen
 zufallsgenerator "was gibs heute zu essen"
 
 recipe tab input feld nicht sichtbar
+
+
+
+
+
+
+
+
+
+2018-08-13 23:04:31.744 10356-10423/de.schmaun.ourrecipes D/BackupService: sendMessageToClients: 4
+2018-08-13 23:08:04.144 10356-10356/de.schmaun.ourrecipes E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: de.schmaun.ourrecipes, PID: 10356
+    java.lang.IllegalArgumentException: connection is null
+        at android.app.ContextImpl.bindServiceCommon(ContextImpl.java:1483)
+        at android.app.ContextImpl.bindService(ContextImpl.java:1458)
+        at android.content.ContextWrapper.bindService(ContextWrapper.java:636)
+        at de.schmaun.ourrecipes.backup.GoogleDriveActivity.onStart(GoogleDriveActivity.java:120)
+        at android.app.Instrumentation.callActivityOnStart(Instrumentation.java:1299)
+        at android.app.Activity.performStart(Activity.java:6690)
+        at android.app.Activity.performRestart(Activity.java:6764)
+        at android.app.ActivityThread.handleSleeping(ActivityThread.java:4293)
+        at android.app.ActivityThread.-wrap23(ActivityThread.java)
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1701)
+        at android.os.Handler.dispatchMessage(Handler.java:102)
+        at android.os.Looper.loop(Looper.java:173)
+        at android.app.ActivityThread.main(ActivityThread.java:6523)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:938)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:828)
