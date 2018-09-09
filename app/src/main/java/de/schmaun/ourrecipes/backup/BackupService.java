@@ -14,6 +14,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
+import com.google.android.gms.drive.DriveId;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -32,12 +34,15 @@ public class BackupService extends IntentService {
     public static final int MESSAGE_UNREGISTER = 2;
     public static final int MESSAGE_BACKUP_STATUS = 3;
     public static final int MESSAGE_PLEASE_UNBIND_FROM_ME = 4;
+    public static final int MESSAGE_RESTORE_IMAGES_SUCCESS = 5;
+    public static final int MESSAGE_RESTORE_IMAGES_ERROR = 6;
 
-    static final int JOB_ID_BACKUP = 1001;
-    static final int JOB_ID_RESTORE = 1002;
+    public static final String INTENT_VALUE_DRIVE_ID = "driveId";
+
     private static final int BACKUP_GOOGLE_DRIVE_FINISHED_NOTIFICATION_ID = 1000;
     private static final int BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID = 1001;
     private static final String TAG = "BackupService";
+
 
     private boolean running;
     ArrayList<Messenger> clients = new ArrayList<Messenger>();
@@ -77,7 +82,8 @@ public class BackupService extends IntentService {
             if (ACTION_BACKUP.equals(currentAction)) {
                 handleActionBackup();
             } else if (ACTION_RESTORE_IMAGES.equals(currentAction)) {
-                handleActionRestoreImages();
+                String driveId = intent.getStringExtra(INTENT_VALUE_DRIVE_ID);
+                handleActionRestoreImages(DriveId.decodeFromString(driveId));
             }
         }
     }
@@ -105,21 +111,23 @@ public class BackupService extends IntentService {
         });
     }
 
-    private void handleActionRestoreImages() {
-/*        startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.restoreBackupInProgress(this));
+    private void handleActionRestoreImages(DriveId driveId) {
+        startForeground(BACKUP_GOOGLE_DRIVE_PROGRESS_NOTIFICATION_ID, Notifications.restoreBackupInProgress(this));
 
         GoogleDriveBackup googleDriveBackup = new GoogleDriveBackup(this);
-        googleDriveBackup.restoreImages(new GoogleDriveBackup.OnResultListener() {
+        googleDriveBackup.restoreImages(driveId, new GoogleDriveBackup.OnResultListener() {
             @Override
             public void onSuccess() {
                 BackupService.this.onSuccessRestore();
+                sendMessageToClients(Message.obtain(null, MESSAGE_RESTORE_IMAGES_SUCCESS));
             }
 
             @Override
             public void onError(Exception e) {
                 BackupService.this.onErrorRestore(e);
+                sendMessageToClients(Message.obtain(null, MESSAGE_RESTORE_IMAGES_ERROR));
             }
-        });*/
+        });
     }
 
     private void onSuccessBackup() {

@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -136,20 +137,20 @@ public class GoogleDriveBackup {
 
                         return getDriveResourceClient().openFile(file, DriveFile.MODE_READ_ONLY);
                     }).addOnSuccessListener(driveContents -> {
-                        try {
-                            File database = context.getDatabasePath(DbHelper.DATABASE_NAME);
-                            OutputStream output = new FileOutputStream(database);
-                            Stream.copy(driveContents.getInputStream(), output);
+                try {
+                    File database = context.getDatabasePath(DbHelper.DATABASE_NAME);
+                    OutputStream output = new FileOutputStream(database);
+                    Stream.copy(driveContents.getInputStream(), output);
 
-                            onResultListener.onSuccess();
-                        } catch (java.io.IOException e) {
-                            Log.e(TAG, "restoreDatabase failed: IOException", e);
-                            onResultListener.onError(e);
-                        }
-                    }).addOnFailureListener(e -> {
-                        Log.e(TAG, "restoreDatabase failed", e);
-                        onResultListener.onError(e);
-                    });
+                    onResultListener.onSuccess();
+                } catch (java.io.IOException e) {
+                    Log.e(TAG, "restoreDatabase failed: IOException", e);
+                    onResultListener.onError(e);
+                }
+            }).addOnFailureListener(e -> {
+                Log.e(TAG, "restoreDatabase failed", e);
+                onResultListener.onError(e);
+            });
         } catch (NotSignedInException e) {
             onResultListener.onError(e);
         }
@@ -334,6 +335,49 @@ public class GoogleDriveBackup {
         Tasks.await(Tasks.whenAll(tasks));
 
         Log.d(TAG, "uploadImages: finished upload");
+    }
+
+    public void restoreImages(DriveId folderId, OnResultListener onResultListener) {
+        try {
+            initDriveClient();
+
+            Query query = new Query.Builder()
+                    .addFilter(Filters.eq(SearchableField.TITLE, "images"))
+                    .build();
+
+            Log.d(TAG, "restoreImages: starting restoring of images from " + folderId.encodeToString());
+
+            /** das hier ist der images folder.. da drinnen müssen noch die images geladen werden */
+            Task<MetadataBuffer> queryTask = getDriveResourceClient().queryChildren(folderId.asDriveFolder(), query);
+            queryTask.addOnSuccessListener(
+                    metadataBuffer -> {
+                        for (int i = 0; i < metadataBuffer.getCount(); i++) {
+                            Metadata metadata = metadataBuffer.get(i);
+                            getDriveResourceClient().openFile(metadata.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY)
+                                    .continueWithTask(task -> {
+                                        DriveContents contents = task.getResult();
+                                        OutputStream output = new FileOutputStream(metadata.getTitle());
+                                        Stream.copy(contents.getInputStream(), output);
+
+                                        return getDriveResourceClient().discardContents(contents);
+                                    })
+                                    .addOnSuccessListener(driveContents -> {
+                                        Log.d(TAG, String.format("Image download: %s -> %s", metadata.getDriveId().encodeToString(), metadata.getTitle()));
+                                    })
+                                    .addOnFailureListener(e -> Log.e(TAG, "Image download failed: " + metadata.getTitle(), e));
+                        }
+                    })
+                    .addOnSuccessListener(command -> {
+                        Log.d(TAG, "restoreImages: finished download");
+                        onResultListener.onSuccess();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "restoreImages: error", e);
+                        onResultListener.onError(e);
+                    });
+        } catch (NotSignedInException e) {
+            onResultListener.onError(e);
+        }
     }
 
     @NonNull

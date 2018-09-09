@@ -25,11 +25,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.drive.DriveId;
 
 import java.util.ArrayList;
 
+import de.schmaun.ourrecipes.Application;
 import de.schmaun.ourrecipes.Configuration;
+import de.schmaun.ourrecipes.Dialogs;
 import de.schmaun.ourrecipes.R;
 
 public class GoogleDriveActivity extends AppCompatActivity implements BackupListAdapter.RestoreHandler {
@@ -46,6 +49,7 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
 
     private ServiceConnection backupServiceConnection = new BackupServiceConnection();
     private boolean isRunningBackup = false;
+    private MaterialDialog restoreImagesProgressDialog;
 
     class BackupServiceConnection implements ServiceConnection {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -73,6 +77,12 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
                     isRunningBackup = message.getData().getBoolean("data");
                     updateView();
                     break;
+                case BackupService.MESSAGE_RESTORE_IMAGES_SUCCESS:
+                    if (restoreImagesProgressDialog != null) {
+                        restoreImagesProgressDialog.dismiss();
+                    }
+                    Dialogs.showRestoreImageSuccess(GoogleDriveActivity.this);
+                    break;
                 default:
                     super.handleMessage(message);
             }
@@ -82,6 +92,15 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        String restoreImagesDriveId = intent.getStringExtra(Application.RESTORE_DRIVE_ID);
+        if (restoreImagesDriveId != null) {
+            Log.d(TAG, "Starting image restore for int: " + restoreImagesDriveId);
+            restoreImagesProgressDialog = Dialogs.showRestoreImagesProgress(this);
+            startImagesRestore(restoreImagesDriveId);
+        }
+
         setContentView(R.layout.activity_backup_google_drive);
 
         startBackupButton = (Button) findViewById(R.id.backup_google_drive_start_backup);
@@ -117,12 +136,15 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
     protected void onStart() {
         super.onStart();
 
+        createServiceConnection();
+        bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
+        sendMessageToService(Message.obtain(null, BackupService.MESSAGE_BACKUP_STATUS));
+    }
+
+    private void createServiceConnection() {
         if (backupServiceConnection == null) {
             backupServiceConnection = new BackupServiceConnection();
         }
-
-        bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
-        sendMessageToService(Message.obtain(null, BackupService.MESSAGE_BACKUP_STATUS));
     }
 
     @Override
@@ -148,11 +170,22 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
     }
 
     private void startBackup() {
+        createServiceConnection();
+
         Intent intent = new Intent(this, BackupService.class);
         intent.setAction(BackupService.ACTION_BACKUP);
-        startService(intent);
 
-        bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
+        startIntentInService(intent);
+    }
+
+    public void startImagesRestore(String backupFolderId) {
+        createServiceConnection();
+
+        Intent intent = new Intent(this, BackupService.class);
+        intent.setAction(BackupService.ACTION_RESTORE_IMAGES);
+        intent.putExtra(BackupService.INTENT_VALUE_DRIVE_ID, backupFolderId);
+
+        startIntentInService(intent);
     }
 
     public void startDatabaseRestore(DriveId backupFolderId,  GoogleDriveBackup.OnResultListener restoreFinishedCallback) {
@@ -160,11 +193,8 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
         googleDriveBackup.restoreDatabase(backupFolderId, restoreFinishedCallback);
     }
 
-    public void startImagesRestore() {
-        Intent intent = new Intent(this, BackupService.class);
-        intent.setAction(BackupService.ACTION_RESTORE_IMAGES);
+    private void startIntentInService(Intent intent) {
         startService(intent);
-
         bindService(new Intent(this, BackupService.class), backupServiceConnection, BIND_AUTO_CREATE);
     }
 

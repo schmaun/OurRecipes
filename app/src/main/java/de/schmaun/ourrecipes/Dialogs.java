@@ -15,6 +15,23 @@ public class Dialogs {
                 .show();
     }
 
+    public static MaterialDialog showRestoreImagesProgress(Context context) {
+        return new MaterialDialog.Builder(context)
+                .title(R.string.backup_google_drive_restore_dialog_title)
+                .content(R.string.backup_google_drive_restore_images_progress_content)
+                .progress(true, 0)
+                .progressIndeterminateStyle(true)
+                .show();
+    }
+
+    public static MaterialDialog showRestoreImageSuccess(Context context) {
+        return new MaterialDialog.Builder(context)
+                .title(R.string.backup_google_drive_restore_dialog_title)
+                .content(R.string.backup_google_drive_restore_images_finished_content)
+                .positiveText(R.string.backup_google_drive_restore_finished_dialog_ok)
+                .show();
+    }
+
     public static MaterialDialog showRestoreFailed(Context context) {
         return new MaterialDialog.Builder(context)
                 .title(R.string.backup_google_drive_restore_dialog_title)
@@ -24,13 +41,13 @@ public class Dialogs {
                 .show();
     }
 
-    public static MaterialDialog showRestoreSuccess(Context context) {
+    public static MaterialDialog showRestoreSuccess(Context context, MaterialDialog.SingleButtonCallback onAny) {
         return new MaterialDialog.Builder(context)
                 .title(R.string.backup_google_drive_restore_dialog_title)
                 .content(R.string.backup_google_drive_restore_finished_dialog_content)
                 .positiveText(R.string.backup_google_drive_restore_finished_dialog_ok)
                 .cancelable(false)
-                .onAny((dialog1, which1) -> Application.restart(context))
+                .onAny(onAny)
                 .show();
     }
 

@@ -15,6 +15,7 @@ import com.google.android.gms.drive.DriveId;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import de.schmaun.ourrecipes.Application;
 import de.schmaun.ourrecipes.Dialogs;
 import de.schmaun.ourrecipes.R;
 
@@ -68,7 +69,9 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ho
                             @Override
                             public void onSuccess() {
                                 progressDialog.dismiss();
-                                Dialogs.showRestoreSuccess(context);
+                                Dialogs.showRestoreSuccess(context, (dialog1, which1) -> {
+                                    Application.restartWithImageRestore(context, backup.getFolderId());
+                                });
                             }
 
                             @Override
