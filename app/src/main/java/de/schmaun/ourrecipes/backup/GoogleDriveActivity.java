@@ -178,6 +178,10 @@ public class GoogleDriveActivity extends AppCompatActivity implements BackupList
         startIntentInService(intent);
     }
 
+    public void startImagesRestore(DriveId backupFolderId) {
+        startImagesRestore(backupFolderId.encodeToString());
+    }
+
     public void startImagesRestore(String backupFolderId) {
         createServiceConnection();
 

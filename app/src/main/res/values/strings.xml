@@ -236,8 +236,8 @@
     <string name="backup_google_drive_restore_dialog_content">Restore backup from %s? This will overwrite all your current recipes and images!</string>
     <string name="backup_google_drive_restore_dialog_negative">No, Cancel</string>
     <string name="backup_google_drive_restore_dialog_positive">Yes, restore!</string>
-    <string name="backup_google_drive_restore_finished_dialog_content">Restore of database finished. You can use the app while the images are being restored in the background. We now need a restart of this App.</string>
-    <string name="backup_google_drive_restore_finished_dialog_ok">Restart OurRecipes</string>
+    <string name="backup_google_drive_restore_finished_dialog_content">Restore of database finished. You can use the app while the images are being restored in the background. We now move to the start screen.</string>
+    <string name="backup_google_drive_restore_finished_dialog_ok">Okay</string>
     <string name="backup_google_drive_restore_error_dialog_content">Sorry. Restore failed. Let\'s hope nothing is broken after that :(</string>
     <string name="backup_google_drive_restore_images_progress_content">Images are now being restored. You can continue using this app while restoring is in progress. Check the notifications for progress.</string>
     <string name="backup_google_drive_restore_images_finished_content">Restore of images finished.</string>

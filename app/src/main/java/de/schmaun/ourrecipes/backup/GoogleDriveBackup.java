@@ -20,11 +20,7 @@ import com.google.android.gms.drive.metadata.CustomPropertyKey;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
-import com.google.android.gms.drive.query.SortOrder;
-import com.google.android.gms.drive.query.SortableField;
 import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.gson.Gson;
@@ -32,9 +28,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -347,34 +341,55 @@ public class GoogleDriveBackup {
 
             Log.d(TAG, "restoreImages: starting restoring of images from " + folderId.encodeToString());
 
-            /** das hier ist der images folder.. da drinnen müssen noch die images geladen werden */
             Task<MetadataBuffer> queryTask = getDriveResourceClient().queryChildren(folderId.asDriveFolder(), query);
-            queryTask.addOnSuccessListener(
-                    metadataBuffer -> {
-                        for (int i = 0; i < metadataBuffer.getCount(); i++) {
-                            Metadata metadata = metadataBuffer.get(i);
-                            getDriveResourceClient().openFile(metadata.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY)
-                                    .continueWithTask(task -> {
-                                        DriveContents contents = task.getResult();
-                                        OutputStream output = new FileOutputStream(metadata.getTitle());
-                                        Stream.copy(contents.getInputStream(), output);
+            queryTask.continueWithTask(task -> {
+                DriveFolder imageFolder = task.getResult().get(0).getDriveId().asDriveFolder();
+                Query queryImages = new Query.Builder()
+                        .build();
 
-                                        return getDriveResourceClient().discardContents(contents);
-                                    })
-                                    .addOnSuccessListener(driveContents -> {
-                                        Log.d(TAG, String.format("Image download: %s -> %s", metadata.getDriveId().encodeToString(), metadata.getTitle()));
-                                    })
-                                    .addOnFailureListener(e -> Log.e(TAG, "Image download failed: " + metadata.getTitle(), e));
-                        }
-                    })
-                    .addOnSuccessListener(command -> {
-                        Log.d(TAG, "restoreImages: finished download");
-                        onResultListener.onSuccess();
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "restoreImages: error", e);
-                        onResultListener.onError(e);
-                    });
+                return getDriveResourceClient().queryChildren(imageFolder, queryImages);
+            }).continueWith(task -> {
+                MetadataBuffer metadataBuffer = task.getResult();
+
+                Collection<Task<?>> tasks = new ArrayList<>();
+
+                for (int i = 0; i < metadataBuffer.getCount(); i++) {
+                    Metadata metadata = metadataBuffer.get(i);
+                    tasks.add(
+                            getDriveResourceClient().openFile(metadata.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY).continueWithTask(imageFileTask -> {
+                                DriveContents contents = imageFileTask.getResult();
+
+                                File storageDir = context.getExternalFilesDir(Configuration.IMAGE_PATH);
+                                File file = new File(storageDir + File.separator + metadata.getTitle());
+                                OutputStream output = new FileOutputStream(file);
+
+                                Log.d(TAG, String.format("Image download started: %s", file.toString()));
+
+                                Stream.copy(contents.getInputStream(), output);
+                                Thread.sleep(4000);
+
+                                return getDriveResourceClient().discardContents(contents);
+                            }).addOnSuccessListener(driveContents -> {
+                                Log.d(TAG, String.format("Image downloaded: %s", metadata.getTitle()));
+                            }).addOnFailureListener(e -> Log.e(TAG, "Image download failed: " + metadata.getTitle(), e))
+                    );
+                }
+
+                //return Tasks.whenAll(tasks);
+                Task<Void> tasksTask = Tasks.whenAll(tasks);
+                //return tasksTask;
+
+                return tasks;
+            }).continueWith(task -> {
+                Collection<Task<?>> result = task.getResult();
+                return Tasks.whenAll(result);
+            }).addOnSuccessListener(command -> {
+                Log.d(TAG, "restoreImages: finished download");
+                onResultListener.onSuccess();
+            }).addOnFailureListener(e -> {
+                Log.e(TAG, "restoreImages: error", e);
+                onResultListener.onError(e);
+            });
         } catch (NotSignedInException e) {
             onResultListener.onError(e);
         }
